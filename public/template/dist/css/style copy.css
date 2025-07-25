@@ -1,0 +1,327 @@
+html, body {
+    height: 100%;
+    overflow: hidden !important;
+    font-size: 14px;
+}
+
+.content-wrapper {
+    flex-grow: 1;
+    min-height: 100vh;
+    background: #f5f6fa;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin-top: -2px !important;
+    overflow-y: scroll;
+}
+
+.content-header {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    margin-bottom: 0.5rem;
+    /* margin-left: 13px; */
+}
+
+.header-cont{
+    margin-left: 30px;
+}
+
+.content-header .rounded-circle {
+    width: 40px;
+    height: 40px;
+    background: #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-right: 0.5rem;
+}
+
+.content-header .fa-user {
+    font-size: 1.25rem;
+    color: #6c757d;
+}
+
+.main-sidebar,
+.custom-sidebar {
+    width: 80px !important;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    z-index: 1030;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    padding-top: 8px;
+}
+
+.main-sidebar .sidebar,
+.custom-sidebar .sidebar {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-sidebar .sidebar hr,
+.main-sidebar .sidebar .nav,
+.main-sidebar .sidebar-menu,
+.main-sidebar .sidebar .user-panel,
+.main-sidebar .sidebar .form-inline {
+    display: none !important;
+}
+
+.custom-sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    width: 85%;
+}
+
+.custom-sidebar-menu li {
+    margin-top: 5px;
+}
+
+.custom-sidebar-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 70px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    color: #bbb;
+    text-align: center;
+}
+
+.custom-sidebar-link .icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+    color: #bbb;
+}
+
+.custom-sidebar-link.active,
+.custom-sidebar-link:hover {
+    background-color: #fc204f;
+    color: #fff;
+    border-radius: 10px;
+}
+
+.custom-sidebar-link.active .icon,
+.custom-sidebar-link:hover .icon {
+    color: #fff;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #fc204f !important;
+    border-color: #fc204f !important;
+}
+
+.btn-outline-primary {
+    border-radius: 25px;
+    background-color: #ffffff;
+    border: 1px solid #fc204f;
+    color: #666;
+}
+
+.btn-outline-primary:hover {
+    background-color: #fc204f;
+    color: #fff;
+}
+
+/* Price Button */
+.button-price {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 44px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 120px;
+}
+
+.button-price .circle-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: #fff;
+    color: #fc204f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.button-price .price-text {
+    margin: 0 auto;
+    text-align: center;
+    z-index: 1;
+    width: 100%;
+}
+
+/* Category Button */
+.category-btn {
+    width: 75px;
+    height: 85px;
+    border-radius: 12px;
+    border: 1px solid #c4c4c4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #fff;
+    transition: 0.3s ease;
+    margin-right: 8px;
+}
+
+.category-btn i {
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: #999;
+}
+
+.category-btn .label {
+    font-size: 14px;
+    color: #666;
+}
+
+.category-btn.active {
+    background-color: #fff;
+    border: 1px solid #e4b083;
+}
+
+.category-btn.active i,
+.category-btn.active .label,
+.category-btn:hover i,
+.category-btn:hover .label {
+    color: #fc204f;
+}
+
+.category-btn:hover {
+    background-color: #f5f5f5;
+    border: 1px solid #e4b083;
+}
+
+/* Order Box */
+.order-box {
+    height: 100vh;
+    background: #f9fafb;
+    padding: 24px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.order-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.order-box::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.order-box::-webkit-scrollbar-thumb {
+    background: #fc204f;
+    border-radius: 4px;
+}
+
+/* -------- RESPONSIVE -------- */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .category-btn {
+        width: 65px;
+        height: 75px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    html {
+        font-size: 13px;
+    }
+    .main-sidebar,
+    .custom-sidebar {
+        width: 60px !important;
+        padding-top: 10px;
+    }
+    .order-box {
+        height: 60vh;
+        padding: 12px 8px;
+    }
+    .category-btn {
+        width: 55px;
+        height: 65px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    html {
+        font-size: 12px;
+    }
+    .main-sidebar,
+    .custom-sidebar {
+        width: 48px !important;
+    }
+    .order-box {
+        height: 45vh;
+        padding: 6px 2px;
+    }
+    .category-btn {
+        width: 40px;
+        height: 48px;
+    }
+    .button-price {
+        min-width: 70px;
+        padding-left: 28px;
+        font-size: 12px;
+    }
+    .button-price .circle-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        left: 4px;
+    }
+}
+
+/* Extra small screens (max-width: 350px) */
+@media (max-width: 350px) {
+    html {
+        font-size: 11px;
+    }
+    .main-sidebar,
+    .custom-sidebar {
+        width: 36px !important;
+    }
+    .order-box {
+        height: 35vh;
+        padding: 2px 1px;
+    }
+    .category-btn {
+        width: 28px;
+        height: 32px;
+        font-size: 8px;
+    }
+}
