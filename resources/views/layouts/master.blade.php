@@ -129,10 +129,7 @@
     </div>
     
     @include('script.masterScript')
-    {{-- @include('script.userScript')
-    @include('script.createPpmpScript')
-    @include('script.itemSettingScript')
-    @include('script.itemScript')
-    @include('script.ppmpScript') --}}
+    {{-- @include('script.userScript') --}}
+    @include('script.productScript') 
 </body>
 </html>

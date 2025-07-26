@@ -5,23 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class ProductPreset extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'barcode',
         'product_name',
-        'product_type',
-        'category',
-        'packaging',
-        'w_capital',
-        'w_price',
-        'w_unit',
-        'r_capital',
-        'r_price',
-        'r_unit',
-        'image',
     ];
-
 }

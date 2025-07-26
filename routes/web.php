@@ -34,6 +34,9 @@ Route::group(['middleware' => ['login_auth']], function() {
         Route::post('/edit',[ProductController::class,'productEdit'])->name('productEdit');
         Route::get('/update',[ProductController::class,'productUpdate'])->name('productUpdate');
         Route::get('/delete',[ProductController::class,'productDelete'])->name('productDelete');
+
+        Route::get('/presets', [ProductController::class, 'getProductPresets'])->name('getProductPresets');
+        Route::get('/next-barcode', [ProductController::class, 'getNextBarcode'])->name('getNextBarcode');
     });
 
     Route::prefix('myaccount')->group(function() {
