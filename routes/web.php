@@ -30,7 +30,7 @@ Route::group(['middleware' => ['login_auth']], function() {
 
     Route::prefix('products')->group(function() {
         Route::get('/',[MasterController::class,'productRead'])->name('productRead');
-        Route::get('/create',[ProductController::class,'productCreate'])->name('productCreate');
+        Route::post('/create',[ProductController::class,'productCreate'])->name('productCreate');
         Route::post('/edit',[ProductController::class,'productEdit'])->name('productEdit');
         Route::get('/update',[ProductController::class,'productUpdate'])->name('productUpdate');
         Route::get('/delete',[ProductController::class,'productDelete'])->name('productDelete');

@@ -43,7 +43,7 @@
                             <div class="panel panel-default">
                                 <div class="panel-heading">ADD PRODUCT</div>
                                 <div class="panel-body bg-form">
-                                    <form class="p-2" id="product_form_data" method="POST" action="{{ isset($productedit) ? route('productUpdate', $productedit->id) : route('productCreate') }}">
+                                    <form class="p-2" id="product_form_data" method="POST" action="{{ isset($productedit) ? route('productUpdate', $productedit->id) : route('productCreate') }}" enctype="multipart/form-data">
                                         @csrf
                                         @if(isset($productedit))
                                             @method('PUT')
@@ -51,8 +51,8 @@
                                         @endif
 
                                         <div class="form-group">
-                                            <label for="barcode">Barcode <i class="fas fa-sync"></i></label>
-                                            <input type="text" name="barcode" value="{{ $productedit->barcode ?? '' }}" class="form-control form-control-sm" onclick="generateBarcode()" id="barcode" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                            <label for="barcode">Barcode <i class="fas fa-sync" onclick="generateBarcode()"></i></label>
+                                            <input type="text" name="barcode" value="{{ $productedit->barcode ?? '' }}" class="form-control form-control-sm" id="barcode" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                             
                                             <label for="product_name">Product Name</label>
                                             <input type="text" name="product_name" value="{{ $productedit->product_name ?? '' }}" class="form-control form-control-sm" id="product_name" required>
@@ -67,17 +67,17 @@
                                             <label for="category">Category</label>
                                             <select name="category" id="category" class="form-control form-control-sm" required>
                                                 <option value="">-- Select Category --</option>
-                                                <option value="Drink" {{ ($productedit->category ?? '') == 'Drink' ? 'selected' : '' }}>Drink</option>
-                                                <option value="Vegetable" {{ ($productedit->category ?? '') == 'Vegetable' ? 'selected' : '' }}>Vegetable</option>
-                                                <option value="Grocery" {{ ($productedit->category ?? '') == 'Grocery' ? 'selected' : '' }}>Grocery</option>
-                                                <option value="Restaurant" {{ ($productedit->category ?? '') == 'Restaurant' ? 'selected' : '' }}>Restaurant</option>
-                                                <option value="Meat" {{ ($productedit->category ?? '') == 'Meat' ? 'selected' : '' }}>Meat</option>
-                                                <option value="Snacks" {{ ($productedit->category ?? '') == 'Snacks' ? 'selected' : '' }}>Snacks</option>
-                                                <option value="Others" {{ ($productedit->category ?? '') == 'Others' ? 'selected' : '' }}>Others</option>
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}" 
+                                                        {{ ($productedit->category ?? '') == $category->id ? 'selected' : '' }}>
+                                                        {{ $category->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
 
+
                                             <label for="packaging">Packaging</label>
-                                            <input type="text" name="packaging" value="{{ $productedit->packaging ?? '' }}" class="form-control form-control-sm" id="packaging" required>
+                                            <input type="number" name="packaging" value="{{ $productedit->packaging ?? '' }}" class="form-control form-control-sm" id="packaging" required>
 
                                              <label for="w_capital">Wholesale Capital</label>
                                             <input type="number" step="0.01" name="w_capital" value="{{ $productedit->w_capital ?? '' }}" class="form-control form-control-sm" id="whole_capital" required>
@@ -86,18 +86,13 @@
                                             <input type="number" step="0.01" name="w_price" value="{{ $productedit->w_price ?? '' }}" class="form-control form-control-sm" id="whole_price" required>
 
                                             <label for="w_unit">Wholesale Unit</label>
-                                            <select name="w_unit" id="w_unit" class="form-control form-control-sm" required>
+                                            <select name="w_unit" class="form-control form-control-sm" id="wholesale_unit">
                                                 <option value="">-- Select Unit --</option>
-                                                <option value="pc" {{ ($productedit->w_unit ?? '') == 'pc' ? 'selected' : '' }}>pc</option>
-                                                <option value="box" {{ ($productedit->w_unit ?? '') == 'box' ? 'selected' : '' }}>box</option>
-                                                <option value="pack" {{ ($productedit->w_unit ?? '') == 'pack' ? 'selected' : '' }}>pack</option>
-                                                <option value="bot" {{ ($productedit->w_unit ?? '') == 'bot' ? 'selected' : '' }}>bot</option>
-                                                <option value="can" {{ ($productedit->w_unit ?? '') == 'can' ? 'selected' : '' }}>can</option>
-                                                <option value="kg" {{ ($productedit->w_unit ?? '') == 'kg' ? 'selected' : '' }}>kg</option>
-                                                <option value="g" {{ ($productedit->w_unit ?? '') == 'g' ? 'selected' : '' }}>g</option>
-                                                <option value="ml" {{ ($productedit->w_unit ?? '') == 'ml' ? 'selected' : '' }}>ml</option>
-                                                <option value="ltr" {{ ($productedit->w_unit ?? '') == 'ltr' ? 'selected' : '' }}>ltr</option>
-                                                <option value="dozen" {{ ($productedit->w_unit ?? '') == 'dozen' ? 'selected' : '' }}>dozen</option>
+                                                @foreach ($units as $unit)
+                                                    <option value="{{ $unit->id }}" {{ ($productedit->w_unit ?? '') == $unit->id ? 'selected' : '' }}>
+                                                        {{ $unit->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
 
                                             <label for="r_capital">Retail Capital</label>
@@ -107,24 +102,19 @@
                                             <input type="number" step="0.01" name="r_price" value="{{ $productedit->r_price ?? '' }}" class="form-control form-control-sm" id="retail_price" required>
 
                                             <label for="r_unit">Retail Unit</label>
-                                            <select name="r_unit" id="r_unit" class="form-control form-control-sm" required>
+                                            <select name="r_unit" class="form-control form-control-sm" id="wholesale_unit" required>
                                                 <option value="">-- Select Unit --</option>
-                                                <option value="pc" {{ ($productedit->r_unit ?? '') == 'pc' ? 'selected' : '' }}>pc</option>
-                                                <option value="box" {{ ($productedit->r_unit ?? '') == 'box' ? 'selected' : '' }}>box</option>
-                                                <option value="pack" {{ ($productedit->r_unit ?? '') == 'pack' ? 'selected' : '' }}>pack</option>
-                                                <option value="bot" {{ ($productedit->r_unit ?? '') == 'bot' ? 'selected' : '' }}>bot</option>
-                                                <option value="can" {{ ($productedit->r_unit ?? '') == 'can' ? 'selected' : '' }}>can</option>
-                                                <option value="kg" {{ ($productedit->r_unit ?? '') == 'kg' ? 'selected' : '' }}>kg</option>
-                                                <option value="g" {{ ($productedit->r_unit ?? '') == 'g' ? 'selected' : '' }}>g</option>
-                                                <option value="ml" {{ ($productedit->r_unit ?? '') == 'ml' ? 'selected' : '' }}>ml</option>
-                                                <option value="ltr" {{ ($productedit->r_unit ?? '') == 'ltr' ? 'selected' : '' }}>ltr</option>
-                                                <option value="dozen" {{ ($productedit->r_unit ?? '') == 'dozen' ? 'selected' : '' }}>dozen</option>
+                                                @foreach ($units as $unit)
+                                                    <option value="{{ $unit->id }}" {{ ($productedit->r_unit ?? '') == $unit->id ? 'selected' : '' }}>
+                                                        {{ $unit->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
 
                                         <label for="image">Image</label>
-                                        <input type="file" name="image" value="{{ $productedit->image ?? '' }}" class="form-control form-control-sm" id="image" required>
-
+                                        <input type="file" name="image" class="form-control form-control-sm" id="image" {{ isset($productedit) ? '' : 'required' }}>
+                                        
 
                                         <button type="submit" class="btn btn-success mt-2">
                                             <i class="glyphicon glyphicon-save"></i> Save
@@ -161,14 +151,18 @@
                                                     <td>{{ $product->product_name }}</td>
                                                     <td>
                                                         <strong>Type:</strong> {{ ucfirst($product->product_type) ?? 'N/A' }}<br>
-                                                        <strong>Category:</strong> {{ $product->category }}<br>
-                                                        <strong>Packaging:</strong> {{ $product->packaging }}<br>
                                                     </td>
                                                     <td>₱{{ number_format($product->r_price, 2) }}</td>
                                                     <td>₱{{ number_format($product->w_price, 2) }}</td>
+                                                    <td>{{ number_format($product->rqty) }}</td>
+                                                    <td>{{ number_format($product->wqty) }}</td>
                                                     <td class="text-center">
-                                                        <a href="{{ route('productEdit', $product->id) }}" class="btn btn-primary btn-sm">Edit</a>
-                                                        <a href="#" class="btn btn-primary btn-sm">Delete</a>
+                                                        <a href="{{ route('productEdit', $product->id) }}" class="btn btn-sm btn-primary" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="#" class="btn btn-sm btn-danger" title="Delete">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             @endforeach

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Category;
+use App\Models\Unit;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
@@ -23,9 +25,11 @@ class MasterController extends Controller
     }
 
     public function productRead()
-    {
+    {   
+        $categories = Category::all();
+        $units = Unit::all();
         $products = Product::all();
-        return view('admin.products.index', compact('products'));
+        return view('admin.products.index', compact('categories', 'units', 'products'));
     }
     
     public function logout()
