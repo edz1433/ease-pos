@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 26, 2025 at 06:17 PM
+-- Generation Time: Aug 02, 2025 at 10:51 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -46,6 +46,38 @@ INSERT INTO `branch` (`id`, `branch_name`, `address`, `created_at`, `updated_at`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `icon` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`, `icon`, `created_at`, `updated_at`) VALUES
+(1, 'Drink', 'fas fa-glass-martini-alt', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(2, 'Vegetable', 'fas fa-carrot', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(3, 'Grocery', 'fas fa-shopping-basket', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(4, 'Meat', 'fas fa-drumstick-bite', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(5, 'Others', 'fas fa-ellipsis-h', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(6, 'Cooked Dish / Meal', 'fas fa-utensils', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(7, 'Burger', 'fas fa-hamburger', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(8, 'Pizza', 'fas fa-pizza-slice', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(9, 'Snack', 'fas fa-box', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(10, 'Soft Drink', 'fas fa-cocktail', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(11, 'Coffee', 'fas fa-mug-hot', '2025-07-27 20:42:54', '2025-07-27 20:42:54'),
+(12, 'Ice Cream', 'fas fa-ice-cream', '2025-07-27 20:42:54', '2025-07-27 20:42:54');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `products`
 --
 
@@ -62,11 +94,19 @@ CREATE TABLE `products` (
   `w_capital` decimal(10,2) DEFAULT NULL,
   `w_price` decimal(10,2) DEFAULT NULL,
   `w_unit` varchar(50) DEFAULT NULL,
-  `rqty` int(11) NOT NULL,
-  `wqty` int(11) NOT NULL,
+  `rqty` int(11) NOT NULL DEFAULT 0,
+  `wqty` int(11) NOT NULL DEFAULT 0,
+  `image` varchar(255) NOT NULL DEFAULT 'default-product.png',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `barcode`, `product_name`, `product_type`, `category`, `packaging`, `r_capital`, `r_price`, `r_unit`, `w_capital`, `w_price`, `w_unit`, `rqty`, `wqty`, `image`, `created_at`, `updated_at`) VALUES
+(1, '000000001', 'Cheese Burger', 2, '7', '1', 0.00, 45.00, '1', 0.00, 0.00, NULL, 0, 0, 'product_68862edf01db09.55855290.png', '2025-07-27 05:51:27', '2025-07-27 05:51:27');
 
 -- --------------------------------------------------------
 
@@ -60609,6 +60649,36 @@ INSERT INTO `product_presets` (`id`, `barcode`, `product_name`, `created_at`, `u
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `units`
+--
+
+CREATE TABLE `units` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `label` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `units`
+--
+
+INSERT INTO `units` (`id`, `name`, `label`, `created_at`, `updated_at`) VALUES
+(1, 'pc', 'piece', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(2, 'box', 'box', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(3, 'pack', 'pack', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(4, 'bot', 'bottle', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(5, 'can', 'can', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(6, 'kg', 'kilogram', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(7, 'g', 'gram', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(8, 'ml', 'milliliter', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(9, 'ltr', 'liter', '2025-07-27 13:11:12', '2025-07-27 13:11:12'),
+(10, 'dozen', 'dozen', '2025-07-27 13:11:12', '2025-07-27 13:11:12');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -60645,6 +60715,13 @@ ALTER TABLE `branch`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -60655,6 +60732,13 @@ ALTER TABLE `products`
 --
 ALTER TABLE `product_presets`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `units`
+--
+ALTER TABLE `units`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `users`
@@ -60673,16 +60757,28 @@ ALTER TABLE `branch`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `product_presets`
 --
 ALTER TABLE `product_presets`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60442;
+
+--
+-- AUTO_INCREMENT for table `units`
+--
+ALTER TABLE `units`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `users`
