@@ -28,7 +28,17 @@ class MasterController extends Controller
     {   
         $categories = Category::all();
         $units = Unit::all();
-        $products = Product::all();
+        $products = Product::select(
+            'products.*',
+            'categories.name as category_name',
+            'r_unit.name as r_unit_name',
+            'w_unit.name as w_unit_name'
+        )
+        ->leftJoin('categories', 'products.category', '=', 'categories.id')
+        ->leftJoin('units as r_unit', 'products.r_unit', '=', 'r_unit.id')
+        ->leftJoin('units as w_unit', 'products.w_unit', '=', 'w_unit.id')
+        ->get();
+
         return view('admin.products.index', compact('categories', 'units', 'products'));
     }
     

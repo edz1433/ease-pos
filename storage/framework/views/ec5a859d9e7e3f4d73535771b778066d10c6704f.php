@@ -80,7 +80,7 @@ $(document).ready(function () {
 
         if (barcode.length > 0) {
             $.ajax({
-                url: '{{ route("getProductPresets") }}',
+                url: '<?php echo e(route("getProductPresets")); ?>',
                 method: 'GET',
                 data: { barcode: barcode },
                 success: function (response) {
@@ -96,7 +96,7 @@ $(document).ready(function () {
 </script>
 <script>
     function generateBarcode() {
-        fetch('{{ route('getNextBarcode') }}')
+        fetch('<?php echo e(route('getNextBarcode')); ?>')
             .then(response => response.json())
             .then(data => {
                 document.getElementById('barcode').value = data.next_barcode;
@@ -152,3 +152,4 @@ $(document).ready(function () {
     }
 </script>
 
+<?php /**PATH C:\xampp\htdocs\ease-pos\resources\views/script/productScript.blade.php ENDPATH**/ ?>
