@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /ease-pos/
+
+    # Redirect root requests to /public
+    RewriteRule ^$ public/ [L,R=302]
+
+    # Optional: if someone visits without slash, send to public
+    RewriteRule ^index\.php$ public/ [L,R=302]
+</IfModule>

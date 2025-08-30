@@ -13,9 +13,8 @@ class UserController extends Controller
     public function userEdit(Request $request)
     {
         $useredit = User::find($request->id);
-        $type = Type::all();
         $users = User::all();
-        return view('users.index', compact('users', 'type', 'useredit'));
+        return view('admin.users.index', compact('users', 'useredit'));
     }
 
     public function userCreate(Request $request)
@@ -24,59 +23,105 @@ class UserController extends Controller
             'lname' => 'required|string|max:255',
             'fname' => 'required|string|max:255',
             'mname' => 'required|string|max:255',
-            'position' => 'required|string',
-            'office' => 'required|string|max:255',
-            'gender' => 'required|string|in:Male,Female',
-            'role' => 'required|in:0,1,2', // match select values (0=Admin, 1=User, 2=Budget Officer)
+            'gender' => 'required|in:Male,Female',
+            'role' => 'nullable|in:1,2',
             'username' => 'required|string|max:255|unique:users,username',
+            'password' => 'required|string|min:6',
+            'profile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        User::create([
-            'lname' => $request->lname,
-            'fname' => $request->fname,
-            'mname' => $request->mname,
-            'position' => $request->position,
-            'office' => $request->office,
-            'gender' => $request->gender,
-            'isAdmin' => $request->role, // assuming the DB column is 'isAdmin' (as in your form)
-            'username' => $request->username,
-            'password' => Hash::make('password123'),
-            'remember_token' => Str::random(60),
-        ]);
+        $user = new User();
+        $user->lname = $request->lname;
+        $user->fname = $request->fname;
+        $user->mname = $request->mname;
+        $user->gender = $request->gender;
 
-        return redirect()->route('userRead')->with('success', 'User added successfully.');
+        // default role = cashier
+        $user->role = $request->role ?? 2;
+
+        $user->username = $request->username;
+        $user->password = bcrypt($request->password);
+
+        // assign default remember_token as null
+        $user->remember_token = null;
+
+        // handle profile upload
+        if ($request->hasFile('profile')) {
+            $file = $request->file('profile');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/profile'), $filename);
+            $user->profile = $filename;
+        } else {
+            if ($user->role == 1) {
+                $user->profile = 'admin-default.png';
+            } else {
+                $user->profile = $user->gender === 'Male'
+                    ? 'cashier-default-male.png'
+                    : 'cashier-default-female.png';
+            }
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'User created successfully!');
     }
 
-    public function userUpdate(Request $request)
+    public function userUpdate(Request $request, $id)
     {
+        $user = User::findOrFail($id);
+
         $request->validate([
-            'id' => 'required|exists:users,id',
             'lname' => 'required|string|max:255',
             'fname' => 'required|string|max:255',
             'mname' => 'required|string|max:255',
-            'position' => 'required|string|in:Dean,Office Head,Budget Officer III',
-            'office' => 'required|string|max:255',
-            'gender' => 'required|string|in:Male,Female',
-            'role' => 'required|in:0,1,2',
-            'username' => 'required|string|max:255|unique:users,username,' . $request->id,
-            'password' => 'nullable|string',
+            'gender' => 'required|in:Male,Female',
+            'role' => 'nullable|in:1,2',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'password' => 'nullable|string|min:6',
+            'profile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $user = User::findOrFail($request->id);
+        $user->lname = $request->lname;
+        $user->fname = $request->fname;
+        $user->mname = $request->mname;
+        $user->gender = $request->gender;
 
-        $user->update([
-            'lname' => $request->lname,
-            'fname' => $request->fname,
-            'mname' => $request->mname,
-            'position' => $request->position,
-            'office' => $request->office,
-            'gender' => $request->gender,
-            'isAdmin' => $request->role,
-            'username' => $request->username,
-            'password' => $request->password ? Hash::make($request->password) : $user->password,
-        ]);
+        // default role = cashier
+        $user->role = $request->role ?? 2;
 
-        return redirect()->route('userRead')->with('success', 'User updated successfully.');
+        $user->username = $request->username;
+
+        // only update password if provided
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        // keep remember_token as is or reset if needed
+        $user->remember_token = $user->remember_token ?? null;
+
+        // handle profile upload
+        if ($request->hasFile('profile')) {
+            // delete old profile if not default
+            if ($user->profile && !in_array($user->profile, [
+                'admin-default.png',
+                'cashier-default-male.png',
+                'cashier-default-female.png'
+            ])) {
+                $oldPath = public_path('uploads/profile/' . $user->profile);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            $file = $request->file('profile');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/profile'), $filename);
+            $user->profile = $filename;
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'User updated successfully!');
     }
 
     public function userDelete($id)

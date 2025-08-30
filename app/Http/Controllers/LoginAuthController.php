@@ -12,7 +12,7 @@ class LoginAuthController extends Controller
     {
         return view('login');
     }
-
+    
     public function postLogin(Request $request)
     {
         $request->validate([
@@ -27,13 +27,20 @@ class LoginAuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            if ($user->role == 1) {
-                return redirect()->route('dashboard')->with('success', 'Login Successfully');
-            } elseif ($user->role == 2) {
-                return redirect()->route('pos')->with('success', 'Login Successfully');
-            } else {
+            
+            // Check if user is active/approved
+            if (isset($user->status) && $user->status != 1) {
                 Auth::logout();
-                return back()->with('error', 'Unauthorized role.')->withInput();
+                return back()->with('error', 'Your account is not active. Please contact administrator.')->withInput();
+            }
+
+            // Use role field consistently
+            if ($user->role == 1) {
+                // Admin user - redirect to Laravel dashboard
+                return redirect()->route('dashboard')->with('success', 'Login Successful');
+            } else {
+                // Cashier user (role == 2) - redirect to React app
+               return redirect(config('app.react_url'));
             }
         }
 

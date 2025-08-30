@@ -22,6 +22,7 @@ class Product extends Model
         'r_price',
         'r_unit',
         'image',
+        'vatable',
     ];
 
 }

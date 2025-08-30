@@ -107,6 +107,49 @@ $(document).ready(function () {
             });
     }
 </script>
+<script>
+    $(document).ready(function () {
+        const $form = $('.product-form');
+        const $list = $('.product-list');
+        const $icon = $('#toggleForm').find('i');
 
+        // Check sessionStorage on load
+        const isVisible = sessionStorage.getItem('formVisible') === 'true';
+
+        if (isVisible) {
+            $form.show();
+            $list.removeClass('col-lg-12').addClass('col-lg-9');
+            $icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            $form.hide();
+            $list.removeClass('col-lg-9').addClass('col-lg-12');
+            $icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+
+        // Toggle logic
+        $('#toggleForm').on('click', function () {
+            $form.slideToggle(250, function () {
+                const visible = $form.is(':visible');
+
+                $list.toggleClass('col-lg-12', !visible)
+                     .toggleClass('col-lg-9', visible);
+
+                $icon.toggleClass('fa-eye', !visible)
+                     .toggleClass('fa-eye-slash', visible);
+
+                // Save to sessionStorage
+                sessionStorage.setItem('formVisible', visible);
+            });
+        });
+    });
+</script>
+
+<script>
+    function editPostForm(id) {
+        document.getElementById('user-id').value = id;
+
+        document.getElementById('post-form').submit();
+    }
+</script>
 
 <?php /**PATH F:\xampp\htdocs\ease-pos\resources\views/script/productScript.blade.php ENDPATH**/ ?>

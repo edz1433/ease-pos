@@ -4,38 +4,25 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of the exception types that are not reported.
-     *
-     * @var array<int, class-string<Throwable>>
+     * Convert an authentication exception into a response.
      */
-    protected $dontReport = [
-        //
-    ];
-
-    /**
-     * A list of the inputs that are never flashed for validation exceptions.
-     *
-     * @var array<int, string>
-     */
-    protected $dontFlash = [
-        'current_password',
-        'password',
-        'password_confirmation',
-    ];
-
-    /**
-     * Register the exception handling callbacks for the application.
-     *
-     * @return void
-     */
-    public function register()
+    protected function unauthenticated($request, AuthenticationException $exception)
     {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
+        // For API requests, return JSON response
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json([
+                'authenticated' => false,
+                'redirect_url' => 'http://localhost/ease-pos/public/',
+                'message' => 'Unauthenticated. Please login first.'
+            ], 401);
+        }
+
+        // For web requests, redirect to login page
+        return redirect()->guest('http://localhost/ease-pos/public/');
     }
 }

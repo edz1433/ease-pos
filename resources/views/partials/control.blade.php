@@ -14,7 +14,6 @@
         <small class="text-muted">Administrator</small>
     </div>
 
-
     <!-- Sidebar Menu -->
     <ul class="custom-sidebar-menu">
         <li>
@@ -24,7 +23,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="{{ request()->is('purchases*') ? 'active' : '' }}">
+            <a href="{{ route('purchaseRead') }}" class="{{ request()->is('purchases*') ? 'active' : '' }}">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Purchases</span>
             </a>
@@ -42,7 +41,14 @@
             </a>
         </li>
         <li>
-            <a href="#" class="{{ request()->is('pos*') ? 'active' : '' }}">
+            <a href="{{ route('inventoryRead') }}" class="{{ request()->is('inventory*') ? 'active' : '' }}">
+                <i class="fas fa-warehouse"></i>
+                <span>Inventory</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ config('app.react_url') }}" target="_blank"
+                class="{{ request()->is('pos*') ? 'active' : '' }}">
                 <i class="fas fa-cash-register"></i>
                 <span>POS</span>
             </a>
@@ -60,9 +66,15 @@
             </a>
         </li>
         <li>
-            <a href="#" class="{{ request()->is('staff-member*') ? 'active' : '' }}">
+            <a href="{{ route('supplierRead') }}" class="{{ request()->is('suppliers*') ? 'active' : '' }}">
                 <i class="fas fa-users"></i>
-                <span>Staff</span>
+                <span>Suppliers</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('userRead') }}" class="{{ request()->is('user*') ? 'active' : '' }}">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
             </a>
         </li>
         <li>

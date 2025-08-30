@@ -129,7 +129,17 @@
     </div>
     
     @include('script.masterScript')
-    {{-- @include('script.userScript') --}}
-    @include('script.productScript') 
+    @if(request()->is('dashboard*'))
+        @include('script.dashboardScript')
+    @endif
+    @if(request()->is('products*'))
+        @include('script.productScript')
+    @endif
+    @if(request()->is('purchases*'))
+        @include('script.purchaseScript')
+    @endif
+    @if(request()->is('inventory*'))
+        @include('script.inventoryScript')
+    @endif
 </body>
 </html>

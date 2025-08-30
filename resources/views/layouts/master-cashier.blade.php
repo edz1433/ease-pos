@@ -190,6 +190,6 @@
         </aside>
     </div>
 
-    @include('script.masterScriptCashier')
+    {{-- @include('script.masterScriptCashier') --}}
 </body>
 </html>

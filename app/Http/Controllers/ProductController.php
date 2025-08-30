@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Category;
+use App\Models\Unit;
 use App\Models\Product;
 use App\Models\ProductPreset;
 use Illuminate\Support\Facades\Storage;
@@ -26,50 +28,39 @@ class ProductController extends Controller
             'image' => 'nullable|image',
         ]);
 
-        // Handle packaging logic
-        if ($request->product_type === '2') {
-            $validated['packaging'] = 1;
-            $validated['w_capital'] = 0;
-            $validated['w_price'] = 0;
-            $validated['r_capital'] = 0;
-            $validated['w_unit'] = null;
-        } else {
-            $packaging = max((float) $request->packaging, 1);
-            $wCapital = (float) $request->w_capital;
-
-            if ($packaging > 1 && $wCapital > 0) {
-                $validated['r_capital'] = $wCapital / $packaging;
-
-                if (!$request->filled('r_price')) {
-                    $validated['r_price'] = round($validated['r_capital'] * 1.10, 2);
-                }
-            }
-        }
-
-        // Ensure the upload directory exists
-        $uploadPath = public_path('uploads/products');
-        if (!file_exists($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
-        }
-
         // Handle image upload
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-
-            if ($image->isValid()) {
-                $imageName = uniqid('product_', true) . '.' . $image->getClientOriginalExtension();
-                $image->move($uploadPath, $imageName);
-                $validated['image'] = $imageName;
-            } else {
-                return redirect()->back()->withErrors(['image' => 'Uploaded image is invalid.']);
-            }
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $validated['image'] = $imagePath;
         } else {
             $validated['image'] = 'default-product.png';
         }
 
+        // Create the product
         Product::create($validated);
 
         return redirect()->back()->with('success', 'Product created successfully!');
+    }
+
+
+    public function productEdit(Request $request)
+    {   
+        $categories = Category::all();
+        $units = Unit::all();
+        $products = Product::select(
+            'products.*',
+            'categories.name as category_name',
+            'r_unit.name as r_unit_name',
+            'w_unit.name as w_unit_name'
+        )
+        ->leftJoin('categories', 'products.category', '=', 'categories.id')
+        ->leftJoin('units as r_unit', 'products.r_unit', '=', 'r_unit.id')
+        ->leftJoin('units as w_unit', 'products.w_unit', '=', 'w_unit.id')
+        ->get();
+
+        $productsedit = Product::find($request->id);
+        
+        return view('admin.products.index', compact('categories', 'units', 'products', 'productsedit'));
     }
 
     public function productUpdate(Request $request, $id)
@@ -91,38 +82,17 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,bmp,gif|max:2048',
         ]);
 
-        // Packaging logic
-        if ($request->product_type === '2') {
-            $validated['packaging'] = 1;
-            $validated['w_capital'] = 0;
-            $validated['w_price'] = 0;
-            $validated['r_capital'] = 0;
-            $validated['w_unit'] = null;
-        } else {
-            $packaging = max((float) $request->packaging, 1);
-            $wCapital = (float) $request->w_capital;
-
-            if ($packaging > 1 && $wCapital > 0) {
-                $validated['r_capital'] = $wCapital / $packaging;
-                if (!$request->filled('r_price')) {
-                    $validated['r_price'] = round($validated['r_capital'] * 1.10, 2);
-                }
-            }
-        }
-
-        // Handle new image upload (if any)
+        // --- Handle new image upload ---
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             // Delete old image if it's not default
-            if ($product->image && $product->image !== 'storage/uploads/products/default-product.png') {
-                $oldPath = str_replace('storage/', '', $product->image);
-                if (Storage::disk('public')->exists($oldPath)) {
-                    Storage::disk('public')->delete($oldPath);
+            if ($product->image && $product->image !== 'default-product.png') {
+                if (Storage::disk('public')->exists($product->image)) {
+                    Storage::disk('public')->delete($product->image);
                 }
             }
 
             // Store new image
-            $path = $request->file('image')->store('uploads/products', 'public');
-            $validated['image'] = 'storage/' . $path;
+            $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
         $product->update($validated);
@@ -161,4 +131,94 @@ class ProductController extends Controller
 
         return response()->json(['next_barcode' => $nextBarcode]);
     }
+
+    public function products($category = null)
+    {
+        if ($category) {
+            $products = Product::where('category', $category)
+                ->leftJoin('units as retail_units', 'products.r_unit', '=', 'retail_units.id')
+                ->leftJoin('units as wholesale_units', 'products.w_unit', '=', 'wholesale_units.id')
+                ->select(
+                    'products.*',
+                    'retail_units.name as retail_unit_name',
+                    'wholesale_units.name as wholesale_unit_name',
+                )
+                ->get();
+        } else {
+            $products = Product::query()
+                ->leftJoin('sales_orders', 'sales_orders.product_id', '=', 'products.id')
+                ->select(
+                    'products.id',
+                    'products.barcode',
+                    'products.product_name',
+                    'products.product_type',
+                    'products.category',
+                    'products.packaging',
+                    'products.r_capital',
+                    'products.r_price',
+                    'products.r_unit',
+                    'products.w_capital',
+                    'products.w_price',
+                    'products.w_unit',
+                    'products.rqty',
+                    'products.wqty',
+                    'products.vatable',
+                    'products.image',
+                    \DB::raw('COALESCE(SUM(sales_orders.quantity), 0) as total_sold')
+                )
+                ->groupBy(
+                    'products.id',
+                    'products.barcode',
+                    'products.product_name',
+                    'products.product_type',
+                    'products.category',
+                    'products.packaging',
+                    'products.r_capital',
+                    'products.r_price',
+                    'products.r_unit',
+                    'products.w_capital',
+                    'products.w_price',
+                    'products.w_unit',
+                    'products.rqty',
+                    'products.wqty',
+                    'products.vatable',
+                    'products.image'
+                )
+                ->orderByDesc('total_sold')
+                ->limit(15)
+                ->get();
+
+
+        }
+
+        return response()->json($products);
+    }
+
+
+    public function addToCart(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id'    => 'required|integer',
+            'product_id' => 'required|integer',
+            'capital'    => 'required|numeric',
+            'price'      => 'required|numeric',
+            'price_type' => 'required|in:retail,wholesale',
+            'qty'        => 'required|integer|min:1'
+        ]);
+
+        $cartItem = Cart::where('user_id', $validated['user_id'])
+                        ->where('product_id', $validated['product_id'])
+                        ->where('price_type', $validated['price_type'])
+                        ->first();
+
+        if ($cartItem) {
+            $cartItem->qty += $validated['qty'];
+            $cartItem->save();
+        } else {
+            Cart::create($validated);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
 }

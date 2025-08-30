@@ -15,7 +15,6 @@
         <small class="text-muted">Administrator</small>
     </div>
 
-
     <!-- Sidebar Menu -->
     <ul class="custom-sidebar-menu">
         <li>
@@ -25,7 +24,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="<?php echo e(request()->is('purchases*') ? 'active' : ''); ?>">
+            <a href="<?php echo e(route('purchaseRead')); ?>" class="<?php echo e(request()->is('purchases*') ? 'active' : ''); ?>">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Purchases</span>
             </a>
@@ -43,7 +42,14 @@
             </a>
         </li>
         <li>
-            <a href="#" class="<?php echo e(request()->is('pos*') ? 'active' : ''); ?>">
+            <a href="<?php echo e(route('inventoryRead')); ?>" class="<?php echo e(request()->is('inventory*') ? 'active' : ''); ?>">
+                <i class="fas fa-warehouse"></i>
+                <span>Inventory</span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo e(config('app.react_url')); ?>" target="_blank"
+                class="<?php echo e(request()->is('pos*') ? 'active' : ''); ?>">
                 <i class="fas fa-cash-register"></i>
                 <span>POS</span>
             </a>
@@ -61,9 +67,15 @@
             </a>
         </li>
         <li>
-            <a href="#" class="<?php echo e(request()->is('staff-member*') ? 'active' : ''); ?>">
+            <a href="<?php echo e(route('supplierRead')); ?>" class="<?php echo e(request()->is('suppliers*') ? 'active' : ''); ?>">
                 <i class="fas fa-users"></i>
-                <span>Staff</span>
+                <span>Suppliers</span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo e(route('userRead')); ?>" class="<?php echo e(request()->is('user*') ? 'active' : ''); ?>">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
             </a>
         </li>
         <li>

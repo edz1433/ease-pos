@@ -125,8 +125,18 @@
     </div>
     
     <?php echo $__env->make('script.masterScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-    
-    <?php echo $__env->make('script.productScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> 
+    <?php if(request()->is('dashboard*')): ?>
+        <?php echo $__env->make('script.dashboardScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php endif; ?>
+    <?php if(request()->is('products*')): ?>
+        <?php echo $__env->make('script.productScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php endif; ?>
+    <?php if(request()->is('purchases*')): ?>
+        <?php echo $__env->make('script.purchaseScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php endif; ?>
+    <?php if(request()->is('inventory*')): ?>
+        <?php echo $__env->make('script.inventoryScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php endif; ?>
 </body>
 </html>
 <?php /**PATH F:\xampp\htdocs\ease-pos\resources\views/layouts/master.blade.php ENDPATH**/ ?>
