@@ -55,13 +55,13 @@
             </a>
         </li>
         <li>
-            <a href="#" class="<?php echo e(request()->is('cashbank*') ? 'active' : ''); ?>">
+            <a href="<?php echo e(route('cashbankRead')); ?>" class="<?php echo e(request()->is('cash-bank*') ? 'active' : ''); ?>">
                 <i class="fas fa-university"></i>
                 <span>Cash & Bank</span>
             </a>
         </li>
         <li>
-            <a href="#" class="<?php echo e(request()->is('cashcount*') ? 'active' : ''); ?>">
+            <a href="<?php echo e(route('cashCountRead')); ?>" class="<?php echo e(request()->is('cash-count*') ? 'active' : ''); ?>">
                 <i class="fas fa-coins"></i>
                 <span>Cash Count</span>
             </a>

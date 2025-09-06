@@ -11,6 +11,7 @@ class Product extends Model
 
     protected $fillable = [
         'barcode',
+        'w_barcode',
         'product_name',
         'product_type',
         'category',
@@ -23,6 +24,8 @@ class Product extends Model
         'r_unit',
         'image',
         'vatable',
+        'r_stock_alert',
+        'w_stock_alert',
     ];
 
 }

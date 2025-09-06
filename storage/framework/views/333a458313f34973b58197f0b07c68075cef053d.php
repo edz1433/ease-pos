@@ -2,50 +2,61 @@
 document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById('topProducts').getContext('2d');
 
+    const labels = <?php echo json_encode($topProducts->pluck('row_number'), 15, 512) ?>;        // 1,2,3...
+    const data = <?php echo json_encode($topProducts->pluck('total_wvat'), 15, 512) ?>;
+    const names = <?php echo json_encode($topProducts->pluck('product_name'), 15, 512) ?>;       // for tooltips
+
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: [
-                'Product A', 'Product B', 'Product C', 'Product D', 'Product E',
-                'Product F', 'Product G', 'Product H', 'Product I', 'Product J'
-            ],
+            labels: labels,
             datasets: [{
-                data: [12340, 11200, 9870, 9050, 8600, 7500, 7200, 6890, 6700, 6450],
+                label: 'Total Sales',
+                data: data.map(Number),
                 backgroundColor: [
-                    'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)', 'rgba(252, 32, 120, 0.8)',
-                    'rgba(252, 32, 140, 0.8)', 'rgba(252, 32, 160, 0.8)', 'rgba(32, 252, 194, 0.8)',
-                    'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)', 'rgba(32, 140, 194, 0.8)',
-                    'rgba(32, 110, 194, 0.8)'
+                    'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)',
+                    'rgba(252, 32, 120, 0.8)', 'rgba(252, 32, 140, 0.8)',
+                    'rgba(252, 32, 160, 0.8)', 'rgba(32, 252, 194, 0.8)',
+                    'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)',
+                    'rgba(32, 140, 194, 0.8)', 'rgba(32, 110, 194, 0.8)'
                 ],
-                borderColor: [
-                    'rgba(252, 32, 79, 1)', 'rgba(252, 32, 100, 1)', 'rgba(252, 32, 120, 1)',
-                    'rgba(252, 32, 140, 1)', 'rgba(252, 32, 160, 1)', 'rgba(32, 252, 194, 1)',
-                    'rgba(32, 200, 194, 1)', 'rgba(32, 170, 194, 1)', 'rgba(32, 140, 194, 1)',
-                    'rgba(32, 110, 194, 1)'
-                ],
+                borderColor: 'rgba(0,0,0,0.1)',
                 borderWidth: 1
             }]
         },
         options: {
-            indexAxis: 'y', // ⬅️ This makes it horizontal
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: value => '₱' + value.toLocaleString()
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: context => names[context[0].dataIndex], // show product_name in tooltip
+                        label: context => {
+                            const value = parseFloat(context.raw) || 0;
+                            return '₱' + value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        }
                     }
                 }
             },
-            plugins: {
-                legend: {
-                    display: false
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        display: false
+                    },
+                    grid: {
+                        drawTicks: false
+                    }
                 },
-                tooltip: {
-                    callbacks: {
-                        title: () => '',
-                        label: context => '₱' + context.raw.toLocaleString()
+                x: {
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 45,
+                        minRotation: 0
+                    },
+                    grid: {
+                        drawTicks: false
                     }
                 }
             }
@@ -53,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

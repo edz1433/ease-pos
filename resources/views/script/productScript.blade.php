@@ -95,17 +95,27 @@ $(document).ready(function () {
 });
 </script>
 <script>
-    function generateBarcode() {
-        fetch('{{ route('getNextBarcode') }}')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('barcode').value = data.next_barcode;
-            })
-            .catch(error => {
-                alert('Error generating barcode');
-                console.error(error);
-            });
-    }
+function generateBarcode(fieldId) {
+    let url = "{{ route('getNextBarcode', ':id') }}".replace(':id', fieldId);
+
+    console.log("📡 Calling URL:", url); // Debug which endpoint is called
+
+    fetch(url)
+        .then(response => {
+            console.log("✅ Raw response:", response);
+            return response.json();
+        })
+        .then(data => {
+            console.log("📦 JSON data:", data);
+
+            if (data.next_barcode) {
+                document.getElementById(fieldId).value = data.next_barcode;
+            } else {
+                alert(data.error || 'Failed to generate barcode');
+            }
+        })
+        .catch(error => console.error("❌ Fetch error:", error));
+}
 </script>
 <script>
     $(document).ready(function () {

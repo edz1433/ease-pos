@@ -10,16 +10,46 @@ use App\Models\Unit;
 use App\Models\Product;
 use App\Models\Inventory;
 use App\Models\Sale;
+use App\Models\SalesOrder;
 use App\Models\Purchase;
 use App\Models\Supplier;
+use App\Models\CashBankTransaction;
+use App\Models\CashCount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class MasterController extends Controller
 {
-    public function dashboard() 
+    public function dashboard()
     {
-        return view("admin.dashboard.index");
+        // Totals
+        $totalSales     = Sale::sum('total_wvat');      
+        $totalPurchases = Purchase::sum('total_amount');   
+        $totalExpenses  = 0; // Update when you add an expenses table
+        $totalStaff     = User::where('role', 2)->count();  
+
+        $topProducts = SalesOrder::join('products', 'sales_orders.product_id', '=', 'products.id')
+            ->select(
+                'products.id as product_id',        
+                'products.product_name',            
+                \DB::raw('SUM(sales_orders.price * sales_orders.quantity) as total_wvat')
+            )
+            ->groupBy('sales_orders.product_id', 'products.id', 'products.product_name')
+            ->orderByDesc('total_wvat')
+            ->limit(10)
+            ->get()
+            ->map(function ($item, $key) {
+                $item->row_number = $key + 1;      
+                return $item;
+            });
+
+        return view('admin.dashboard.index', compact(
+            'totalSales',
+            'totalPurchases',
+            'totalExpenses',
+            'totalStaff',
+            'topProducts'
+        ));
     }
 
     public function purchaseRead() 
@@ -69,6 +99,69 @@ class MasterController extends Controller
     {
         $users = User::all();
         return view('admin.users.index', compact('users'));
+    }
+
+    public function store(Request $request)
+    {
+        // Calculate total cash counted
+        $denominations = [1,5,10,20,50,100,500,1000];
+        $totalCounted = 0;
+
+        foreach ($denominations as $denom) {
+            $totalCounted += ($request->input("qty_$denom") ?? 0) * $denom;
+        }
+
+        $expensesPaid = $request->input('expenses_paid') ?? 0;
+        $pettyCashUsed = $request->input('petty_cash_used') ?? 0;
+
+        $closingBalance = $totalCounted - $expensesPaid - $pettyCashUsed;
+
+        $cashCount = CashCount::create([
+            'qty_1' => $request->input('qty_1') ?? 0,
+            'qty_5' => $request->input('qty_5') ?? 0,
+            'qty_10' => $request->input('qty_10') ?? 0,
+            'qty_20' => $request->input('qty_20') ?? 0,
+            'qty_50' => $request->input('qty_50') ?? 0,
+            'qty_100' => $request->input('qty_100') ?? 0,
+            'qty_500' => $request->input('qty_500') ?? 0,
+            'qty_1000' => $request->input('qty_1000') ?? 0,
+            'expenses_paid' => $expensesPaid,
+            'petty_cash_used' => $pettyCashUsed,
+            'closing_balance' => $closingBalance,
+        ]);
+
+        return view('cash-count.index', compact(
+            'cashCounts',
+            'totalCash',
+            'expensesPaid',
+            'pettyCashUsed'
+        ));
+    }
+
+    public function cashbankRead()
+    {
+        $transactions = CashBankTransaction::orderByDesc('transaction_date')->get();
+        return view('admin.cash-bank.index', compact('transactions'));
+    }
+
+    public function cashCountRead()
+    {
+        // Get totals from cash transactions
+        $totalCash = CashBankTransaction::where('account_type', 'Cash')
+            ->whereIn('transaction_type', ['Deposit', 'Withdrawal', 'Expense', 'Petty Cash', 'Salary'])
+            ->sum('amount');
+
+        $expensesPaid = CashBankTransaction::where('transaction_type', 'Expense')->sum('amount');
+        $pettyCashUsed = CashBankTransaction::where('transaction_type', 'Petty Cash')->sum('amount');
+
+        $cashCounts = CashCount::latest()->get();
+
+        return view('admin.cash-count.index', compact(
+            'cashCounts',
+            'totalCash',
+            'expensesPaid',
+            'pettyCashUsed'
+        ));
     }
 
     public function delete(Request $request)

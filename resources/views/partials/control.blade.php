@@ -54,13 +54,13 @@
             </a>
         </li>
         <li>
-            <a href="#" class="{{ request()->is('cashbank*') ? 'active' : '' }}">
+            <a href="{{ route('cashbankRead') }}" class="{{ request()->is('cash-bank*') ? 'active' : '' }}">
                 <i class="fas fa-university"></i>
                 <span>Cash & Bank</span>
             </a>
         </li>
         <li>
-            <a href="#" class="{{ request()->is('cashcount*') ? 'active' : '' }}">
+            <a href="{{ route('cashCountRead') }}" class="{{ request()->is('cash-count*') ? 'active' : '' }}">
                 <i class="fas fa-coins"></i>
                 <span>Cash Count</span>
             </a>

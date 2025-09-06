@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CashBankController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchasesController;
@@ -28,6 +29,8 @@ Route::prefix('api')->group(function () {
 
     Route::get('/categories', [CategoryController::class, 'categories'])->name('categories');
     Route::get('/products/{category?}', [ProductController::class, 'products'])->name('products');
+    Route::get('/all-products', [ProductController::class, 'getAllProducts'])->name('getAllProducts');
+    Route::get('/products-by-barcode/{barcode}', [ProductController::class, 'getProductByBarcode'])->name('getAllProducts');
     Route::post('/checkout', [SalesController::class, 'checkout']);
     Route::get('/next-transaction-number', [SalesController::class, 'nextTransactionNumber']);
     
@@ -59,7 +62,7 @@ Route::group(['middleware' => ['login_auth']], function() {
         Route::post('/update/{id}',[ProductController::class,'productUpdate'])->name('productUpdate');
 
         Route::get('/presets', [ProductController::class, 'getProductPresets'])->name('getProductPresets');
-        Route::get('/next-barcode', [ProductController::class, 'getNextBarcode'])->name('getNextBarcode');
+        Route::get('/next-barcode/{id}', [ProductController::class, 'getNextBarcode'])->name('getNextBarcode');
     });
 
     Route::prefix('inventory')->group(function() {
@@ -71,8 +74,6 @@ Route::group(['middleware' => ['login_auth']], function() {
 
         Route::post('/inventories-save-finalize', [InventoryController::class, 'finalizeInventory'])->name('finalizeInventory');
 
-        
-
         Route::post('/create',[InventoryController::class,'inventoryCreate'])->name('inventoryCreate');
         Route::post('/',[InventoryController::class,'inventoryEdit'])->name('inventoryEdit');
         Route::post('/update/{id}',[InventoryController::class,'inventoryUpdate'])->name('inventoryUpdate');
@@ -83,6 +84,18 @@ Route::group(['middleware' => ['login_auth']], function() {
         Route::post('/create', [SupplierController::class, 'supplierCreate'])->name('supplierCreate');
         Route::post('/', [SupplierController::class, 'supplierEdit'])->name('supplierEdit');
         Route::post('/update/{id}', [SupplierController::class, 'supplierUpdate'])->name('supplierUpdate');
+    });
+
+    Route::prefix('cash-bank')->middleware(['auth'])->group(function () {
+        Route::get('/', [MasterController::class, 'cashbankRead'])->name('cashbankRead');
+        Route::post('/create', [CashBankController::class, 'cashbankCreate'])->name('cashbankCreate');
+        Route::get('/edit/{id}', [CashBankController::class, 'cashbankEdit'])->name('cashbankEdit');
+        Route::post('/update/{id}', [CashBankController::class, 'cashbankUpdate'])->name('cashbankUpdate');
+        Route::delete('/delete/{id}', [CashBankController::class, 'cashbankDelete'])->name('cashbankDelete');
+    });
+
+    Route::prefix('cash-count')->group(function () {
+        Route::get('/', [MasterController::class, 'cashCountRead'])->name('cashCountRead'); 
     });
 
     Route::prefix('user')->group(function() {

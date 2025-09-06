@@ -46,7 +46,7 @@
                     <div class="row">
                         <div class="col-lg-12 col-md-12">
                             <div class="table-responsive" style="height: 300px !important;">
-                                <table id="inventory-table" class="table table-bordered table-hover" width="100%">
+                                <table id="example3" class="table table-bordered table-hover" width="100%">
                                     <thead>
                                         <tr>
                                             <th width="30" class="text-center">#</th>
