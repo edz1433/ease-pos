@@ -64,7 +64,7 @@
                                                 <td class="text-center align-middle"><?php echo e(\Carbon\Carbon::parse($inv->end_date)->format('M d, Y')); ?></td>
                                                 <td class="text-center align-middle">
                                                     <?php if($inv->status == 1): ?>
-                                                        <span class="badge badge-success">Ongoing</span>
+                                                        <span class="badge badge-warning">Ongoing</span>
                                                     <?php else: ?>
                                                         <span class="badge badge-success">Done</span>
                                                     <?php endif; ?>

@@ -1,136 +1,223 @@
 @extends('layouts.master')
 
 @section('body')
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid py-4">
+
+    <div class="row g-4">
 
         <!-- Cash Count Form -->
-        <div class="col-lg-5 col-md-12">
-            <div class="card card-primary shadow-sm">
+        <div class="col-lg-6 col-md-12">
+            <div class="card shadow-sm border-0">
                 <div class="card-header">
-                    <h3 class="card-title">Cash Count / Reconciliation</h3>
+                    <h4 class="mb-0"><i class="fas fa-coins me-2"></i> Cash Count Entry</h4>
                 </div>
                 <div class="card-body">
-                    <form id="cashCountForm" method="POST" action="">
+                    <form id="cashCountForm" method="POST" action="{{ route('cashCountCreate') }}">
                         @csrf
 
-                        <h5 class="mb-3 text-secondary"><i class="fas fa-coins mr-2"></i>Enter Cash Denominations</h5>
-                        <div class="form-group">
-                            @foreach([1,5,10,20,50,100,500,1000] as $denom)
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text">₱{{ $denom }}</span>
-                                    <input type="number" name="qty_{{ $denom }}" id="qty_{{ $denom }}" 
-                                        value="0" min="0" class="form-control form-control-sm">
-                                </div>
-                            @endforeach
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered table-hover align-middle text-center mb-3">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Denomination</th>
+                                        <th>Quantity</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach([0.25,0.50,1,5,10,20,50,100,500,1000] as $denom)
+                                    <tr>
+                                        <td class="fw-bold align-middle">₱{{ number_format($denom, 2) }}</td>
+                                        <td class="align-middle">
+                                            <input type="number" 
+                                                name="qty_{{ str_replace('.','_',$denom) }}" 
+                                                id="qty_{{ str_replace('.','_',$denom) }}" 
+                                                min="0" 
+                                                class="form-control form-control-sm text-center">
+                                        </td>
+                                        <td class="text-end fw-bold align-middle">₱<span id="subtotal_{{ str_replace('.','_',$denom) }}">0.00</span></td>
+                                    </tr>
+                                    @endforeach
+                                    <tr>
+                                        <td class="fw-bold align-middle" colspan="2"><b>GCASH</b></td>
+                                        <td class="fw-bold align-middle"><input type="number" name="gcash" id="gcash" class="form-control form-control-sm text-center"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold align-middle" colspan="2"><b>BANK</b></td>
+                                        <td class="fw-bold align-middle"><input type="number" name="bank" id="bank" class="form-control form-control-sm text-center"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
 
-                        <h5 class="mb-3 text-secondary"><i class="fas fa-file-invoice-dollar mr-2"></i>Expenses & Petty Cash</h5>
-                        <div class="form-group">
-                            <label for="expenses_paid">Expenses Paid</label>
-                            <input type="number" name="expenses_paid" id="expenses_paid" step="0.01" min="0" 
-                                value="0" class="form-control form-control-sm">
-                        </div>
+                        <!-- Hidden system values -->
+                        <input type="hidden" name="total_inflow" value="{{ $totalCashInflow->sum('amount') ?? 0 }}">
+                        <input type="hidden" name="total_outflow" value="{{ $totalCashOutflow->sum('amount') ?? 0 }}">
+                        <input type="hidden" name="total_purchases" value="{{ $totalPurchases ?? 0 }}">
+                        <input type="hidden" name="total_sales_today" value="{{ $totalSalesToday ?? 0 }}">
 
-                        <div class="form-group">
-                            <label for="petty_cash_used">Petty Cash Used</label>
-                            <input type="number" name="petty_cash_used" id="petty_cash_used" step="0.01" min="0" 
-                                value="0" class="form-control form-control-sm">
-                        </div>
+                        <!-- This will be set dynamically by JS -->
+                        <input type="hidden" name="variance" id="variance_field">
 
-                        <div class="form-group text-right">
-                            <span class="h5 text-success">Total Cash Counted: ₱<span id="total_cash">0.00</span></span>
-                        </div>
-
-                        <button type="submit" class="btn btn-success btn-block">
-                            <i class="fas fa-save mr-2"></i>Save Cash Count
+                        <button type="submit" class="btn bg-main-7 btn-sm text-light w-100">
+                            <i class="fas fa-save me-2"></i> Save Cash Count
                         </button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Cash Count History Table -->
-        <div class="col-lg-7 col-md-12">
-            <div class="card card-secondary shadow-sm">
+        <!-- Summary Card -->
+        <div class="col-lg-6 col-md-12">
+            <div class="card shadow-sm border-0">
                 <div class="card-header">
-                    <h3 class="card-title">Cash Count History</h3>
+                    <h4 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i> Summary</h4>
                 </div>
-                <div class="card-body table-responsive">
-                    <table class="table table-bordered table-hover table-sm">
-                        <thead class="thead-light">
-                            <tr class="text-center">
-                                <th>Date</th>
-                                <th>Total Cash</th>
-                                <th>Expenses Paid</th>
-                                <th>Petty Cash</th>
-                                <th>Discrepancy</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($cashCounts as $cash)
-                                @php
-                                    $totalCash = ($cash->qty_1*1)+($cash->qty_5*5)+($cash->qty_10*10)+($cash->qty_20*20)+
-                                                 ($cash->qty_50*50)+($cash->qty_100*100)+($cash->qty_500*500)+($cash->qty_1000*1000);
-                                    $discrepancy = $totalCash - ($cash->closing_balance ?? $totalCash);
-                                @endphp
-                                <tr>
-                                    <td>{{ $cash->created_at->format('Y-m-d H:i') }}</td>
-                                    <td class="text-right">₱{{ number_format($totalCash,2) }}</td>
-                                    <td class="text-right">₱{{ number_format($cash->expenses_paid,2) }}</td>
-                                    <td class="text-right">₱{{ number_format($cash->petty_cash_used,2) }}</td>
-                                    <td class="text-right">₱{{ number_format($discrepancy,2) }}</td>
-                                    <td class="text-center">
-                                        <a href="{{ route('cashcount.edit', $cash->id) }}" class="btn btn-info btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('cashcount.destroy', $cash->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this record?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach 
-                        </tbody>
-                    </table>
+                <div class="card-body">
+                    
+                    <!-- Sales Today -->
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="fw-bold">Total Sales Today:</span>
+                        <span class="text-primary">₱{{ number_format($totalSalesToday, 2) }}</span>
+                    </div>
+
+                    <!-- INFLOW Section -->
+                    <h6 class="fw-bold text-success mb-2"><i class="fas fa-arrow-down me-2"></i> INFLOW</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        @foreach($totalCashInflow as $data)
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span>{{ $data->transaction_type }}{{ isset($data->description) ? ' ('.$data->description.')' : '' }}</span>
+                                <span class="fw-semibold">₱{{ number_format($data->amount, 2) }}</span>
+                            </li>
+                        @endforeach
+                        <li class="list-group-item d-flex justify-content-between fw-bold text-success px-0">
+                            <span>Total Inflow</span>
+                            <span>₱<span id="total_inflow">{{ number_format($totalCashInflow->sum('amount') ?? 0, 2) }}</span></span>
+                        </li>
+                    </ul>
+
+                    <!-- OUTFLOW Section -->
+                    <h6 class="fw-bold text-danger mb-2"><i class="fas fa-arrow-up me-2"></i> OUTFLOW</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        @foreach($totalCashOutflow as $data)
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span>{{ $data->transaction_type }}{{ isset($data->description) ? ' ('.$data->description.')' : '' }}</span>
+                                <span class="fw-semibold">₱{{ number_format($data->amount, 2) }}</span>
+                            </li>
+                        @endforeach
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span>Total Purchases</span>
+                            <span class="fw-semibold">₱{{ number_format($totalPurchases ?? 0, 2) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between fw-bold text-danger px-0">
+                            <span>Total Outflow + Purchases</span>
+                            <span>₱<span id="total_outflow">{{ number_format(($totalCashOutflow->sum('amount') ?? 0) + ($totalPurchases ?? 0), 2) }}</span></span>
+                        </li>
+                    </ul>
+
+                    <hr>
+
+                    <!-- Totals & Variance -->
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold text-success">Total Cash Counted:</span>
+                        <span class="fw-bold text-success">₱<span id="total_cash">0.00</span></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold">Variance:</span>
+                        <span class="fw-bold">₱<span id="variance">0.00</span></span>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div class="mt-3 text-center">
+                        <span id="statusBadge" class="badge bg-secondary fs-6 px-3 py-2">Waiting...</span>
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
+
 </div>
 
 <script>
-    const denominations = [1,5,10,20,50,100,500,1000];
+    // Denominations
+    const denominations = [0.25, 0.50, 1, 5, 10, 20, 50, 100, 500, 1000];
 
-    function calculateTotalCash() {
-        let total = 0;
-        denominations.forEach(val => {
-            let qty = parseInt(document.getElementById('qty_' + val).value) || 0;
-            total += qty * val;
-        });
+    // Totals from Blade variables
+    const totalInflow = parseFloat("{{ $totalCashInflow->sum('amount') ?? 0 }}");
+    const totalOutflow = parseFloat("{{ $totalCashOutflow->sum('amount') ?? 0 }}");
+    const totalPurchases = parseFloat("{{ $totalPurchases ?? 0 }}");
+    const totalSalesToday = parseFloat("{{ $totalSalesToday ?? 0 }}");
 
-        let expenses = parseFloat(document.getElementById('expenses_paid').value) || 0;
-        let petty = parseFloat(document.getElementById('petty_cash_used').value) || 0;
-
-        let totalCounted = total - expenses - petty;
-        document.getElementById('total_cash').textContent = totalCounted.toFixed(2);
+    // Format number as Philippine Peso
+    function formatPeso(amount) {
+        return amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    // Main calculation
+    function calculateTotalCash() {
+        let cashTotal = 0;
+
+        // Loop through denominations
+        denominations.forEach(val => {
+            let inputId = 'qty_' + val.toString().replace('.', '_');
+            let input = document.getElementById(inputId);
+            if (!input) return;
+
+            let qty = parseFloat(input.value) || 0;
+            let subtotal = qty * val;
+            cashTotal += subtotal;
+
+            // Update subtotal cell
+            let subtotalElem = document.getElementById('subtotal_' + val.toString().replace('.', '_'));
+            if (subtotalElem) subtotalElem.textContent = formatPeso(subtotal);
+        });
+
+        // Add GCASH + BANK
+        let gcash = parseFloat(document.getElementById('gcash')?.value) || 0;
+        let bank  = parseFloat(document.getElementById('bank')?.value) || 0;
+        let totalAvailable = cashTotal + gcash + bank;
+
+        // Update totals
+        document.getElementById('total_cash').textContent = formatPeso(totalAvailable);
+
+        // ✅ Expected cash should include total sales
+        let expectedCash = totalSalesToday + totalInflow - totalOutflow - totalPurchases;
+        let variance = totalAvailable - expectedCash;
+        document.getElementById('variance').textContent = formatPeso(variance);
+
+        // Update status badge
+        let badge = document.getElementById('statusBadge');
+        badge.className = "badge fs-6 px-3 py-2";
+
+        if (variance === 0) {
+            badge.textContent = "Balanced (Matches system)";
+            badge.classList.add("bg-success");
+        } else if (variance < 0) {
+            badge.textContent = "Shortage (Under by ₱" + formatPeso(Math.abs(variance)) + ")";
+            badge.classList.add("bg-danger");
+        } else {
+            badge.textContent = "Overage (Over by ₱" + formatPeso(variance) + ")";
+            badge.classList.add("bg-primary");
+        }
+
+        document.getElementById('variance_field').value = (variance === 0 ? 0 : variance.toFixed(2));
+    }
+
+    // Attach event listeners to denominations
     denominations.forEach(val => {
-        let input = document.getElementById('qty_' + val);
-        if(input) input.addEventListener('input', calculateTotalCash);
+        let inputId = 'qty_' + val.toString().replace('.', '_');
+        let input = document.getElementById(inputId);
+        if (input) input.addEventListener('input', calculateTotalCash);
     });
 
-    ['expenses_paid','petty_cash_used'].forEach(id => {
-        let input = document.getElementById(id);
-        if(input) input.addEventListener('input', calculateTotalCash);
-    });
+    // Attach event listeners to gcash and bank
+    document.getElementById('gcash')?.addEventListener('input', calculateTotalCash);
+    document.getElementById('bank')?.addEventListener('input', calculateTotalCash);
 
+    // Initial calculation
     calculateTotalCash();
 </script>
+
+
 @endsection

@@ -41,7 +41,7 @@
                                 @foreach($inventoryItems as $index => $item)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td>{{ $item->barcode }}</td>
+                                    <td>{{ ($item->price_type == 'retail') ? $item->barcode : $item->w_barcode}}</td>
                                     <td>{{ $item->product_name }}</td>
                                     <td>{{ ucfirst($item->price_type) }}</td>
                                     <td>

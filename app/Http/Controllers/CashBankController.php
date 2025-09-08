@@ -12,17 +12,15 @@ class CashBankController extends Controller
     {
         $request->validate([
             'transaction_date' => 'required|date',
-            'account_type' => 'required|in:Cash,Bank',
-            'account_name' => 'required|string|max:100',
-            'transaction_type' => 'required|in:Deposit,Withdrawal,Transfer,Expense,Salary,Petty Cash',
+            'transaction_type' => 'required|in:Sales Deposit,Petty Cash,Transfer In,Cash Withdrawal,Operating Expense,Salary & Wages,Petty Cash Expense,Transfer Out',
             'amount' => 'required|numeric|min:0',
+            'category' => 'required|in:1,2',
         ]);
         
         CashBankTransaction::create([
             'transaction_date' => $request->transaction_date,
-            'account_type' => $request->account_type,
-            'account_name' => $request->account_name,
             'transaction_type' => $request->transaction_type,
+            'category' => $request->category,
             'amount' => $request->amount,
             'description' => $request->description,
             'user_id' => Auth::id(),
@@ -45,17 +43,16 @@ class CashBankController extends Controller
 
         $request->validate([
             'transaction_date' => 'required|date',
-            'account_type' => 'required|in:Cash,Bank',
-            'account_name' => 'required|string|max:100',
-            'transaction_type' => 'required|in:Deposit,Withdrawal,Transfer,Expense,Salary,Petty Cash',
+            'transaction_type' => 'required|in:Sales Deposit,Petty Cash,Transfer In,Cash Withdrawal,Operating Expense,Salary & Wages,Petty Cash Expense,Transfer Out',
             'amount' => 'required|numeric|min:0',
+            'category' => 'required|in:1,2',
         ]);
 
         $transaction->update([
             'transaction_date' => $request->transaction_date,
-            'account_type' => $request->account_type,
-            'account_name' => $request->account_name,
+            'category' => $request->category,
             'transaction_type' => $request->transaction_type,
+            'category' => $request->category,
             'amount' => $request->amount,
             'description' => $request->description,
         ]);

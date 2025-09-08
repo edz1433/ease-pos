@@ -35,11 +35,11 @@ class InventoryController extends Controller
             $insertData[] = [
                 'inventory_id' => $inventory->id,
                 'product_id'   => $product->id,
-                'r_qty'        => $product->retail_qty ?? 0,
+                'r_qty'        => $product->rqty ?? 0,
                 'w_qty'        => 0,
                 'r_capital'    => $product->r_capital ?? 0,
                 'w_capital'    => 0,
-                'r_subtotal'   => ($product->retail_qty ?? 0) * ($product->r_capital ?? 0),
+                'r_subtotal'   => ($product->rqty ?? 0) * ($product->r_capital ?? 0),
                 'w_subtotal'   => 0,
                 'price_type'   => 'retail',
                 'created_at'   => $now,
@@ -52,11 +52,11 @@ class InventoryController extends Controller
                     'inventory_id' => $inventory->id,
                     'product_id'   => $product->id,
                     'r_qty'        => 0,
-                    'w_qty'        => $product->wholesale_qty ?? 0,
+                    'w_qty'        => $product->wqty ?? 0,
                     'r_capital'    => 0,
                     'w_capital'    => $product->w_capital ?? 0,
                     'r_subtotal'   => 0,
-                    'w_subtotal'   => ($product->w_qty ?? 0) * ($product->w_capital ?? 0),
+                    'w_subtotal'   => ($product->wqty ?? 0) * ($product->w_capital ?? 0),
                     'price_type'   => 'wholesale',
                     'created_at'   => $now,
                     'updated_at'   => $now,
@@ -86,6 +86,7 @@ class InventoryController extends Controller
             ->select(
                 'inventory_items.*',
                 'products.barcode',
+                'products.w_barcode',
                 'products.product_name',
                 'products.product_type'
             )
@@ -151,17 +152,30 @@ class InventoryController extends Controller
 
     public function finalizeInventory()
     {
-        // Get all inventory items that belong to active inventories and are marked as updated (status = 1)
+        // Group inventory by product_id and aggregate retail/wholesale quantities
         $inventoryItems = InventoryItems::join('inventories', 'inventory_items.inventory_id', '=', 'inventories.id')
-            ->where('inventory_items.status', 1)
             ->where('inventories.status', 1)
-            ->select('inventory_items.*')
+            ->select(
+                'inventory_items.product_id',
+                DB::raw('MAX(inventory_items.updated_at) as last_update'),
+                DB::raw('SUM(CASE WHEN inventory_items.price_type = "retail" THEN inventory_items.r_qty ELSE 0 END) as r_qty'),
+                DB::raw('SUM(CASE WHEN inventory_items.price_type = "wholesale" THEN inventory_items.w_qty ELSE 0 END) as w_qty')
+            )
+            ->groupBy('inventory_items.product_id')
             ->get();
 
+        $updatedProducts = [];
+
         foreach ($inventoryItems as $inventory) {
-            // Get all sales orders for this product after the inventory item update
+            $product = Product::find($inventory->product_id);
+
+            if (!$product) {
+                continue;
+            }
+
+            // Get all sales orders for this product after the last inventory update
             $sales = SalesOrder::where('product_id', $inventory->product_id)
-                ->where('created_at', '>=', $inventory->updated_at)
+                ->where('created_at', '>=', $inventory->last_update)
                 ->get();
 
             // Start with inventory snapshot quantities
@@ -173,33 +187,57 @@ class InventoryController extends Controller
                 if ($sale->price_type === 'retail') {
                     $finalRQty -= $sale->quantity;
                 } elseif ($sale->price_type === 'wholesale') {
-                    // Only handle wholesale if product packaging > 1
-                    if ($inventory->packaging > 1) {
+                    if ($product->packaging > 1) {
                         $finalWQty -= $sale->quantity;
                     } else {
-                        // Treat as retail if no wholesale packaging exists
                         $finalRQty -= $sale->quantity;
                     }
                 }
             }
 
             // Update the product table with final quantities
-            $product = Product::find($inventory->product_id);
-            if ($product) {
+            $changed = false;
+            $oldR = $product->rqty;
+            $oldW = $product->wqty;
+
+            if ($product->rqty != $finalRQty) {
                 $product->rqty = $finalRQty;
+                $changed = true;
+            }
 
-                // Only update w_qty if packaging > 1
-                if ($inventory->packaging > 1) {
+            if ($product->packaging > 1) {
+                if ($product->wqty != $finalWQty) {
                     $product->wqty = $finalWQty;
+                    $changed = true;
                 }
+            } else {
+                if ($product->wqty != 0) {
+                    $product->wqty = 0;
+                    $changed = true;
+                }
+            }
 
+            if ($changed) {
                 $product->save();
+
+                $updatedProducts[] = [
+                    'product_id' => $product->id,
+                    'old_rqty'   => $oldR,
+                    'new_rqty'   => $finalRQty,
+                    'old_wqty'   => $oldW,
+                    'new_wqty'   => $product->wqty,
+                ];
             }
         }
 
+        // Mark all active inventories as finalized
         Inventory::where('status', 1)->update(['status' => 2]);
 
-         return response()->json(['message' => 'Inventory save successfully']);
+        return response()->json([
+            'message' => 'Inventory saved successfully',
+            'updated_products' => $updatedProducts
+        ]);
     }
+
 
 }

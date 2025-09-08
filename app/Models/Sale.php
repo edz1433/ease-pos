@@ -20,6 +20,7 @@ class Sale extends Model
         'amount_change',
         'table_no',
         'customer',
+        'payment_method',
         'status'
     ];
 }

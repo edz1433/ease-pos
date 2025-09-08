@@ -41,7 +41,7 @@
                                 <?php $__currentLoopData = $inventoryItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
                                     <td><?php echo e($index + 1); ?></td>
-                                    <td><?php echo e($item->barcode); ?></td>
+                                    <td><?php echo e(($item->price_type == 'retail') ? $item->barcode : $item->w_barcode); ?></td>
                                     <td><?php echo e($item->product_name); ?></td>
                                     <td><?php echo e(ucfirst($item->price_type)); ?></td>
                                     <td>

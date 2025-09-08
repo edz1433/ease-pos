@@ -155,7 +155,7 @@ class PurchasesController extends Controller
             'po_number'        => 'required',
             'supplier_id'      => 'required|integer',
             'purchase_date'    => 'required|date',
-            'payment_mode'     => 'required|in:Cash,Credit,Postdated Check',
+            'payment_mode'     => 'required|in:Cash,Cash in Bank,Credit,Postdated Check',
             'total_amount'     => 'required|numeric|min:0',
             // Optional fields
             'due_date'         => 'nullable|date',
@@ -178,7 +178,7 @@ class PurchasesController extends Controller
         $purchase->bank_name     = $validated['bank_name'] ?? null;
         $purchase->check_date    = $validated['check_date'] ?? null;
         $purchase->account_name  = $validated['account_name'] ?? null;
-        $purchase->payment_status = ($validated['payment_mode'] == "Cash") ? 'paid' : 'unpaid';
+        $purchase->payment_status = ($validated['payment_mode'] == "Cash" || $validated['payment_mode'] == "Cash in Bank") ? 'paid' : 'unpaid';
         $purchase->status        = 1;
 
         $purchase->save();

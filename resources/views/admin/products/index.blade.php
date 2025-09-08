@@ -40,6 +40,14 @@
                                             <label for="product_name">Product Name</label>
                                             <input type="text" name="product_name" value="{{ $productsedit->product_name ?? '' }}" class="form-control form-control-sm" id="product_name" required>
 
+                                            <label for="model">Model</label>
+                                            <input type="text" name="model" value="{{ $productsedit->model ?? '' }}" class="form-control form-control-sm" id="model" required>
+
+                                            <label for="more_details">More Details</label>
+                                            <textarea name="more_details" rows="2" class="form-control form-control-sm" id="more_details">
+                                             {{ $productsedit->more_details ?? '' }} 
+                                            </textarea>
+
                                             <label for="product_name">Product Type</label>
                                             <select name="product_type" id="product_type" class="form-control form-control-sm" required>
                                                 <option value="">-- Select Type --</option>

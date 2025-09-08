@@ -367,6 +367,7 @@
                             <label for="payment_mode">Payment Mode</label>
                             <select name="payment_mode" id="payment_mode" class="form-control" required>
                                 <option value="Cash">Cash</option>
+                                <option value="Cash in Bank">Cash in Bank</option>
                                 <option value="Credit">Credit</option>
                                 <option value="Postdated Check">Postdated Check</option>
                             </select>

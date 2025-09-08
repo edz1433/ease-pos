@@ -66,8 +66,9 @@
 
                             <label for="role">Role</label>
                             <select name="role" id="role" class="form-control form-control-sm">
-                                <option value="2" <?php echo e(($useredit->role ?? '') == '2' ? 'selected' : ''); ?>>Cashier</option>
                                 <option value="1" <?php echo e(($useredit->role ?? '') == '1' ? 'selected' : ''); ?>>Administrator</option>
+                                <option value="2" <?php echo e(($useredit->role ?? '') == '2' ? 'selected' : ''); ?>>Cashier</option>
+                                <option value="3" <?php echo e(($useredit->role ?? '') == '3' ? 'selected' : ''); ?>>Manager</option>
                             </select>
 
                             <label for="username">Username</label>

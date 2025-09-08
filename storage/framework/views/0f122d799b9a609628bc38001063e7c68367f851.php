@@ -48,31 +48,29 @@
                         </div>
 
                         <div class="mb-2">
-                            <label>Account Type</label>
-                            <select name="account_type" id="account_type" class="form-control form-control-sm" required>
-                                <option value="">-- Select Account Type --</option>
-                                <option value="Cash">Cash</option>
-                                <option value="Bank">Bank</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-2">
-                            <label>Account Name</label>
-                            <input type="text" name="account_name" id="account_name" class="form-control form-control-sm" required>
-                        </div>
-
-                        <div class="mb-2">
                             <label>Transaction Type</label>
+
                             <select name="transaction_type" id="transaction_type" class="form-control form-control-sm" required>
                                 <option value="">-- Select Transaction Type --</option>
-                                <option value="Deposit">Deposit</option>
-                                <option value="Withdrawal">Withdrawal</option>
-                                <option value="Transfer">Transfer</option>
-                                <option value="Expense">Expense</option>
-                                <option value="Salary">Salary</option>
-                                <option value="Petty Cash">Petty Cash</option>  
+
+                                <!-- Inflow: money entering the cash drawer -->
+                                <optgroup label="Inflow">
+                                    <option value="Sales Deposit">Sales Deposit (POS)</option>
+                                    <option value="Petty Cash">Petty Cash (Starting Money)</option>
+                                    <option value="Transfer In">Transfer In</option>
+                                </optgroup>
+
+                                <!-- Outflow: money leaving the cash drawer -->
+                                <optgroup label="Outflow">
+                                    <option value="Cash Withdrawal">Cash Withdrawal</option>
+                                    <option value="Operating Expense">Operating Expense</option>
+                                    <option value="Salary & Wages">Salary & Wages</option>
+                                    <option value="Petty Cash Expense">Petty Cash Expense</option>
+                                    <option value="Transfer Out">Transfer Out</option>
+                                </optgroup>
                             </select>
                         </div>
+                        <input type="hidden" name="category" id="category">
 
                         <div class="mb-2">
                             <label>Amount</label>
@@ -103,7 +101,6 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Type</th>
-                                    <th>Account</th>
                                     <th>Transaction</th>
                                     <th>Amount</th>
                                     <th>Description</th>
@@ -113,17 +110,15 @@
                             <tbody>
                                 <?php $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tx): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td><?php echo e($tx->transaction_date->format('Y-m-d H:i')); ?></td>
-                                        <td><?php echo e($tx->account_type); ?></td>
-                                        <td><?php echo e($tx->account_name); ?></td>
+                                        <td><?php echo e($tx->transaction_date->format('M d, Y - h:i A')); ?></td>
+                                        <td><?php echo e($tx->category == 1 ? 'Inflow' : 'Outflow'); ?></td>
                                         <td><?php echo e($tx->transaction_type); ?></td>
                                         <td class="text-end">₱<?php echo e(number_format($tx->amount, 2)); ?></td>
                                         <td><?php echo e($tx->description); ?></td>
                                         <td class="text-center">
                                             <button class="btn btn-info btn-sm editBtn" data-id="<?php echo e($tx->id); ?>"
                                                 data-date="<?php echo e($tx->transaction_date->format('Y-m-d\TH:i')); ?>"
-                                                data-type="<?php echo e($tx->account_type); ?>"
-                                                data-account="<?php echo e($tx->account_name); ?>"
+                                                data-category="<?php echo e($tx->category); ?>"
                                                 data-trans="<?php echo e($tx->transaction_type); ?>"
                                                 data-amount="<?php echo e($tx->amount); ?>"
                                                 data-desc="<?php echo e($tx->description); ?>">
@@ -156,24 +151,44 @@
 </div>
 
 <script>
-    // Prefill form for editing
-    document.querySelectorAll('.editBtn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const form = document.getElementById('cashBankForm');
-            const txId = this.dataset.id;
+// Define transaction type categories
+const inflowTypes = ['Sales Deposit', 'Petty Cash', 'Transfer In'];
+const outflowTypes = ['Cash Withdrawal', 'Operating Expense', 'Salary & Wages', 'Petty Cash Expense', 'Transfer Out'];
 
-            document.getElementById('transaction_id').value = txId;
-            document.getElementById('transaction_date').value = this.dataset.date;
-            document.getElementById('account_type').value = this.dataset.type;
-            document.getElementById('account_name').value = this.dataset.account;
-            document.getElementById('transaction_type').value = this.dataset.trans;
-            document.getElementById('amount').value = this.dataset.amount;
-            document.getElementById('description').value = this.dataset.desc;
+// Function to get category from transaction type
+function setCategory(transactionType) {
+    if (inflowTypes.includes(transactionType)) return 1;
+    if (outflowTypes.includes(transactionType)) return 2;
+    return '';
+}
 
-            form.action = "<?php echo e(route('cashbankUpdate', ':id')); ?>".replace(':id', txId);
-            form.querySelector('#saveBtn').innerHTML = '<i class="fas fa-save"></i> Update Transaction';
-        });
+// Prefill form for editing
+document.querySelectorAll('.editBtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const form = document.getElementById('cashBankForm');
+        const txId = this.dataset.id;
+        const transactionType = this.dataset.trans;
+
+        // Fill form fields
+        document.getElementById('transaction_id').value = txId;
+        document.getElementById('transaction_date').value = this.dataset.date;
+        document.getElementById('transaction_type').value = transactionType;
+        document.getElementById('amount').value = this.dataset.amount;
+        document.getElementById('description').value = this.dataset.desc;
+
+        // Set category based on transaction type
+        document.getElementById('category').value = this.dataset.category;
+
+        // Update form action for update route
+        form.action = "<?php echo e(route('cashbankUpdate', ':id')); ?>".replace(':id', txId);
+        form.querySelector('#saveBtn').innerHTML = '<i class="fas fa-save"></i> Update Transaction';
     });
+});
+
+// Optional: automatically set category when transaction type changes
+document.getElementById('transaction_type').addEventListener('change', function() {
+    document.getElementById('category').value = setCategory(this.value);
+});
 </script>
 <?php $__env->stopSection(); ?>
 

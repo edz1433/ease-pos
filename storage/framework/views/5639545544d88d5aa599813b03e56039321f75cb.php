@@ -146,11 +146,20 @@ $('#saveInventoryBtn').on('click', function() {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(res) {
-                     Swal.fire({
+                    let msg = res.message;
+
+                    if (res.updated_products && res.updated_products.length > 0) {
+                        msg += `\n\nUpdated Products:\n`;
+                        res.updated_products.forEach(p => {
+                            msg += `#${p.product_id}: R(${p.old_rqty} → ${p.new_rqty}), W(${p.old_wqty} → ${p.new_wqty})\n`;
+                        });
+                    }
+
+                    Swal.fire({
                         title: 'Saved!',
-                        text: 'Inventory has been updated.',
+                        text: msg,
                         icon: 'success',
-                        timer: 2000,
+                        timer: 3000,
                         showConfirmButton: false
                     }).then(() => {
                         window.location.href = "<?php echo e(route('inventoryRead')); ?>";

@@ -64,7 +64,7 @@
                                                 <td class="text-center align-middle">{{ \Carbon\Carbon::parse($inv->end_date)->format('M d, Y') }}</td>
                                                 <td class="text-center align-middle">
                                                     @if($inv->status == 1)
-                                                        <span class="badge badge-success">Ongoing</span>
+                                                        <span class="badge badge-warning">Ongoing</span>
                                                     @else
                                                         <span class="badge badge-success">Done</span>
                                                     @endif

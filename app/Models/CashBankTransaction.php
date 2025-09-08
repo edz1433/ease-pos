@@ -11,11 +11,11 @@ class CashBankTransaction extends Model
 
     protected $fillable = [
         'transaction_date',
-        'account_type',
-        'account_name',
+        'category',
         'transaction_type',
         'amount',
         'description',
+        'user_id',
     ];
 
     protected $casts = [

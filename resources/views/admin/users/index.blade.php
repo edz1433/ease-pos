@@ -66,8 +66,9 @@
 
                             <label for="role">Role</label>
                             <select name="role" id="role" class="form-control form-control-sm">
-                                <option value="2" {{ ($useredit->role ?? '') == '2' ? 'selected' : '' }}>Cashier</option>
                                 <option value="1" {{ ($useredit->role ?? '') == '1' ? 'selected' : '' }}>Administrator</option>
+                                <option value="2" {{ ($useredit->role ?? '') == '2' ? 'selected' : '' }}>Cashier</option>
+                                <option value="3" {{ ($useredit->role ?? '') == '3' ? 'selected' : '' }}>Manager</option>
                             </select>
 
                             <label for="username">Username</label>

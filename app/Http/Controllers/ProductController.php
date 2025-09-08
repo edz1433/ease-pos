@@ -17,19 +17,25 @@ class ProductController extends Controller
             'barcode' => 'required|string|max:255|unique:products,barcode',
             'w_barcode' => 'required|string|max:255|unique:products,w_barcode',
             'product_name' => 'required|string|max:255',
+            'model' => 'nullable|string|max:255',  
+            'more_details' => 'nullable|string|max:1000',  
             'product_type' => 'required|in:1,2',
             'category' => 'required|string|max:255',
             'packaging' => 'required|numeric|min:1',
+
             'w_capital' => 'nullable|numeric|min:0',
             'w_price' => 'nullable|numeric|min:0',
             'w_unit' => 'nullable|string|max:50',
             'w_stock_alert' => 'nullable|numeric|min:0',
+
             'r_capital' => 'nullable|numeric|min:0',
             'r_price' => 'required|numeric|min:0',
             'r_unit' => 'nullable|string|max:50',
             'r_stock_alert' => 'nullable|numeric|min:0',
+
             'image' => 'nullable|image',
         ]);
+
 
         // Handle image upload
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
@@ -74,6 +80,8 @@ class ProductController extends Controller
             'barcode' => 'required|string|max:255|unique:products,barcode,' . $id,
             'w_barcode' => 'required|string|max:255|unique:products,w_barcode,' . $id,
             'product_name' => 'required|string|max:255',
+            'model' => 'nullable|string|max:255',  
+            'more_details' => 'nullable|string|max:1000',  
             'product_type' => 'required|in:1,2',
             'category' => 'required|string|max:255',
             'packaging' => 'required|numeric|min:1',
@@ -220,7 +228,8 @@ class ProductController extends Controller
                 ->leftJoin('units as wholesale_units', 'products.w_unit', '=', 'wholesale_units.id')
                 ->select(
                     'products.id',
-                    'products.barcode',
+                    'products.barcode',       // retail barcode
+                    'products.w_barcode',     // wholesale barcode
                     'products.product_name',
                     'products.packaging',
                     'products.r_capital',
@@ -239,22 +248,10 @@ class ProductController extends Controller
             $finalProducts = collect();
 
             foreach ($products as $product) {
-                // Split barcodes
-                $retailBarcode = null;
-                $wholesaleBarcode = null;
-
-                if (strpos($product->barcode, ',') !== false) {
-                    $parts = explode(',', $product->barcode);
-                    $retailBarcode = trim($parts[0]);
-                    $wholesaleBarcode = trim($parts[1]);
-                } else {
-                    $retailBarcode = $product->barcode;
-                }
-
                 // Retail row
                 $finalProducts->push([
                     'id' => $product->id,
-                    'barcode' => $retailBarcode,
+                    'barcode' => $product->barcode,   // retail barcode
                     'product_name' => $product->product_name,
                     'packaging' => $product->packaging,
                     'capital' => $product->r_capital,
@@ -266,11 +263,11 @@ class ProductController extends Controller
                     'type' => 'retail'
                 ]);
 
-                // Wholesale row (only if barcode exists)
-                if ($wholesaleBarcode) {
+                // Wholesale row (only if w_barcode exists)
+                if (!empty($product->w_barcode)) {
                     $finalProducts->push([
                         'id' => $product->id,
-                        'barcode' => $wholesaleBarcode,
+                        'barcode' => $product->w_barcode,  // wholesale barcode
                         'product_name' => $product->product_name,
                         'packaging' => $product->packaging,
                         'capital' => $product->w_capital,

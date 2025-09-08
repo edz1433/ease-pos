@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
-use Illuminate\Support\Facades\DB;
 use App\Models\Sale;
+use App\Models\InventoryItems;
+use App\Models\InventoryLog;
 use App\Models\SalesOrder;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class SalesController extends Controller
 {
@@ -54,7 +57,9 @@ class SalesController extends Controller
 
             $status = isset($data['status']) ? intval($data['status']) : 1;
 
-            DB::transaction(function () use ($data, $status, $vat, $totalWithVat) {
+            $paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : 'Cash';
+
+            DB::transaction(function () use ($data, $status, $vat, $totalWithVat, $paymentMethod) {
                 $sale = Sale::create([
                     'transaction_number' => $data['transaction_number'],
                     'date' => Carbon::now('Asia/Manila')->toDateString(),
@@ -67,6 +72,7 @@ class SalesController extends Controller
                     'status' => $status,
                     'customer' => $data['customer'] ?? null,
                     'table_no' => $data['table_no'] ?? null,
+                    'payment_method' => $paymentMethod,
                 ]);
 
                 foreach ($data['items'] as $item) {
@@ -363,4 +369,312 @@ class SalesController extends Controller
             ], 500);
         }
     }
+
+public function cancelOrReturnSale($saleId)
+{
+    DB::beginTransaction();
+
+    try {
+        // Find the sale with items
+        $sale = Sale::with('items')->findOrFail($saleId);
+        
+        // Get request data
+        $isPartialReturn = request('is_partial_return', false);
+        $returnItems = request('return_items', []);
+
+        // Determine action based on status
+        if ($sale->status == 1) { // Paid → Return
+            if ($isPartialReturn) {
+                $targetStatus = 5; // Partially Returned
+            } else {
+                $targetStatus = 4; // Returned
+            }
+            $adjustmentType = 'return_restock';
+        } elseif ($sale->status == 2) { // Unpaid → Cancel
+            $targetStatus = 3; // Cancelled
+            $adjustmentType = null; // No inventory change
+        } elseif ($sale->status == 3) { // Already cancelled
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Sale has already been cancelled.'
+            ], 422);
+        } elseif ($sale->status == 4 || $sale->status == 5) { // Already returned
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Sale has already been returned.'
+            ], 422);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot process this sale status.'
+            ], 422);
+        }
+
+        // Handle partial returns
+        if ($isPartialReturn && !empty($returnItems)) {
+            foreach ($returnItems as $returnItem) {
+                $order = SalesOrder::find($returnItem['sales_order_id']);
+                
+                if (!$order || $order->sales_id != $saleId) {
+                    continue; // Skip invalid items
+                }
+                
+                $product = Product::find($order->product_id);
+                if (!$product) continue;
+
+                // Validate return quantity
+                $returnQty = min($returnItem['quantity'], $order->quantity);
+                
+                if ($returnQty <= 0) continue;
+
+                // Previous quantity
+                $previousQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
+
+                // Restore inventory
+                if ($order->price_type === 'retail') {
+                    $product->increment('rqty', $returnQty);
+                } else {
+                    $product->increment('wqty', $returnQty);
+                }
+
+                $newQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
+
+                // Log inventory change
+                InventoryLog::create([
+                    'product_id' => $order->product_id,
+                    'quantity' => $returnQty,
+                    'adjustment_type' => $adjustmentType,
+                    'price_type' => $order->price_type,
+                    'previous_quantity' => $previousQty,
+                    'new_quantity' => $newQty,
+                    'reason' => 'Partial Return - ' . $sale->transaction_number,
+                    'sale_id' => $saleId,
+                    'user_id' => auth()->id(),
+                    'price' => $order->unit_price
+                ]);
+
+                // Create return history record
+                ReturnHistory::create([
+                    'sale_id' => $saleId,
+                    'sales_order_id' => $order->id,
+                    'product_id' => $order->product_id,
+                    'quantity' => $returnQty,
+                    'price' => $order->unit_price,
+                    'price_type' => $order->price_type,
+                    'reason' => $returnItem['reason'] ?? 'No reason provided',
+                    'user_id' => auth()->id()
+                ]);
+
+                // Update the sales order quantity if not returning all
+                if ($returnQty < $order->quantity) {
+                    $order->decrement('quantity', $returnQty);
+                } else {
+                    // If returning all, mark as returned
+                    $order->update(['is_returned' => true]);
+                }
+            }
+            
+            // Recalculate sale total
+            $newTotal = SalesOrder::where('sales_id', $saleId)
+                ->where('is_returned', false)
+                ->sum(DB::raw('quantity * unit_price'));
+                
+            $sale->update([
+                'total' => $newTotal,
+                'status' => $targetStatus
+            ]);
+            
+        } else {
+            // Full return/cancellation logic (your existing code)
+            $salesOrders = SalesOrder::where('sales_id', $saleId)->get();
+
+            if ($adjustmentType) { // Only restore inventory if returning
+                foreach ($salesOrders as $order) {
+                    $product = Product::find($order->product_id);
+                    if (!$product) continue;
+
+                    // Previous quantity
+                    $previousQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
+
+                    // Restore inventory
+                    if ($order->price_type === 'retail') {
+                        $product->increment('rqty', $order->quantity);
+                    } else {
+                        $product->increment('wqty', $order->quantity);
+                    }
+
+                    $newQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
+
+                    // Log inventory change
+                    InventoryLog::create([
+                        'product_id' => $order->product_id,
+                        'quantity' => $order->quantity,
+                        'adjustment_type' => $adjustmentType,
+                        'price_type' => $order->price_type,
+                        'previous_quantity' => $previousQty,
+                        'new_quantity' => $newQty,
+                        'reason' => ucfirst($adjustmentType) . ' - ' . $sale->transaction_number,
+                        'sale_id' => $saleId,
+                        'user_id' => auth()->id(),
+                        'price' => $order->unit_price
+                    ]);
+
+                    // Create return history record for full return
+                    if ($targetStatus === 4) {
+                        ReturnHistory::create([
+                            'sale_id' => $saleId,
+                            'sales_order_id' => $order->id,
+                            'product_id' => $order->product_id,
+                            'quantity' => $order->quantity,
+                            'price' => $order->unit_price,
+                            'price_type' => $order->price_type,
+                            'reason' => 'Full return',
+                            'user_id' => auth()->id()
+                        ]);
+                    }
+                }
+            }
+
+            // Update sale status
+            $sale->update([
+                'status' => $targetStatus,
+                'cancelled_at' => now(),
+                'cancelled_by' => auth()->id()
+            ]);
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $targetStatus === 3 ? 'Sale cancelled successfully' : 
+                        ($targetStatus === 4 ? 'Sale returned successfully' : 'Partial return processed successfully'),
+            'data' => [
+                'sale_id' => $saleId,
+                'status' => $sale->status,
+                'cancelled_at' => $sale->cancelled_at
+            ]
+        ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to process sale: ' . $e->getMessage()
+        ], 500);
+    }
+}
+    public function processReturn(Request $request, $saleId)
+    {
+        $validator = Validator::make($request->all(), [
+            'return_items' => 'required|array',
+            'return_items.*.product_id' => 'required|exists:products,id',
+            'return_items.*.quantity' => 'required|numeric|min:0.01',
+            'return_items.*.price_type' => 'required|in:retail,wholesale,special',
+            'return_items.*.reason' => 'required|string|max:500'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $sale = Sale::findOrFail($saleId);
+
+            if ($sale->status != Sale::STATUS_PAID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Only paid orders can be returned.'
+                ], 422);
+            }
+
+            $totalReturnAmount = 0;
+
+            foreach ($request->return_items as $item) {
+                $order = $sale->salesOrders()
+                    ->where('product_id', $item['product_id'])
+                    ->where('price_type', $item['price_type'])
+                    ->firstOrFail();
+
+                $alreadyReturned = InventoryLog::where('sale_id', $saleId)
+                    ->where('product_id', $item['product_id'])
+                    ->where('price_type', $item['price_type'])
+                    ->where('adjustment_type', 'return')
+                    ->sum('quantity');
+
+                $maxReturnable = $order->quantity - $alreadyReturned;
+                if ($item['quantity'] > $maxReturnable) {
+                    throw new \Exception("Cannot return more than purchased quantity for product ID: {$item['product_id']}");
+                }
+
+                // Update product inventory
+                $product = $order->product;
+                $previousQty = $item['price_type'] === 'retail' ? $product->rqty : $product->wqty;
+                $product->increment($item['price_type'] === 'retail' ? 'rqty' : 'wqty', $item['quantity']);
+                $newQty = $item['price_type'] === 'retail' ? $product->rqty : $product->wqty;
+
+                InventoryLog::create([
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'adjustment_type' => 'return',
+                    'price_type' => $item['price_type'],
+                    'previous_quantity' => $previousQty,
+                    'new_quantity' => $newQty,
+                    'reason' => $item['reason'],
+                    'price' => $order->unit_price,
+                    'sale_id' => $saleId,
+                    'user_id' => auth()->id()
+                ]);
+
+                $totalReturnAmount += $item['quantity'] * $order->unit_price;
+            }
+
+            // Update sale status
+            $totalSoldQty = $sale->salesOrders()->sum('quantity');
+            $totalReturnedQty = InventoryLog::where('sale_id', $saleId)
+                ->where('adjustment_type', 'return')
+                ->sum('quantity');
+
+            $sale->status = ($totalReturnedQty >= $totalSoldQty) ? Sale::STATUS_RETURNED : Sale::STATUS_PAID;
+            $sale->save();
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Return processed successfully',
+                'data' => [
+                    'sale_id' => $saleId,
+                    'total_return_amount' => $totalReturnAmount,
+                    'new_status' => $sale->status
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to process return: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function getStatusText($status)
+    {
+        switch ($status) {
+            case 1: return 'Paid';
+            case 2: return 'Unpaid';
+            case 3: return 'Cancelled';
+            case 4: return 'Returned';
+            default: return 'Unknown';
+        }
+    }
+
 }

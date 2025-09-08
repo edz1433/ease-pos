@@ -17,6 +17,7 @@ use App\Models\CashBankTransaction;
 use App\Models\CashCount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class MasterController extends Controller
 {
@@ -89,9 +90,11 @@ class MasterController extends Controller
         return view('admin.products.index', compact('categories', 'units', 'products'));
     }
 
-    public function inventoryRead(){
-        $inventories = Inventory::all();
+    public function inventoryRead()
+    {
+        $inventories = Inventory::orderBy('created_at', 'desc')->get();
         $checkinv = Inventory::where('status', 1)->first();
+
         return view('admin.inventory.index', compact('inventories', 'checkinv'));
     }
 
@@ -146,21 +149,33 @@ class MasterController extends Controller
 
     public function cashCountRead()
     {
-        // Get totals from cash transactions
-        $totalCash = CashBankTransaction::where('account_type', 'Cash')
-            ->whereIn('transaction_type', ['Deposit', 'Withdrawal', 'Expense', 'Petty Cash', 'Salary'])
-            ->sum('amount');
+        $today = Carbon::now('Asia/Manila')->toDateString();
 
-        $expensesPaid = CashBankTransaction::where('transaction_type', 'Expense')->sum('amount');
-        $pettyCashUsed = CashBankTransaction::where('transaction_type', 'Petty Cash')->sum('amount');
+        // Total Inflow for Cash today
+        $totalCashInflow = CashBankTransaction::where('category', 1)
+            ->whereDate('created_at', $today)
+            ->get();
+
+        // Total Outflow for Cash today
+        $totalCashOutflow = CashBankTransaction::where('category', 2)
+            ->whereDate('created_at', $today)
+            ->get();
+
+        $totalSalesToday = Sale::whereDate('date', Carbon::now('Asia/Manila')->toDateString()) // today in Manila
+        ->where('status', 1)
+        ->sum('total');
+
+        $totalPurchases = Purchase::where('payment_mode', 'Cash')->whereDate('created_at', $today)
+        ->sum('total_amount');
 
         $cashCounts = CashCount::latest()->get();
 
         return view('admin.cash-count.index', compact(
             'cashCounts',
-            'totalCash',
-            'expensesPaid',
-            'pettyCashUsed'
+            'totalCashInflow',
+            'totalCashOutflow',
+            'totalSalesToday',
+            'totalPurchases',
         ));
     }
 

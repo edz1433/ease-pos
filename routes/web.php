@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CashBankController;
+use App\Http\Controllers\CashCountController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchasesController;
@@ -38,6 +39,8 @@ Route::prefix('api')->group(function () {
     Route::get('/sales/{date?}', [SalesController::class, 'getSales'])->name('getSales');
     Route::get('/edit-sales/{saleId}', [SalesController::class, 'editSales'])->name('editSales');
     Route::put('/update-sales/{saleId}', [SalesController::class, 'updateSales'])->name('updateSales');
+    // Cancel an order    // Cancel sale
+    Route::post('/sales/{saleId}/cancel-or-return', [SalesController::class, 'cancelOrReturnSale']);
 });
 
 // Authenticated routes
@@ -96,6 +99,7 @@ Route::group(['middleware' => ['login_auth']], function() {
 
     Route::prefix('cash-count')->group(function () {
         Route::get('/', [MasterController::class, 'cashCountRead'])->name('cashCountRead'); 
+        Route::post('/cash-count-create', [CashCountController::class, 'cashCountCreate'])->name('cashCountCreate'); 
     });
 
     Route::prefix('user')->group(function() {
