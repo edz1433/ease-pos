@@ -15,7 +15,18 @@ class AuthCheckController extends Controller
     {
         if (Auth::guard('web')->check()) {
             $user = Auth::user();
-            
+
+            // Determine profile path
+            $profilePath = public_path('uploads/profile/' . $user->profile);
+
+            // Convert to base64 if file exists
+            if (file_exists($profilePath)) {
+                $profileData = base64_encode(file_get_contents($profilePath));
+                $profileBase64 = 'data:' . mime_content_type($profilePath) . ';base64,' . $profileData;
+            } else {
+                $profileBase64 = null;
+            }
+
             return response()->json([
                 'authenticated' => true,
                 'user' => [
@@ -25,12 +36,13 @@ class AuthCheckController extends Controller
                     'mname' => $user->mname,
                     'name' => $user->fname . ' ' . $user->lname,
                     'email' => $user->email,
-                    'username' => $user->username,  
+                    'username' => $user->username,
                     'position' => $user->position,
                     'office' => $user->office,
                     'ceiling_amount' => $user->ceiling_amount,
                     'role' => $user->role,
-                    'status' => $user->status
+                    'status' => $user->status,
+                    'profile' => $profileBase64
                 ]
             ]);
         }
@@ -46,7 +58,18 @@ class AuthCheckController extends Controller
     {
         if (Auth::guard('web')->check()) {
             $user = Auth::user();
-            
+
+            // Determine profile path
+            $profilePath = public_path('uploads/profile/' . $user->profile);
+
+            // Convert to base64 if file exists
+            if (file_exists($profilePath)) {
+                $profileData = base64_encode(file_get_contents($profilePath));
+                $profileBase64 = 'data:' . mime_content_type($profilePath) . ';base64,' . $profileData;
+            } else {
+                $profileBase64 = null;
+            }
+
             return response()->json([
                 'authenticated' => true,
                 'user' => [
@@ -54,7 +77,8 @@ class AuthCheckController extends Controller
                     'fname' => $user->fname,
                     'lname' => $user->lname,
                     'name' => $user->fname . ' ' . $user->lname,
-                    'role' => $user->role
+                    'role' => $user->role,
+                    'profile' => $profileBase64
                 ]
             ]);
         }
@@ -63,4 +87,5 @@ class AuthCheckController extends Controller
             'authenticated' => false
         ]);
     }
+
 }

@@ -115,9 +115,10 @@
                                 @foreach ($users as $user)
                                 <tr id="row-{{ $user->id }}" class="odd gradeX">
                                     <td class="text-center">
-                                        <img src="{{ $user->profile && Storage::disk('public')->exists('uploads/profile/' . $user->profile) 
-                                                    ? asset('storage/uploads/profile/' . $user->profile) 
-                                                    : asset('storage/uploads/profile/admin-default.png') }}"
+                                        <img 
+                                            src="{{ file_exists(public_path('uploads/profile/' . $user->profile)) && $user->profile
+                                                    ? asset('uploads/profile/' . $user->profile)
+                                                    : asset('uploads/profile/admin-default.png') }}"
                                             alt="Profile"
                                             class="img-thumbnail"
                                             style="width:40px; height:40px; object-fit:cover; border-radius:50%;">

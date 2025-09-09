@@ -116,9 +116,10 @@
                                 <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr id="row-<?php echo e($user->id); ?>" class="odd gradeX">
                                     <td class="text-center">
-                                        <img src="<?php echo e($user->profile && Storage::disk('public')->exists('uploads/profile/' . $user->profile) 
-                                                    ? asset('storage/uploads/profile/' . $user->profile) 
-                                                    : asset('storage/uploads/profile/admin-default.png')); ?>"
+                                        <img 
+                                            src="<?php echo e(file_exists(public_path('uploads/profile/' . $user->profile)) && $user->profile
+                                                    ? asset('uploads/profile/' . $user->profile)
+                                                    : asset('uploads/profile/admin-default.png')); ?>"
                                             alt="Profile"
                                             class="img-thumbnail"
                                             style="width:40px; height:40px; object-fit:cover; border-radius:50%;">

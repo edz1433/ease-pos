@@ -87,7 +87,7 @@ class UserController extends Controller
         $user->gender = $request->gender;
 
         // default role = cashier
-        $user->role = $request->role ?? 2;
+        $user->role = $request->role;
 
         $user->username = $request->username;
 

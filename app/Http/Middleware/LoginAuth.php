@@ -23,7 +23,7 @@ class LoginAuth
         }
 
         // Allow only role == 1
-        if (auth()->user()->role != 1) {
+        if (auth()->user()->role == 2) {
            return redirect(config('app.react_url'));
         }
 

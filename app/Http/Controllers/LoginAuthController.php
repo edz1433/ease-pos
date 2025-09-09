@@ -35,7 +35,7 @@ class LoginAuthController extends Controller
             }
 
             // Use role field consistently
-            if ($user->role == 1) {
+            if ($user->role != 2) {
                 // Admin user - redirect to Laravel dashboard
                 return redirect()->route('dashboard')->with('success', 'Login Successful');
             } else {

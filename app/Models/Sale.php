@@ -23,4 +23,9 @@ class Sale extends Model
         'payment_method',
         'status'
     ];
+
+    public function salesorder()
+    {
+        return $this->hasMany(SalesOrder::class, 'sales_id');
+    }
 }

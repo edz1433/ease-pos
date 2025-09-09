@@ -14,6 +14,7 @@ use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\Api\AuthCheckController;
+use App\Http\Controllers\Api\SalesControllerApi;
 
 Route::get('/', function () {
     return view('login');
@@ -32,15 +33,15 @@ Route::prefix('api')->group(function () {
     Route::get('/products/{category?}', [ProductController::class, 'products'])->name('products');
     Route::get('/all-products', [ProductController::class, 'getAllProducts'])->name('getAllProducts');
     Route::get('/products-by-barcode/{barcode}', [ProductController::class, 'getProductByBarcode'])->name('getAllProducts');
-    Route::post('/checkout', [SalesController::class, 'checkout']);
-    Route::get('/next-transaction-number', [SalesController::class, 'nextTransactionNumber']);
+    Route::post('/checkout', [SalesControllerApi::class, 'checkout']);
+    Route::get('/next-transaction-number', [SalesControllerApi::class, 'nextTransactionNumber']);
     
     // Sales routes
-    Route::get('/sales/{date?}', [SalesController::class, 'getSales'])->name('getSales');
-    Route::get('/edit-sales/{saleId}', [SalesController::class, 'editSales'])->name('editSales');
-    Route::put('/update-sales/{saleId}', [SalesController::class, 'updateSales'])->name('updateSales');
+    Route::get('/sales/{date?}', [SalesControllerApi::class, 'getSales'])->name('getSales');
+    Route::get('/edit-sales/{saleId}', [SalesControllerApi::class, 'editSales'])->name('editSales');
+    Route::put('/update-sales/{saleId}', [SalesControllerApi::class, 'updateSales'])->name('updateSales');
     // Cancel an order    // Cancel sale
-    Route::post('/sales/{saleId}/cancel-or-return', [SalesController::class, 'cancelOrReturnSale']);
+    Route::post('/sales/{saleId}/cancel-or-return', [SalesControllerApi::class, 'cancelOrReturnSale']);
 });
 
 // Authenticated routes
