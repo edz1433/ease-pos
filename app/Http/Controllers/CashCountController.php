@@ -35,17 +35,28 @@ class CashCountController extends Controller
             'variance'          => 'required|numeric',
         ]);
 
+        // Normalize null values to 0.00
         foreach ($data as $key => $value) {
-            if (is_null($value)) {
-                $data[$key] = 0.00;
-            } else {
-                $data[$key] = number_format((float) $value, 2, '.', '');
-            }
+            $data[$key] = is_null($value) ? 0.00 : number_format((float)$value, 2, '.', '');
         }
 
-        $cashCount = CashCount::create($data);
+        // Check if a cash count already exists for today
+        $today = now()->startOfDay();
+        $cashCount = CashCount::whereDate('created_at', $today)->first();
 
-        return redirect()->back()->with('success', 'Cash count saved successfully!');
+        if ($cashCount) {
+            // Update existing record
+            $cashCount->update($data);
+            $message = 'Cash count updated successfully';
+        } else {
+            // Create new record
+            $cashCount = CashCount::create($data);
+            $message = 'Cash count saved successfully';
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message
+        ]);
     }
-
 }

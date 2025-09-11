@@ -131,6 +131,8 @@
                                             <span class="label label-danger">Administrator</span>
                                         <?php elseif($user->role == 2): ?>
                                             <span class="label label-primary">Cashier</span>
+                                        <?php elseif($user->role == 3): ?>
+                                            <span class="label label-primary">Manager</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="center"><?php echo e($user->username); ?></td>

@@ -141,5 +141,8 @@
     @if(request()->is('inventory*'))
         @include('script.inventoryScript')
     @endif
+    @if(request()->is('cash-count*'))
+        @include('script.cashCountScript')
+    @endif
 </body>
 </html>

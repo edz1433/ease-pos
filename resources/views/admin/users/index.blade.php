@@ -130,6 +130,8 @@
                                             <span class="label label-danger">Administrator</span>
                                         @elseif($user->role == 2)
                                             <span class="label label-primary">Cashier</span>
+                                        @elseif($user->role == 3)
+                                            <span class="label label-primary">Manager</span>
                                         @endif
                                     </td>
                                     <td class="center">{{ $user->username }}</td>
