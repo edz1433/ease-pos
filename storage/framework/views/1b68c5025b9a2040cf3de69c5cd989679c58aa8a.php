@@ -30,12 +30,6 @@
             </a>
         </li>
         <li>
-            <a href="#" class="<?php echo e(request()->is('sales*') ? 'active' : ''); ?>">
-                <i class="fas fa-chart-bar"></i>
-                <span>Sales Report</span>
-            </a>
-        </li>
-        <li>
             <a href="<?php echo e(route('productRead')); ?>" class="<?php echo e(request()->is('products*') ? 'active' : ''); ?>">
                 <i class="fas fa-boxes"></i>
                 <span>Products</span>
@@ -55,6 +49,12 @@
             </a>
         </li>
         <li>
+            <a href="<?php echo e(route('salesRead')); ?>" class="<?php echo e(request()->is('sales*') ? 'active' : ''); ?>">
+                <i class="fas fa-receipt"></i>
+                <span>Sales</span>
+            </a>
+        </li>
+        <li>
             <a href="<?php echo e(route('cashbankRead')); ?>" class="<?php echo e(request()->is('cash-bank*') ? 'active' : ''); ?>">
                 <i class="fas fa-university"></i>
                 <span>Cash & Bank</span>
@@ -70,6 +70,12 @@
             <a href="<?php echo e(route('supplierRead')); ?>" class="<?php echo e(request()->is('suppliers*') ? 'active' : ''); ?>">
                 <i class="fas fa-users"></i>
                 <span>Suppliers</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="<?php echo e(request()->is('reports*') ? 'active' : ''); ?>">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
             </a>
         </li>
         <li>

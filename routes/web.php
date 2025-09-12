@@ -69,6 +69,13 @@ Route::group(['middleware' => ['login_auth']], function() {
         Route::get('/next-barcode/{id}', [ProductController::class, 'getNextBarcode'])->name('getNextBarcode');
     });
 
+    Route::prefix('sales')->group(function() {
+        Route::get('/',[MasterController::class,'salesRead'])->name('salesRead');
+        Route::post('/', [SalesController::class, 'salesEdit'])->name('salesEdit');
+        Route::post('/create',[SalesController::class,'salesCreate'])->name('salesCreate');
+        Route::post('/update/{id}', [SalesController::class, 'salesUpdate'])->name('salesUpdate');
+    });
+
     Route::prefix('inventory')->group(function() {
         Route::get('/',[MasterController::class,'inventoryRead'])->name('inventoryRead');
         Route::get('/form/{id}',[InventoryController::class,'inventoryForm'])->name('inventoryForm');

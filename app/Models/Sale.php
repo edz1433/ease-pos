@@ -21,7 +21,8 @@ class Sale extends Model
         'table_no',
         'customer',
         'payment_method',
-        'status'
+        'status',
+        'user_id'
     ];
 
     public function salesorder()

@@ -90,6 +90,12 @@ class MasterController extends Controller
         return view('admin.products.index', compact('categories', 'units', 'products'));
     }
 
+    public function salesRead()
+    {
+        $sales = Sale::all();
+        return view('admin.sales.index', compact('sales'));
+    }
+
     public function inventoryRead()
     {
         $inventories = Inventory::orderBy('created_at', 'desc')->get();
