@@ -15,7 +15,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'barcode' => 'required|string|max:255|unique:products,barcode',
-            'w_barcode' => 'required|string|max:255|unique:products,w_barcode',
+            'w_barcode' => 'nullable|string|max:255|unique:products,w_barcode',
             'product_name' => 'required|string|max:255',
             'model' => 'nullable|string|max:255',  
             'more_details' => 'nullable|string|max:1000',  
@@ -78,7 +78,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'barcode' => 'required|string|max:255|unique:products,barcode,' . $id,
-            'w_barcode' => 'required|string|max:255|unique:products,w_barcode,' . $id,
+            'w_barcode' => 'nullable|string|max:255|unique:products,w_barcode,' . $id,
             'product_name' => 'required|string|max:255',
             'model' => 'nullable|string|max:255',  
             'more_details' => 'nullable|string|max:1000',  
@@ -231,6 +231,7 @@ class ProductController extends Controller
                     'products.barcode',       // retail barcode
                     'products.w_barcode',     // wholesale barcode
                     'products.product_name',
+                    'products.model',
                     'products.packaging',
                     'products.r_capital',
                     'products.r_price',
@@ -253,6 +254,7 @@ class ProductController extends Controller
                     'id' => $product->id,
                     'barcode' => $product->barcode,   // retail barcode
                     'product_name' => $product->product_name,
+                    'model' => $product->model,
                     'packaging' => $product->packaging,
                     'capital' => $product->r_capital,
                     'price' => $product->r_price,
@@ -269,6 +271,7 @@ class ProductController extends Controller
                         'id' => $product->id,
                         'barcode' => $product->w_barcode,  // wholesale barcode
                         'product_name' => $product->product_name,
+                        'model' => $product->model,
                         'packaging' => $product->packaging,
                         'capital' => $product->w_capital,
                         'price' => $product->w_price,
