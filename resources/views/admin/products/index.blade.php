@@ -66,7 +66,6 @@
                                                 @endforeach
                                             </select>
 
-
                                             <label for="packaging">Packaging</label>
                                             <input type="number" name="packaging" value="{{ $productsedit->packaging ?? '' }}" class="form-control form-control-sm" id="packaging" required>
 

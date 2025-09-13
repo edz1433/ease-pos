@@ -71,9 +71,7 @@ Route::group(['middleware' => ['login_auth']], function() {
 
     Route::prefix('sales')->group(function() {
         Route::get('/',[MasterController::class,'salesRead'])->name('salesRead');
-        Route::post('/', [SalesController::class, 'salesEdit'])->name('salesEdit');
-        Route::post('/create',[SalesController::class,'salesCreate'])->name('salesCreate');
-        Route::post('/update/{id}', [SalesController::class, 'salesUpdate'])->name('salesUpdate');
+        Route::post('/filter', [SalesController::class, 'salesFilter'])->name('salesFilter');
     });
 
     Route::prefix('inventory')->group(function() {
