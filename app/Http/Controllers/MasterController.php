@@ -53,6 +53,7 @@ class MasterController extends Controller
         ));
     }
 
+    
     public function purchaseRead() 
     {
         $purchases = Purchase::join('suppliers', 'purchases.supplier_id', '=', 'suppliers.id')

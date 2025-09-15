@@ -26,16 +26,19 @@
 
                                         <div class="form-group">
                                             <label for="barcode">Retail Barcode <i class="fas fa-sync" onclick="generateBarcode('barcode')"></i></label>
-                                            <input type="text" name="barcode" value="<?php echo e($productsedit->barcode ?? ''); ?>" class="form-control form-control-sm" id="barcode" 
-                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                            <input type="text" name="barcode" value="<?php echo e($productsedit->barcode ?? ''); ?>" 
+                                            class="form-control form-control-sm" id="barcode"
+                                            oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
                                             onkeydown="if(event.key === 'Enter'){event.preventDefault();}"
-                                            required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                            required>
 
-                                            <label for="w_barcode">Wholesale Barcode <i class="fas fa-sync" onclick="generateBarcode('w_barcode')"></i></label>
-                                            <input type="text" name="w_barcode" value="<?php echo e($productsedit->w_barcode ?? ''); ?>" class="form-control form-control-sm" id="w_barcode" 
-                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                            onkeydown="if(event.key === 'Enter'){event.preventDefault();}"
-                                            required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                            <label for="w_barcode">Wholesale Barcode 
+                                                <i class="fas fa-sync" onclick="generateBarcode('w_barcode')"></i>
+                                            </label>
+                                            <input type="text" name="w_barcode" value="<?php echo e($productsedit->w_barcode ?? ''); ?>" 
+                                                class="form-control form-control-sm" id="w_barcode"
+                                                oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
+                                                onkeydown="if(event.key === 'Enter'){event.preventDefault();}">
                                             
                                             <label for="product_name">Product Name</label>
                                             <input type="text" name="product_name" value="<?php echo e($productsedit->product_name ?? ''); ?>" class="form-control form-control-sm" id="product_name" required>
@@ -66,7 +69,6 @@
                                                     </option>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
-
 
                                             <label for="packaging">Packaging</label>
                                             <input type="number" name="packaging" value="<?php echo e($productsedit->packaging ?? ''); ?>" class="form-control form-control-sm" id="packaging" required>

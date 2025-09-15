@@ -49,6 +49,57 @@
     });
 </script>
 <script>
+// Add this if you want submenus to toggle on click
+document.addEventListener('DOMContentLoaded', function() {
+    const submenuParents = document.querySelectorAll('.has-submenu');
+    
+    submenuParents.forEach(parent => {
+        parent.addEventListener('click', function(e) {
+            if (!e.target.matches('.nav-treeview, .nav-treeview *')) {
+                const submenu = this.querySelector('.nav-treeview');
+                if (submenu) {
+                    const isHidden = submenu.style.display === 'none' || window.getComputedStyle(submenu).display === 'none';
+                    
+                    // Toggle the 'open' class for arrow rotation
+                    if (isHidden) {
+                        this.classList.add('open');
+                        submenu.style.display = 'block';
+                    } else {
+                        this.classList.remove('open');
+                        submenu.style.display = 'none';
+                    }
+                    
+                    // Close other open submenus
+                    document.querySelectorAll('.has-submenu').forEach(menu => {
+                        if (menu !== this && menu.classList.contains('open')) {
+                            menu.classList.remove('open');
+                            const otherSubmenu = menu.querySelector('.nav-treeview');
+                            if (otherSubmenu) {
+                                otherSubmenu.style.display = 'none';
+                            }
+                        }
+                    });
+                    
+                    e.preventDefault();
+                }
+            }
+        });
+    });
+    
+    // Auto-open submenus with active items
+    document.querySelectorAll('.has-submenu').forEach(parent => {
+        const activeItems = parent.querySelectorAll('.nav-link.active');
+        if (activeItems.length > 0) {
+            parent.classList.add('active-menu', 'open');
+            const submenu = parent.querySelector('.nav-treeview');
+            if (submenu) {
+                submenu.style.display = 'block';
+            }
+        }
+    });
+});
+</script>
+<script>
     // document.addEventListener('contextmenu', function (e) {
     //     e.preventDefault();
     // });

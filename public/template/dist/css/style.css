@@ -115,6 +115,169 @@ body.sidebar-text-hide .content-wrapper {
     color: #fc204f !important;
 }
 
+/* === SUBMENU STYLING === */
+.custom-sidebar-menu .nav-treeview {
+    list-style: none !important;
+    padding-left: 1rem !important;
+    margin: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    transition: max-height 0.3s ease-in-out !important;
+}
+
+/* Auto-open for active submenus */
+.custom-sidebar-menu li.has-submenu.active-menu > .nav-treeview,
+.custom-sidebar-menu li.has-submenu.open > .nav-treeview,
+.custom-sidebar-menu li:hover > .nav-treeview {
+    max-height: 500px !important;
+    display: block !important;
+}
+
+.custom-sidebar-menu .nav-treeview .nav-item {
+    margin-bottom: 5px !important;
+}
+
+.custom-sidebar-menu .nav-treeview .nav-link {
+    margin-top: 2px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 15px !important;
+    font-size: 14px !important;
+    color: #666 !important;
+    text-decoration: none !important;
+    transition: 0.3s ease !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.custom-sidebar-menu .nav-treeview .nav-link i {
+    margin-right: 8px !important;
+    color: #999 !important;
+    font-size: 12px !important;
+    min-width: 20px !important;
+    text-align: center !important;
+}
+
+.custom-sidebar-menu .nav-treeview .nav-link:hover,
+.custom-sidebar-menu .nav-treeview .nav-link.active {
+    background-color: #fce5eb !important;
+    color: #fc204f !important;
+}
+
+.custom-sidebar-menu .nav-treeview .nav-link:hover i,
+.custom-sidebar-menu .nav-treeview .nav-link.active i {
+    color: #fc204f !important;
+}
+
+/* Parent item highlight when submenu is active */
+.custom-sidebar-menu li.has-submenu.active-menu > a,
+.custom-sidebar-menu li.has-submenu.open > a {
+    background-color: #fce5eb !important;
+    color: #fc204f !important;
+}
+
+.custom-sidebar-menu li.has-submenu.active-menu > a {
+    background-color: #fc204f !important;
+    color: #ffffff !important;
+}
+
+/* Make the icon and the span text white */
+.custom-sidebar-menu li.has-submenu.active-menu > a i,
+.custom-sidebar-menu li.has-submenu.active-menu > a .nav-icon,
+.custom-sidebar-menu li.has-submenu.active-menu > a span {
+    color: #ffffff !important;
+}
+
+/* Font Awesome uses ::before for icons — target that too */
+.custom-sidebar-menu li.has-submenu.active-menu > a i.fas::before,
+.custom-sidebar-menu li.has-submenu.active-menu > a i.far::before,
+.custom-sidebar-menu li.has-submenu.active-menu > a i.fab::before {
+    color: #ffffff !important;
+}
+
+/* === SUBMENU ARROW STYLING === */
+.custom-sidebar-menu li.has-submenu > a {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Add arrow using a separate element instead of ::after pseudo-element */
+.custom-sidebar-menu li.has-submenu > a .submenu-arrow {
+    margin-left: auto !important;
+    transition: transform 0.3s ease !important;
+    font-size: 14px !important;
+    color: #999 !important;
+    margin-right: 5px !important;
+}
+
+.custom-sidebar-menu li.has-submenu.active-menu > a .submenu-arrow,
+.custom-sidebar-menu li.has-submenu.open > a .submenu-arrow {
+    transform: rotate(180deg) !important;
+    color: #ffffff !important;
+}
+
+.custom-sidebar-menu li.has-submenu > a .submenu-arrow {
+    display: inline-block !important; /* Ensure it's always visible */
+}
+/* Collapsed state */
+body.sidebar-text-hide .custom-sidebar-menu .nav-treeview {
+    display: none !important;
+}
+
+body.sidebar-text-hide .custom-sidebar-menu li.has-submenu.active-menu .nav-treeview,
+body.sidebar-text-hide .custom-sidebar-menu li.has-submenu.open .nav-treeview,
+body.sidebar-text-hide .custom-sidebar-menu li:hover .nav-treeview {
+    display: block !important;
+    position: absolute !important;
+    left: 80px !important;
+    background: white !important;
+    width: 180px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    padding: 10px 0 !important;
+    z-index: 1000 !important;
+    max-height: none !important;
+}
+
+body.sidebar-text-hide .custom-sidebar-menu li:hover .nav-treeview .nav-link {
+    padding: 8px 15px !important;
+}
+
+/* Collapsed sidebar arrow handling */
+body.sidebar-text-hide .custom-sidebar-menu li.has-submenu > a::after {
+    display: none !important;
+}
+
+/* Fix alignment issues */
+.custom-sidebar-menu .nav-treeview .nav-link p {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+}
+
+/* Override AdminLTE defaults */
+.nav-treeview > .nav-item {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+.nav-link > .far, .nav-link > .fas {
+    width: 20px !important;
+    text-align: center !important;
+}
+
+/* Ensure proper alignment in collapsed state */
+body.sidebar-text-hide .custom-sidebar-menu li {
+    position: relative !important;
+}
+
+body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
+    justify-content: flex-start !important;
+    padding-left: 15px !important;
+}
+
 body.sidebar-mini.sidebar-collapse .main-sidebar:hover {
     width: 80px !important;
 }

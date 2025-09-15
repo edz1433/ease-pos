@@ -28,11 +28,32 @@
                 <span>Purchases</span>
             </a>
         </li>
-        <li>
+        <li class="has-submenu {{ request()->is('products*') || request()->is('categories*') || request()->is('bundles*') ? 'active-menu' : '' }}">
             <a href="{{ route('productRead') }}" class="{{ request()->is('products*') ? 'active' : '' }}">
                 <i class="fas fa-boxes"></i>
                 <span>Products</span>
+                <i class="fas fa-chevron-down submenu-arrow"></i>
             </a>
+            <ul class="nav-treeview" style="display: none;">
+                <li class="nav-item">
+                    <a href="{{ route('productRead') }}" class="nav-link {{ request()->is('products*') && !request()->is('products/classifications*') && !request()->is('bundles*') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Product list</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('classificationRead') }}" class="nav-link {{ request()->is('products*') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Classifications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link {{ request()->is('bundles*') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Bundles</p>
+                    </a>
+                </li>
+            </ul>
         </li>
         <li>
             <a href="{{ route('inventoryRead') }}" class="{{ request()->is('inventory*') ? 'active' : '' }}">

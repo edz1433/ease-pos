@@ -29,11 +29,32 @@
                 <span>Purchases</span>
             </a>
         </li>
-        <li>
+        <li class="has-submenu <?php echo e(request()->is('products*') || request()->is('categories*') || request()->is('bundles*') ? 'active-menu' : ''); ?>">
             <a href="<?php echo e(route('productRead')); ?>" class="<?php echo e(request()->is('products*') ? 'active' : ''); ?>">
                 <i class="fas fa-boxes"></i>
                 <span>Products</span>
+                <i class="fas fa-chevron-down submenu-arrow"></i>
             </a>
+            <ul class="nav-treeview" style="display: none;">
+                <li class="nav-item">
+                    <a href="<?php echo e(route('productRead')); ?>" class="nav-link <?php echo e(request()->is('products*') && !request()->is('products/classifications*') && !request()->is('bundles*') ? 'active' : ''); ?>">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Product list</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo e(route('classificationRead')); ?>" class="nav-link <?php echo e(request()->is('products*') ? 'active' : ''); ?>">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Classifications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link <?php echo e(request()->is('bundles*') ? 'active' : ''); ?>">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Bundles</p>
+                    </a>
+                </li>
+            </ul>
         </li>
         <li>
             <a href="<?php echo e(route('inventoryRead')); ?>" class="<?php echo e(request()->is('inventory*') ? 'active' : ''); ?>">

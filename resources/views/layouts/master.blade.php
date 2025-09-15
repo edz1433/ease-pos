@@ -135,6 +135,9 @@
     @if(request()->is('products*'))
         @include('script.productScript')
     @endif
+    @if(request()->is('products/classifications*'))
+        @include('script.classificationScript')
+    @endif
     @if(request()->is('sales*'))
         @include('script.salesScript')
     @endif
