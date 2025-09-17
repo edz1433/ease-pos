@@ -161,4 +161,79 @@ function generateBarcode(fieldId) {
         document.getElementById('post-form').submit();
     }
 </script>
+@if(request()->is('products/classifications*'))
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("categoryForm");
+    const idInput = document.getElementById("categoryId");
+    const nameInput = document.getElementById("categoryName");
+    const iconInput = document.getElementById("selectedIcon");
+    const iconPreview = document.getElementById("selectedIconPreview");
+    const submitBtn = document.getElementById("formSubmitBtn");
+    const cancelBtn = document.getElementById("categoryCancelBtn");
 
+    // Icon picker
+    document.querySelectorAll(".icon-picker-item").forEach(function (el) {
+        el.addEventListener("click", function (e) {
+            e.preventDefault();
+            iconInput.value = this.dataset.value;
+            iconPreview.className = this.dataset.value;
+        });
+    });
+
+    // Edit category (switch to update mode)
+    document.querySelectorAll(".edit-category").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            idInput.value = this.dataset.id;
+            nameInput.value = this.dataset.name;
+            iconInput.value = this.dataset.icon;
+            iconPreview.className = this.dataset.icon;
+
+            submitBtn.innerHTML = '<i class="fas fa-save"></i>';
+            cancelBtn.classList.remove("d-none"); // show X button
+            nameInput.focus();
+        });
+    });
+
+    // Reset back to create mode
+    form.addEventListener("reset", function () {
+        idInput.value = "";
+        nameInput.value = "";
+        iconInput.value = "";
+        iconPreview.className = "fas fa-question";
+        submitBtn.innerHTML = '<i class="fas fa-plus"></i>';
+        cancelBtn.classList.add("d-none"); // hide X button
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("addUnitForm");
+    const idInput = document.getElementById("unitId");
+    const nameInput = document.getElementById("unitName");
+    const submitBtn = document.getElementById("unitSubmitBtn");
+    const cancelBtn = document.getElementById("unitCancelBtn");
+
+    // Edit unit (switch to update mode)
+    document.querySelectorAll(".edit-unit").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            idInput.value = this.dataset.id;
+            nameInput.value = this.dataset.name;
+
+            submitBtn.innerHTML = '<i class="fas fa-save"></i>';
+            cancelBtn.classList.remove("d-none");
+            nameInput.focus();
+        });
+    });
+
+    // Reset back to create mode
+    form.addEventListener("reset", function () {
+        idInput.value = "";
+        nameInput.value = "";
+        submitBtn.innerHTML = '<i class="fas fa-plus"></i>';
+        cancelBtn.classList.add("d-none");
+    });
+});
+</script>
+@endif

@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductsClassController;
+use App\Http\Controllers\ProductBundleController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CashBankController;
@@ -71,27 +72,25 @@ Route::group(['middleware' => ['login_auth']], function() {
 
         Route::prefix('classifications')->group(function() { 
             Route::get('/', [ProductsClassController::class, 'classificationRead'])->name('classificationRead');
-            Route::post('/create', [ProductsClassController::class, 'classificationCreate'])->name('classificationCreate');
-            Route::post('/update/{id}', [ProductsClassController::class, 'classificationUpdate'])->name('classificationUpdate');
-            Route::post('/edit', [ProductsClassController::class, 'classificationEdit'])->name('classificationEdit');
-            Route::get('/delete/{id}', [ProductsClassController::class, 'classificationDelete'])->name('classificationDelete');
+            
+            Route::prefix('categories')->group(function() { 
+                Route::post('/save', [ProductsClassController::class, 'categoriesSave'])->name('categoriesSave');
+                Route::get('/delete/{id}', [ProductsClassController::class, 'categoriesDelete'])->name('categoriesDelete');
+            });
         });
 
         Route::prefix('units')->group(function() { 
-            Route::post('/create', [ProductsClassController::class, 'unitsCreate'])->name('unitsCreate');
-            Route::post('/update/{id}', [ProductsClassController::class, 'unitsUpdate'])->name('unitsUpdate');
-            Route::post('/edit', [ProductsClassController::class, 'unitsEdit'])->name('unitsEdit');
+            Route::post('/save', [ProductsClassController::class, 'unitSave'])->name('unitSave');
             Route::get('/delete/{id}', [ProductsClassController::class, 'unitsDelete'])->name('unitsDelete');
         });
         
-        Route::prefix('products')->group(function() {
-            Route::get('/bundles', [ProductController::class, 'bundleRead'])->name('bundleRead');
-            Route::get('/bundles-form', [ProductController::class, 'bundleForm'])->name('bundleForm');
-            Route::post('/bundles-create', [ProductController::class, 'bundleCreate'])->name('bundleCreate');
-            Route::post('/bundles-update/{id}', [ProductController::class, 'bundleUpdate'])->name('bundleUpdate');
-            Route::post('/bundles-edit', [ProductController::class, 'bundleEdit'])->name('bundleEdit');
-            Route::post('/bundles-add-item', [ProductController::class, 'bundleAddItem'])->name('bundleAddItem');
-            Route::get('/bundles-remove-item/{id}', [ProductController::class, 'bundleRemoveItem'])->name('bundleRemoveItem');
+        Route::prefix('bundles')->group(function() {
+            Route::get('/{id?}', [ProductBundleController::class, 'bundleRead'])->name('bundleRead');
+            Route::post('/create', [ProductBundleController::class, 'bundleCreate'])->name('bundleCreate');
+            Route::post('/update/{id}', [ProductBundleController::class, 'bundleUpdate'])->name('bundleUpdate');
+            Route::post('/edit', [ProductBundleController::class, 'bundleEdit'])->name('bundleEdit');
+            Route::post('/add-item', [ProductBundleController::class, 'bundleAddItem'])->name('bundleAddItem');
+            Route::get('/remove-item/{id}', [ProductBundleController::class, 'bundleRemoveItem'])->name('bundleRemoveItem');
         });
     });
 

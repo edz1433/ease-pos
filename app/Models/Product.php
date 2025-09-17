@@ -28,6 +28,7 @@ class Product extends Model
         'rqty',
         'image',
         'vatable',
+        'is_bundle',
         'r_stock_alert',
         'w_stock_alert',
     ];

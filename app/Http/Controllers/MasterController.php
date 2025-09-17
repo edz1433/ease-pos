@@ -96,24 +96,23 @@ class MasterController extends Controller
         $query = Sale::query();
 
         // Filter by Date Range (AdminLTE format: "MM/DD/YYYY - MM/DD/YYYY")
-if ($request->filled('date_range')) {
-    $dates = explode(' - ', $request->date_range);
+        if ($request->filled('date_range')) {
+            $dates = explode(' - ', $request->date_range);
 
-    // If only one date is selected, treat start and end as the same
-    $start = trim($dates[0]);
-    $end = isset($dates[1]) ? trim($dates[1]) : $start;
+            // If only one date is selected, treat start and end as the same
+            $start = trim($dates[0]);
+            $end = isset($dates[1]) ? trim($dates[1]) : $start;
 
-    // Convert to Y-m-d format (AdminLTE usually sends m/d/Y)
-    $start = \Carbon\Carbon::createFromFormat('m/d/Y', $start)->format('Y-m-d');
-    $end   = \Carbon\Carbon::createFromFormat('m/d/Y', $end)->format('Y-m-d');
+            // Convert to Y-m-d format (AdminLTE usually sends m/d/Y)
+            $start = \Carbon\Carbon::createFromFormat('m/d/Y', $start)->format('Y-m-d');
+            $end   = \Carbon\Carbon::createFromFormat('m/d/Y', $end)->format('Y-m-d');
 
-    $query->whereDate('created_at', '>=', $start)
-          ->whereDate('created_at', '<=', $end);
-} else {
-    // Default: today's sales
-    $query->whereDate('created_at', now()->format('Y-m-d'));
-}
-
+            $query->whereDate('created_at', '>=', $start)
+                ->whereDate('created_at', '<=', $end);
+        } else {
+            // Default: today's sales
+            $query->whereDate('created_at', now()->format('Y-m-d'));
+        }
 
         // Transaction
         if ($request->filled('transaction')) {

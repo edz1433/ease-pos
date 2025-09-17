@@ -34,52 +34,91 @@
         <div class="col-md-6">
             <h5 class="mb-3">Categories</h5>
 
-            <!-- Add Category Form -->
-            <form id="addCategoryForm" method="POST" action="{{ route('classificationRead') }}">
+            <!-- Add / Edit Category Form -->
+            <form id="categoryForm" method="POST" action="{{ route('categoriesSave') }}">
                 @csrf
+                <input type="hidden" name="id" id="categoryId">
+                <input type="hidden" name="icon" id="selectedIcon" value="{{ old('icon', '') }}">
+
                 <div class="row g-2 align-items-center">
-                    
-                    <!-- Category Name Input -->
-                    <div class="col-md-10">
-                        <input type="text" name="name" class="form-control form-control-sm" placeholder="Enter new category" required>
+                    <!-- Category Name -->
+                    <div class="col-md-9">
+                        <input type="text" name="name" id="categoryName"
+                            class="form-control form-control-sm"
+                            placeholder="Enter category name" required>
                     </div>
 
                     <!-- Icon Picker -->
                     <div class="col-md-1">
-                        <div class="input-group input-group-sm">
-                            <div class="btn-group">
-                                <!-- Dropdown button styled same as form-control-sm -->
-                                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i id="selectedIconPreview" class="{{ old('icon', 'fas fa-question') }}"></i>
-                                </button>
-
-                                <!-- Dropdown menu -->
-                                <div class="dropdown-menu dropdown-menu-right p-2" style="width:260px; max-height:220px; overflow:auto;">
-                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-glass-martini-alt" title="Beverages"><i class="fas fa-glass-martini-alt fa-lg"></i></a>
-                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-shopping-basket" title="Grocery"><i class="fas fa-shopping-basket fa-lg"></i></a>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i id="selectedIconPreview" class="{{ old('icon', 'fas fa-question') }}"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right p-2" style="max-height:220px; overflow:auto;">
+                                    <!-- Food & Drinks -->
                                     <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-utensils" title="Cooked Dish / Meal"><i class="fas fa-utensils fa-lg"></i></a>
-                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-box" title="Snack"><i class="fas fa-box fa-lg"></i></a>
-                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-mug-hot" title="Coffee"><i class="fas fa-mug-hot fa-lg"></i></a>
-                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-ice-cream" title="Ice Cream"><i class="fas fa-ice-cream fa-lg"></i></a>
-                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-blender" title="Appliances"><i class="fas fa-blender fa-lg"></i></a>
-                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-desktop" title="IT Supplies"><i class="fas fa-desktop fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-hamburger" title="Burgers"><i class="fas fa-hamburger fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-pizza-slice" title="Pizza"><i class="fas fa-pizza-slice fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-drumstick-bite" title="Chicken / Meat"><i class="fas fa-drumstick-bite fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-ice-cream" title="Ice Cream / Dessert"><i class="fas fa-ice-cream fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-egg" title="Breakfast / Eggs"><i class="fas fa-egg fa-lg"></i></a>
+
+                                    <!-- Beverages -->
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-glass-martini-alt" title="Beverages / Alcohol"><i class="fas fa-glass-martini-alt fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-mug-hot" title="Coffee / Tea"><i class="fas fa-mug-hot fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-wine-bottle" title="Wine"><i class="fas fa-wine-bottle fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-beer" title="Beer"><i class="fas fa-beer fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-blender" title="Juice / Smoothies"><i class="fas fa-blender fa-lg"></i></a>
+
+                                    <!-- Grocery & Snacks -->
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-shopping-basket" title="Grocery"><i class="fas fa-shopping-basket fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-box" title="Snacks / Packaged Food"><i class="fas fa-box fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-apple-alt" title="Fruits"><i class="fas fa-apple-alt fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-carrot" title="Vegetables"><i class="fas fa-carrot fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-fish" title="Seafood"><i class="fas fa-fish fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-bread-slice" title="Bread / Bakery"><i class="fas fa-bread-slice fa-lg"></i></a>
+                                    
+                                    <!-- Appliances & Electronics -->
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-tv" title="Television"><i class="fas fa-tv fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-laptop" title="Laptop"><i class="fas fa-laptop fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-mobile-alt" title="Mobile / Phone"><i class="fas fa-mobile-alt fa-lg"></i></a>
                                     <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-plug" title="Electronics"><i class="fas fa-plug fa-lg"></i></a>
-                                </div>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-blender-phone" title="Kitchen Appliances"><i class="fas fa-blender-phone fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-microchip" title="IT / Computer Parts"><i class="fas fa-microchip fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-desktop" title="IT Supplies"><i class="fas fa-desktop fa-lg"></i></a>
+                                    
+                                    <!-- Household & General -->
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-couch" title="Furniture"><i class="fas fa-couch fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-broom" title="Cleaning Supplies"><i class="fas fa-broom fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-toilet-paper" title="Toiletries"><i class="fas fa-toilet-paper fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-tshirt" title="Clothing"><i class="fas fa-tshirt fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-shoe-prints" title="Footwear"><i class="fas fa-shoe-prints fa-lg"></i></a>
+                                    
+                                    <!-- Others -->
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-gift" title="Gift / Special Item"><i class="fas fa-gift fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-tags" title="Discount / Offers"><i class="fas fa-tags fa-lg"></i></a>
+                                    <a href="#" class="dropdown-item icon-picker-item text-center" data-value="fas fa-cash-register" title="Cash Register / POS"><i class="fas fa-cash-register fa-lg"></i></a>
                             </div>
-                            <input type="hidden" name="icon" id="selectedIcon" value="{{ old('icon', '') }}">
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="col-md-1">
-                        <button type="submit" class="btn btn-success btn-sm w-100"><i class="fas fa-plus"></i></button>
+                    <!-- Submit + Cancel -->
+                    <div class="col-md-2 d-flex gap-1">
+                        <button type="submit" id="formSubmitBtn" class="btn btn-success btn-sm w-100 mr-1">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button type="reset" id="categoryCancelBtn" class="btn btn-secondary btn-sm d-none w-100">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-
                 </div>
-            </form><br>
+            </form>
+
+            <br>
 
             <!-- Categories Table -->
-            <table id="example3" class="table table-bordered table-sm">
+            <table class="table table-bordered table-sm">
                 <thead>
                     <tr>
                         <th style="width: 50px;">#</th>
@@ -92,11 +131,14 @@
                     @foreach ($categories as $index => $category)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td><i class="{{ $category->icon }}"></i></td>
+                            <td class="text-center"><i class="{{ $category->icon }}"></i></td>
                             <td>{{ $category->name }}</td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-primary edit-category" data-id="{{ $category->id }}">
-                                    <i class="fas fa-edit"></i>
+                                <button type="button" class="btn btn-sm btn-info edit-category"
+                                    data-id="{{ $category->id }}"
+                                    data-icon="{{ $category->icon }}"
+                                    data-name="{{ $category->name }}">
+                                    <i class="fas fa-info-circle"></i>
                                 </button>
                             </td>
                         </tr>
@@ -109,19 +151,33 @@
         <div class="col-md-6">
             <h5 class="mb-3">Units</h5>
 
-            <!-- Add Unit Form -->
-            <form id="addUnitForm" method="POST" action="{{ route('unitsCreate') }}">
+            <!-- Add / Edit Unit Form -->
+            <form id="addUnitForm" method="POST" action="{{ route('unitSave') }}">
                 @csrf
-                <div class="input-group mb-3">
-                    <input type="text" name="name" class="form-control form-control-sm" placeholder="Enter new unit" required>
-                    <button type="submit" class="btn btn-sm btn-success">
-                        <i class="fas fa-plus"></i>
-                    </button>
+                <input type="hidden" name="id" id="unitId">
+
+                <div class="row g-2 align-items-center">
+                    <!-- Unit Name -->
+                    <div class="col-md-10">
+                        <input type="text" name="name" id="unitName"
+                            class="form-control form-control-sm"
+                            placeholder="Enter new unit" required>
+                    </div>
+
+                    <!-- Submit + Cancel Buttons -->
+                    <div class="col-md-2 d-flex gap-1">
+                        <button type="submit" id="unitSubmitBtn" class="btn btn-success btn-sm w-100 mr-1">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button type="reset" id="unitCancelBtn" class="btn btn-secondary btn-sm d-none w-100">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
             </form>
-
+            <br>
             <!-- Units Table -->
-            <table id="example3" class="table table-bordered table-sm">
+            <table class="table table-bordered table-sm">
                 <thead>
                     <tr>
                         <th style="width: 50px;">#</th>
@@ -130,13 +186,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($units as $index => $unit)
+                     @foreach ($units as $index => $unit)
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $unit->name }}</td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-primary edit-unit" data-id="{{ $unit->id }}">
-                                    <i class="fas fa-edit"></i>
+                                <button type="button" class="btn btn-sm btn-info edit-unit"
+                                    data-id="{{ $unit->id }}"
+                                    data-name="{{ $unit->name }}">
+                                    <i class="fas fa-info-circle"></i>
                                 </button>
                             </td>
                         </tr>
@@ -146,42 +204,4 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("target_form_data");
-    const idInput = document.getElementById("item_id");
-    const typeInput = document.getElementById("type");
-    const nameInput = document.getElementById("name");
-    const submitBtn = document.getElementById("submit-btn");
-
-    // Handle Edit Button
-    document.querySelectorAll(".edit-btn").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            let itemId = this.getAttribute("data-id");
-            let itemType = this.getAttribute("data-type");
-            let itemName = this.getAttribute("data-name");
-
-            // Fill form
-            idInput.value = itemId;
-            typeInput.value = itemType;
-            nameInput.value = itemName;
-
-            // Change action to update route
-            form.action = "{{ url('classification/update') }}/" + itemId;
-
-            // Change button text
-            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update';
-        });
-    });
-
-    // Reset form back to create mode when cleared/refreshed
-    form.addEventListener("reset", function () {
-        idInput.value = "";
-        typeInput.value = "";
-        form.action = "{{ route('classificationCreate') }}";
-        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save';
-    });
-});
-</script>
 @endsection

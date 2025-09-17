@@ -37,19 +37,19 @@
             </a>
             <ul class="nav-treeview" style="display: none;">
                 <li class="nav-item">
-                    <a href="<?php echo e(route('productRead')); ?>" class="nav-link <?php echo e(request()->is('products*') && !request()->is('products/classifications*') && !request()->is('bundles*') ? 'active' : ''); ?>">
+                    <a href="<?php echo e(route('productRead')); ?>" class="nav-link <?php echo e(request()->is('products*') && !request()->is('products/classifications*') && !request()->is('products/bundles*') ? 'active' : ''); ?>">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Product list</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?php echo e(route('classificationRead')); ?>" class="nav-link <?php echo e(request()->is('products*') ? 'active' : ''); ?>">
+                    <a href="<?php echo e(route('classificationRead')); ?>" class="nav-link <?php echo e(request()->is('products/classifications*') ? 'active' : ''); ?>">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Classifications</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="" class="nav-link <?php echo e(request()->is('bundles*') ? 'active' : ''); ?>">
+                    <a href="<?php echo e(route('bundleRead')); ?>" class="nav-link <?php echo e(request()->is('products/bundles*') ? 'active' : ''); ?>">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Bundles</p>
                     </a>
