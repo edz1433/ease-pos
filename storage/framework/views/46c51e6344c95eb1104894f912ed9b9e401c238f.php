@@ -26,13 +26,32 @@
                 <div class="card-body bg-form">
                     <form method="POST" action="<?php echo e(route('bundleCreate')); ?>">
                         <?php echo csrf_field(); ?>
-
+                        <label for="barcode">Retail Barcode <i class="fas fa-sync" onclick="generateBarcode('barcode')"></i></label>
+                        <input type="text" name="barcode" value="<?php echo e($productsedit->barcode ?? ''); ?>" 
+                        class="form-control form-control-sm" id="barcode"
+                        oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
+                        onkeydown="if(event.key === 'Enter'){event.preventDefault();}"
+                        required>
+                        
                         <!-- Bundle Name -->
                         <div class="form-group mb-2">
                             <label for="bundle_name">Bundle Name</label>
                             <input type="text" name="bundle_name" id="bundle_name" class="form-control form-control-sm" required>
                         </div>
 
+                        <label for="category">Category</label>
+                        <select name="category" id="category" class="form-control form-control-sm" required>
+                            <option value="">-- Select Category --</option>
+                            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($category->id); ?>" 
+                                    <?php echo e(($productsedit->category ?? '') == $category->id ? 'selected' : ''); ?>>
+                                    <?php echo e($category->name); ?>
+
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+
+                        <!-- Product Selection -->
                         <div class="form-group mb-2">
                             <label for="product_select">Select Products</label>
                             <select id="product_select" class="form-control form-control-sm select2">
@@ -42,40 +61,44 @@
                                             data-name="<?php echo e($product->product_name); ?>" 
                                             data-capital="<?php echo e($product->r_capital); ?>"
                                             data-price="<?php echo e($product->r_price); ?>">
-                                        <?php echo e($product->product_name); ?> <?php echo e($product->r_price); ?>
+                                        <?php echo e($product->product_name); ?> <?php echo e($product->model); ?> <?php echo e($product->model); ?>
 
                                     </option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </div>
 
+                        <!-- Selected Products (hidden inputs will go here) -->
                         <div id="selected_products_inputs" class="mb-2"></div>
 
+                        <!-- More Details -->
                         <div class="form-group mb-2">
                             <label for="more_details">More Details</label>
-                            <textarea name="more_details" id="more_details" class="form-control form-control-sm" rows="2" cols="" required> 
-
-                            </textarea>
+                            <textarea name="more_details" id="more_details" class="form-control form-control-sm" rows="2"></textarea>
                         </div>
 
+                        <!-- Capital -->
                         <div class="form-group mb-2">
-                            <label for="bundle_capital">Bundle Capital</label>
+                            <label for="r_capital">Bundle Capital</label>
                             <input type="number" name="r_capital" id="r_capital" class="form-control form-control-sm" required readonly>
                         </div>
 
+                        <!-- Quantity -->
                         <div class="form-group mb-2">
-                            <label for="bundle_capital">Quantity</label>
+                            <label for="quantity">Quantity</label>
                             <input type="number" name="quantity" id="quantity" min="1" class="form-control form-control-sm" required>
                         </div>
 
+                        <!-- Price -->
                         <div class="form-group mb-2">
                             <label for="bundle_price">Bundle Price</label>
                             <input type="number" name="r_price" id="bundle_price" class="form-control form-control-sm" required readonly>
                         </div>
 
+                        <!-- Stock Alert -->
                         <div class="form-group mb-2">
-                            <label for="bundle_alert">Stock Alert</label>
-                            <input type="number" step="0.01" name="r_stock_alert" class="form-control form-control-sm" id="r_stock_alert" required>
+                            <label for="r_stock_alert">Stock Alert</label>
+                            <input type="number" step="0.01" name="r_stock_alert" id="r_stock_alert" class="form-control form-control-sm" required>
                         </div>
 
                         <button type="submit" class="btn btn-success w-100">
