@@ -88,7 +88,8 @@ class InventoryController extends Controller
                 'products.barcode',
                 'products.w_barcode',
                 'products.product_name',
-                'products.product_type'
+                'products.model',
+                'products.product_type',
             )
             ->get();
 

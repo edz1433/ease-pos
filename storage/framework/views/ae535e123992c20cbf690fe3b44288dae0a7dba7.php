@@ -131,6 +131,9 @@
     <?php if(request()->is('products*')): ?>
         <?php echo $__env->make('script.productScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     <?php endif; ?>
+    <?php if(request()->is('products/classifications*')): ?>
+        <?php echo $__env->make('script.classificationScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php endif; ?>
     <?php if(request()->is('sales*')): ?>
         <?php echo $__env->make('script.salesScript', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     <?php endif; ?>

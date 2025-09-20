@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\BundleItem;
 use Illuminate\Support\Facades\DB;
@@ -14,15 +15,18 @@ class ProductBundleController extends Controller
     {
         // Get all products that are bundles
         $products = Product::all(); 
-        
+        $categories = Category::all();
+
         $bundleitems = Product::where('is_bundle', 1)->get();
-        return view('admin.products.bundles', compact('products', 'bundleitems'));
+        return view('admin.products.bundles', compact('products', 'bundleitems', 'categories'));
     }
 
     public function bundleCreate(Request $request)
     {
         $request->validate([
+            'barcode' => 'required|string|max:255|unique:products,barcode',
             'bundle_name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'product_id' => 'required|array',
             'rqty' => 'required|array',
             'r_price' => 'required|numeric',
@@ -35,12 +39,15 @@ class ProductBundleController extends Controller
         DB::transaction(function() use ($request) {
             // 1. Create the bundle in products
             $bundle = Product::create([
+                'barcode' => $request->barcode,
                 'product_name' => $request->bundle_name,
+                'category' => $request->category,
                 'r_price' => $request->r_price,
                 'r_capital' => $request->r_capital,
                 'r_stock_alert' => $request->r_stock_alert,
                 'more_details' => $request->more_details,
                 'rqty' => $request->quantity,
+                'image' => 'default-product.png',
                 'is_bundle' => 1
             ]);
 
@@ -52,13 +59,13 @@ class ProductBundleController extends Controller
                 BundleItem::create([
                     'bundle_id' => $bundle->id,
                     'product_id' => $productId,
-                    'quantity' => $qty * $request->quantity, 
+                    'quantity' => $request->quantity, 
                 ]);
 
                 // Deduct quantity from product
                 $product = Product::find($productId);
                 if ($product) {
-                    $product->rqty = max(0, $product->rqty - $qty); // avoid negative
+                    $product->rqty = max(0, $product->rqty - ($qty * $request->quantity)); // avoid negative
                     $product->save();
                 }
             }

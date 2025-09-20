@@ -1,7 +1,7 @@
-@extends('layouts.master')
 
-@section('body')
-@include('layouts.formStyle')
+
+<?php $__env->startSection('body'); ?>
+<?php echo $__env->make('layouts.formStyle', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 <style>
         .product-row {
         display: flex;
@@ -24,10 +24,10 @@
             <div class="card">
                 <div class="card-header">Add Product to Bundle</div>
                 <div class="card-body bg-form">
-                    <form method="POST" action="{{ route('bundleCreate') }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('bundleCreate')); ?>">
+                        <?php echo csrf_field(); ?>
                         <label for="barcode">Retail Barcode <i class="fas fa-sync" onclick="generateBarcode('barcode')"></i></label>
-                        <input type="text" name="barcode" value="{{ $productsedit->barcode ?? '' }}" 
+                        <input type="text" name="barcode" value="<?php echo e($productsedit->barcode ?? ''); ?>" 
                         class="form-control form-control-sm" id="barcode"
                         oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
                         onkeydown="if(event.key === 'Enter'){event.preventDefault();}"
@@ -42,12 +42,13 @@
                         <label for="category">Category</label>
                         <select name="category" id="category" class="form-control form-control-sm" required>
                             <option value="">-- Select Category --</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" 
-                                    {{ ($productsedit->category ?? '') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
+                            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($category->id); ?>" 
+                                    <?php echo e(($productsedit->category ?? '') == $category->id ? 'selected' : ''); ?>>
+                                    <?php echo e($category->name); ?>
+
                                 </option>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
 
                         <!-- Product Selection -->
@@ -55,14 +56,15 @@
                             <label for="product_select">Select Products</label>
                             <select id="product_select" class="form-control form-control-sm select2">
                                 <option value="">-- Select Product --</option>
-                                @foreach ($products as $product)
-                                    <option value="{{ $product->id }}" 
-                                            data-name="{{ $product->product_name }}" 
-                                            data-capital="{{ $product->r_capital }}"
-                                            data-price="{{ $product->r_price }}">
-                                        {{ $product->product_name }} {{ $product->model }} {{ $product->model }}
+                                <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($product->id); ?>" 
+                                            data-name="<?php echo e($product->product_name); ?>" 
+                                            data-capital="<?php echo e($product->r_capital); ?>"
+                                            data-price="<?php echo e($product->r_price); ?>">
+                                        <?php echo e($product->product_name); ?> <?php echo e($product->model); ?> <?php echo e($product->model); ?>
+
                                     </option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </div>
 
@@ -122,20 +124,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($bundleitems as $item)
+                                <?php $__currentLoopData = $bundleitems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td>{{ $item->product_name }}</td>
-                                    <td>{{ $item->rqty }}</td>
+                                    <td><?php echo e($item->product_name); ?></td>
+                                    <td><?php echo e($item->rqty); ?></td>
                                     <td class="text-center">
-                                        <form action="{{ route('bundleRemoveItem', $item->id) }}" method="POST" style="display:inline-block;">
-                                            @csrf
+                                        <form action="<?php echo e(route('bundleRemoveItem', $item->id)); ?>" method="POST" style="display:inline-block;">
+                                            <?php echo csrf_field(); ?>
                                             <button class="btn btn-danger btn-sm">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                     </td>
                                 </tr>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
                     </div>
@@ -228,4 +230,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\ease-pos\resources\views/admin/products/bundles.blade.php ENDPATH**/ ?>

@@ -6,6 +6,10 @@
 <style>
     .btn-sm { font-size: 10px !important; height: 25px !important; padding: 0 .5rem !important; }
     .table th, .table td { font-size: 12px; vertical-align: middle; }
+
+    .bg-done{
+        background-color: #6dda6ec9 !important;
+    }
 </style>
 
 <div class="container-fluid">
@@ -31,18 +35,21 @@
                                     <th>#</th>
                                     <th>Barcode</th>
                                     <th>Product Name</th>
+                                    <th>Model</th>
                                     <th>Type</th>
                                     <th>Quantity</th>
                                     <th>Capital</th>
                                     <th>Subtotal</th>
+                                    <th>status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($inventoryItems as $index => $item)
-                                <tr>
+                                <tr class="">
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ ($item->price_type == 'retail') ? $item->barcode : $item->w_barcode}}</td>
                                     <td>{{ $item->product_name }}</td>
+                                    <td>{{ $item->model }}</td>
                                     <td>{{ ucfirst($item->price_type) }}</td>
                                     <td>
                                         <input type="number" min="0" class="form-control form-control-sm qty-input" 
@@ -57,6 +64,9 @@
                                     <td class="subtotal">
                                         {{ number_format($item->price_type == 'retail' ? $item->r_subtotal : $item->w_subtotal, 2) }}
                                     </td>
+                                    <td>
+                                        <span class="badge badge-{{ $item->status == 1 ? 'success' : 'warning' }}">{{ $item->status == 1 ? 'updated' : '' }}</span>
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -64,10 +74,10 @@
                                 <tr>
                                     <th colspan="6" class="text-right">Total:</th>
                                     <th id="grandTotal">{{ number_format($inventoryItems->sum(fn($i) => $i->r_subtotal + $i->w_subtotal), 2) }}</th>
+                                    <th></th>
                                 </tr>
                             </tfoot>
                         </table>
-
                     </div>
                 </div>
                 @if($inventory->status == 1)

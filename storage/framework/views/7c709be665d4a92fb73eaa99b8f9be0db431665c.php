@@ -214,8 +214,7 @@
                                                         <a href="#" class="btn btn-info btn-sm edit-btn" data-id="<?php echo e($product->id); ?>" title="Edit">
                                                             <i class="fas fa-info-circle"></i>
                                                         </a>
-                                                        <a href="#" class="btn btn-danger btn-sm delete-row" data-model="Product" data-id="<?php echo e($product->id); ?>" title="Delete" 
-                                                        onclick="return confirm('Are you sure you want to delete this product?')">
+                                                        <a href="#" class="btn btn-danger btn-sm delete-row" data-model="Product" data-id="<?php echo e($product->id); ?>" title="Delete">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </td>

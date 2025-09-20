@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Product;
+use App\Models\Inventory;
+use App\Models\InventoryItems;  
 use App\Models\ProductPreset;
 use Illuminate\Support\Facades\Storage;
 
@@ -36,7 +38,6 @@ class ProductController extends Controller
             'image' => 'nullable|image',
         ]);
 
-
         // Handle image upload
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $imagePath = $request->file('image')->store('products', 'public');
@@ -45,12 +46,45 @@ class ProductController extends Controller
             $validated['image'] = 'default-product.png';
         }
 
-        // Create the product
-        Product::create($validated);
+        $product = Product::create($validated);
+
+        $inventory = Inventory::where('status', 1)->first();
+
+        if ($inventory) {
+            $r_capital = $validated['r_capital'] ?? 0;
+            $w_capital = $validated['w_capital'] ?? 0;
+
+            if ($validated['packaging'] > 1) {
+                InventoryItems::create([
+                    'inventory_id' => $inventory->id,
+                    'product_id' => $product->id,
+                    'r_qty' => 0,
+                    'w_qty' => 0,
+                    'r_capital' => $r_capital,
+                    'w_capital' => $w_capital,
+                    'r_subtotal' => 0,
+                    'w_subtotal' => 0,
+                    'price_type' => 'wholesale',
+                    'status' => 1,
+                ]);
+            }
+
+            InventoryItems::create([
+                'inventory_id' => $inventory->id,
+                'product_id' => $product->id,
+                'r_qty' => 0,
+                'w_qty' => 0,
+                'r_capital' => $r_capital,
+                'w_capital' => $w_capital,
+                'r_subtotal' => 0,
+                'w_subtotal' => 0,
+                'price_type' => 'retail',
+                'status' => 1,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Product created successfully!');
     }
-
 
     public function productEdit(Request $request)
     {   
