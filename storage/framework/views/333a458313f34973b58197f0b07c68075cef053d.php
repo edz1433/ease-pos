@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById('topProducts').getContext('2d');
 
     const labels = <?php echo json_encode($topProducts->pluck('row_number'), 15, 512) ?>;        // 1,2,3...
-    const data = <?php echo json_encode($topProducts->pluck('total_wvat'), 15, 512) ?>;
+    const data = <?php echo json_encode($topProducts->pluck('total_items_sold'), 15, 512) ?>;
     const names = <?php echo json_encode($topProducts->pluck('product_name'), 15, 512) ?>;       // for tooltips
 
     new Chart(ctx, {
@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Total Sales',
+                label: 'Total Sold',
                 data: data.map(Number),
                 backgroundColor: [
                     'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)',

@@ -15,6 +15,7 @@ use App\Http\Controllers\CashCountController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchasesController;
+use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\Api\AuthCheckController;
 use App\Http\Controllers\Api\SalesControllerApi;
 
@@ -78,6 +79,11 @@ Route::group(['middleware' => ['login_auth']], function() {
                 Route::get('/delete/{id}', [ProductsClassController::class, 'categoriesDelete'])->name('categoriesDelete');
             });
         });
+
+        Route::prefix('stock-adjustment')->group(function() { 
+            Route::post('/stock-adjustment-create', [StockAdjustmentController::class, 'stockAdjustmentCreate'])->name('stockAdjustmentCreate');
+        });
+        
 
         Route::prefix('units')->group(function() { 
             Route::post('/save', [ProductsClassController::class, 'unitSave'])->name('unitSave');

@@ -31,18 +31,20 @@ class MasterController extends Controller
 
         $topProducts = SalesOrder::join('products', 'sales_orders.product_id', '=', 'products.id')
             ->select(
-                'products.id as product_id',        
-                'products.product_name',            
-                \DB::raw('SUM(sales_orders.price * sales_orders.quantity) as total_wvat')
+                'products.id as product_id',
+                'products.product_name',
+                \DB::raw('SUM(sales_orders.price * sales_orders.quantity) as total_wvat'),
+                \DB::raw('SUM(sales_orders.quantity) as total_items_sold') 
             )
             ->groupBy('sales_orders.product_id', 'products.id', 'products.product_name')
-            ->orderByDesc('total_wvat')
+            ->orderByDesc('total_items_sold')
             ->limit(10)
             ->get()
             ->map(function ($item, $key) {
-                $item->row_number = $key + 1;      
+                $item->row_number = $key + 1;
                 return $item;
             });
+
 
         return view('admin.dashboard.index', compact(
             'totalSales',

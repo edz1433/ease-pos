@@ -236,4 +236,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
-<?php endif; ?><?php /**PATH F:\xampp\htdocs\ease-pos\resources\views/script/productScript.blade.php ENDPATH**/ ?>
+<?php endif; ?>
+
+<script>
+    $(document).ready(function () {
+        $('#stockAdjustModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); 
+            var productId = button.data('id'); 
+            var productName = button.data('name'); 
+
+            var modal = $(this);
+            modal.find('#adjust_product_id').val(productId);
+            modal.find('#adjust_product_name').text(productName);
+
+            // reset notes
+            modal.find('#adjust_reason').val('');
+            modal.find('#adjust_notes_group').addClass('d-none');
+            modal.find('#adjust_notes').val('');
+        });
+
+        // Show notes field if "Others" is selected
+        $('#adjust_reason').on('change', function () {
+            if ($(this).val() === 'Others') {
+                $('#adjust_notes_group').removeClass('d-none');
+            } else {
+                $('#adjust_notes_group').addClass('d-none');
+                $('#adjust_notes').val('');
+            }
+        });
+    });
+</script>
+<?php /**PATH F:\xampp\htdocs\ease-pos\resources\views/script/productScript.blade.php ENDPATH**/ ?>

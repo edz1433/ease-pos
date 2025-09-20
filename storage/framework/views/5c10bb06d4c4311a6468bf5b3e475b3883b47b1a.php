@@ -211,6 +211,13 @@
 
                                                     <!-- Actions -->
                                                     <td class="text-center align-middle">
+                                                        <a href="#" class="btn btn-warning btn-sm" 
+                                                            data-toggle="modal" 
+                                                            data-target="#stockAdjustModal" 
+                                                            data-id="<?php echo e($product->id); ?>" 
+                                                            data-name="<?php echo e($product->product_name); ?>">
+                                                            <i class="fas fa-box"></i>
+                                                        </a>
                                                         <a href="#" class="btn btn-info btn-sm edit-btn" data-id="<?php echo e($product->id); ?>" title="Edit">
                                                             <i class="fas fa-info-circle"></i>
                                                         </a>
@@ -231,6 +238,88 @@
         </div>
     </div>
 </div>
+
+<!-- Stock Adjustment Modal -->
+<div class="modal fade" id="stockAdjustModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md bg-form" role="document">
+    <form method="POST" action="<?php echo e(route('stockAdjustmentCreate')); ?>">
+        <?php echo csrf_field(); ?>
+        <input type="hidden" name="product_id" id="adjust_product_id">
+
+        <div class="modal-content">
+          <div class="modal-header bg-gray text-light">
+            <h5 class="modal-title">Stock Adjustment</h5>
+            <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+              <p id="adjust_product_name" class="font-weight-bold"></p>
+
+              <!-- Adjustment Type -->
+              <div class="form-group">
+                  <label>Adjustment Type</label>
+                  <select name="adjustment_type" class="form-control" required>
+                      <option value="">-- Select Type --</option>
+                      <option value="increase">Increase</option>
+                      <option value="decrease">Decrease</option>
+                  </select>
+              </div>
+
+              <!-- Quantity -->
+              <div class="form-group">
+                  <label>Quantity</label>
+                  <input type="number" name="quantity" class="form-control" min="1" required>
+              </div>
+
+              <!-- Reason -->
+              <div class="form-group">
+                  <label>Reason</label>
+                  <select name="reason" id="adjust_reason" class="form-control" required>
+                      <option value="">-- Select Reason --</option>
+                      <option value="Damaged">Damaged</option>
+                      <option value="Expired">Expired</option>
+                      <option value="Customer Return">Customer Return</option>
+                      <option value="Lost">Lost</option>
+                      <option value="Inventory Count">Inventory Count</option>
+                      <option value="Others">Others</option>
+                  </select>
+              </div>
+
+              <!-- Notes (if "Others") -->
+              <div class="form-group d-none" id="adjust_notes_group">
+                  <label>Notes (if Others)</label>
+                  <input type="text" name="notes" id="adjust_notes" class="form-control">
+              </div>
+
+              <!-- Optional: Price Type -->
+              <div class="form-group">
+                  <label>Price Type</label>
+                  <select name="price_type" class="form-control">
+                      <option value="">-- Select Price Type --</option>
+                      <option value="Retail">Retail</option>
+                      <option value="Wholesale">Wholesale</option>
+                  </select>
+              </div>
+
+              <!-- Optional: Sale ID (for Returns) -->
+              <div class="form-group">
+                  <label>Sale ID (if return)</label>
+                  <input type="text" name="sale_id" class="form-control">
+              </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn bg-main-7 text-light">Save Adjustment</button>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>
+
+
 <form id="post-form" action="<?php echo e(route('productEdit')); ?>" method="POST" style="display: none;">
     <?php echo csrf_field(); ?>
     <input type="hidden" name="id" id="id">
@@ -246,5 +335,6 @@
         });
     });
 </script>
+
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH F:\xampp\htdocs\ease-pos\resources\views/admin/products/index.blade.php ENDPATH**/ ?>
