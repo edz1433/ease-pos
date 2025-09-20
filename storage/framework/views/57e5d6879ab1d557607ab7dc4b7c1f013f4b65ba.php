@@ -239,31 +239,27 @@ document.addEventListener("DOMContentLoaded", function () {
 <?php endif; ?>
 
 <script>
-    $(document).ready(function () {
-        $('#stockAdjustModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); 
-            var productId = button.data('id'); 
-            var productName = button.data('name'); 
-
-            var modal = $(this);
-            modal.find('#adjust_product_id').val(productId);
-            modal.find('#adjust_product_name').text(productName);
-
-            // reset notes
-            modal.find('#adjust_reason').val('');
-            modal.find('#adjust_notes_group').addClass('d-none');
-            modal.find('#adjust_notes').val('');
-        });
-
-        // Show notes field if "Others" is selected
-        $('#adjust_reason').on('change', function () {
-            if ($(this).val() === 'Others') {
-                $('#adjust_notes_group').removeClass('d-none');
-            } else {
-                $('#adjust_notes_group').addClass('d-none');
-                $('#adjust_notes').val('');
-            }
-        });
+$(document).ready(function () {
+    // Show Sale ID only when reason is Customer Return
+    $('#reason').on('change', function () {
+        if ($(this).val() === 'Customer Return') {
+            $('#saleIdGroup').show();
+        } else {
+            $('#saleIdGroup').hide();
+        }
     });
+
+    // Open modal with product_id
+    $('.adjust-stock-btn').on('click', function () {
+        let productId = $(this).data('id');
+        let productName = $(this).data('name');
+
+        $('#adjustment_product_id').val(productId);
+        $('#adjustment_product_name').text(productName);
+        
+        $('#stockAdjustmentModal').modal('show');
+    });
+});
 </script>
+
 <?php /**PATH F:\xampp\htdocs\ease-pos\resources\views/script/productScript.blade.php ENDPATH**/ ?>

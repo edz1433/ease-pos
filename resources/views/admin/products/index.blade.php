@@ -204,12 +204,12 @@
 
                                                     <!-- Actions -->
                                                     <td class="text-center align-middle">
-                                                        <a href="#" class="btn btn-warning btn-sm" 
-                                                            data-toggle="modal" 
-                                                            data-target="#stockAdjustModal" 
-                                                            data-id="{{ $product->id }}" 
-                                                            data-name="{{ $product->product_name }}">
-                                                            <i class="fas fa-box"></i>
+                                                        <a href="javascript:void(0)" 
+                                                        class="btn btn-warning btn-sm adjust-stock-btn" 
+                                                        data-id="{{ $product->id }}" 
+                                                        data-name="{{ $product->product_name }} {{ $product->model }}"
+                                                        title="Adjust Stock">
+                                                        <i class="fas fa-cubes"></i>
                                                         </a>
                                                         <a href="#" class="btn btn-info btn-sm edit-btn" data-id="{{ $product->id }}" title="Edit">
                                                             <i class="fas fa-info-circle"></i>
@@ -233,82 +233,79 @@
 </div>
 
 <!-- Stock Adjustment Modal -->
-<div class="modal fade" id="stockAdjustModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-md bg-form" role="document">
-    <form method="POST" action="{{ route('stockAdjustmentCreate') }}">
+<!-- Stock Adjustment Modal -->
+<div class="modal fade" id="stockAdjustmentModal" tabindex="-1" role="dialog" aria-labelledby="stockAdjustmentLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <form id="stockAdjustmentForm" method="POST" action="{{ route('stockAdjustmentCreate') }}">
         @csrf
-        <input type="hidden" name="product_id" id="adjust_product_id">
-
-        <div class="modal-content">
-          <div class="modal-header bg-gray text-light">
-            <h5 class="modal-title">Stock Adjustment</h5>
-            <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-
-          <div class="modal-body">
-              <p id="adjust_product_name" class="font-weight-bold"></p>
-
-              <!-- Adjustment Type -->
-              <div class="form-group">
-                  <label>Adjustment Type</label>
-                  <select name="adjustment_type" class="form-control" required>
-                      <option value="">-- Select Type --</option>
-                      <option value="increase">Increase</option>
-                      <option value="decrease">Decrease</option>
-                  </select>
-              </div>
-
-              <!-- Quantity -->
-              <div class="form-group">
-                  <label>Quantity</label>
-                  <input type="number" name="quantity" class="form-control" min="1" required>
-              </div>
-
-              <!-- Reason -->
-              <div class="form-group">
-                  <label>Reason</label>
-                  <select name="reason" id="adjust_reason" class="form-control" required>
-                      <option value="">-- Select Reason --</option>
-                      <option value="Damaged">Damaged</option>
-                      <option value="Expired">Expired</option>
-                      <option value="Customer Return">Customer Return</option>
-                      <option value="Lost">Lost</option>
-                      <option value="Inventory Count">Inventory Count</option>
-                      <option value="Others">Others</option>
-                  </select>
-              </div>
-
-              <!-- Notes (if "Others") -->
-              <div class="form-group d-none" id="adjust_notes_group">
-                  <label>Notes (if Others)</label>
-                  <input type="text" name="notes" id="adjust_notes" class="form-control">
-              </div>
-
-              <!-- Optional: Price Type -->
-              <div class="form-group">
-                  <label>Price Type</label>
-                  <select name="price_type" class="form-control">
-                      <option value="">-- Select Price Type --</option>
-                      <option value="Retail">Retail</option>
-                      <option value="Wholesale">Wholesale</option>
-                  </select>
-              </div>
-
-              <!-- Optional: Sale ID (for Returns) -->
-              <div class="form-group">
-                  <label>Sale ID (if return)</label>
-                  <input type="text" name="sale_id" class="form-control">
-              </div>
-
-          </div>
-
-          <div class="modal-footer">
-            <button type="submit" class="btn bg-main-7 text-light">Save Adjustment</button>
-          </div>
+        <div class="modal-header">
+          <h5 class="modal-title" id="stockAdjustmentLabel">Stock Adjustment</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-    </form>
+
+        <div class="modal-body">
+          <input type="hidden" name="product_id" id="adjustment_product_id">
+        <div class="form-group">
+            <p id="adjustment_product_name" class="form-control-plaintext font-weight-bold"></p>
+        </div>
+          <div class="form-group">
+            <label for="adjustment_type">Adjustment Type</label>
+            <select name="adjustment_type" id="adjustment_type" class="form-control" required>
+              <option value="">-- Select --</option>
+              <option value="restock">Restock</option>
+              <option value="sale">Sale</option>
+              <option value="return">Return</option>
+              <option value="damage">Damaged</option>
+              <option value="expired">Expired</option>
+              <option value="lost">Lost</option>
+              <option value="adjustment">Manual Adjustment</option>
+              <option value="inventory">Inventory Count</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" step="0.01" name="quantity" id="quantity" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="price_type">Price Type</label>
+            <select name="price_type" id="price_type" class="form-control">
+              <option value="retail">Retail</option>
+              <option value="wholesale">Wholesale</option>
+              <option value="special">Special</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="reason">Reason</label>
+            <select name="reason" id="reason" class="form-control">
+              <option value="">-- Select Reason --</option>
+              <option value="Customer Return">Customer Return</option>
+              <option value="Damaged">Damaged</option>
+              <option value="Expired">Expired</option>
+              <option value="Lost">Lost</option>
+              <option value="Stock Count">Stock Count</option>
+              <option value="Manual Adjustment">Manual Adjustment</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="saleIdGroup" style="display: none;">
+            <label for="sale_id">Sale ID (if return)</label>
+            <input type="number" name="sale_id" id="sale_id" class="form-control">
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn bg-main-7 text-light">Save Adjustment</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -328,5 +325,25 @@
         });
     });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Show Sale ID only when reason is Customer Return
+    document.getElementById('reason').addEventListener('change', function () {
+        if (this.value === 'Customer Return') {
+            document.getElementById('saleIdGroup').style.display = 'block';
+        } else {
+            document.getElementById('saleIdGroup').style.display = 'none';
+        }
+    });
 
+    // Open modal with product_id
+    document.querySelectorAll(".adjust-stock-btn").forEach(function(button) {
+        button.addEventListener("click", function() {
+            let productId = this.getAttribute("data-id");
+            document.getElementById("adjustment_product_id").value = productId;
+            $('#stockAdjustmentModal').modal('show');
+        });
+    });
+});
+</script>
 @endsection
