@@ -59,12 +59,12 @@
                                     <tbody>
                                         @foreach($purchases as $index => $purchase)
                                             <tr>
-                                                <td class="text-center align-middle">{{ $index + 1 }}</td>
-                                                <td class="text-center align-middle">{{ $purchase->transaction_no }}</td>
-                                                <td class="text-center align-middle">{{ $purchase->supplier_name ?? 'N/A' }}</td>
-                                                <td class="text-center align-middle">{{ $purchase->po_number ?? '-' }}</td>
-                                                <td class="text-center align-middle">{{ \Carbon\Carbon::parse($purchase->purchase_date)->format('M d, Y') ?? '-' }}</td>
-                                                <td class="text-left align-middle">
+                                                <td class="text-center  align-middle text-main-8 font-weight-bold">{{ $index + 1 }}</td>
+                                                <td class="text-center  align-middle text-main-8 font-weight-bold">{{ $purchase->transaction_no }}</td>
+                                                <td class="text-center  align-middle text-main-8 font-weight-bold">{{ $purchase->supplier_name ?? 'N/A' }}</td>
+                                                <td class="text-center  align-middle text-main-8 font-weight-bold">{{ $purchase->po_number ?? '-' }}</td>
+                                                <td class="text-center  align-middle text-main-8 font-weight-bold">{{ \Carbon\Carbon::parse($purchase->purchase_date)->format('M d, Y') ?? '-' }}</td>
+                                                <td class="text-left  align-middle text-main-8 font-weight-bold">
                                                     <b>Mode:</b> {{ $purchase->payment_mode ?? '-' }}<br>
                                                     @if($purchase->payment_mode === 'Credit')
                                                         <b>Due:</b> {{ \Carbon\Carbon::parse($purchase->due_date)->format('M d, Y') ?? '-' }}<br>
