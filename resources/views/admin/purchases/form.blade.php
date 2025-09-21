@@ -169,7 +169,7 @@
                         <hr>
                         <div class="card-body table-responsive p-0" style="height: 400px;">
                             <div class="card-header">
-                                <h3 class="card-title text-success">#: <b>{{ $purchasecheck->transaction_no }}</b></h3>
+                                <h3 class="card-title text-main-8">#: <b>{{ $purchasecheck->transaction_no }}</b></h3>
                                 <div class="card-tools mb-1">
                                     <div class="input-group input-group-sm" style="width: 200px;">
                                         <input type="text" id="table-search" name="table_search" class="form-control float-right" placeholder="Search">
@@ -206,11 +206,11 @@
                                                 $totalSelling += $subtotalSelling;
                                             @endphp
                                             <tr id="row-{{ $item->id }}">
-                                                <td>{{ $item->product_name }}</td>
-                                                <td>{{ number_format($item->price, 2) }}</td>
-                                                <td>{{ number_format($item->selling_price, 2) }}</td>
-                                                <td>{{ $item->quantity }}</td>
-                                                <td>{{ number_format($item->subtotal, 2) }}</td>
+                                                <td class="text-main-8 font-weight-bold">{{ $item->product_name }}</td>
+                                                <td class="text-main-1 font-weight-bold">{{ number_format($item->price, 2) }}</td>
+                                                <td class="text-main-1 font-weight-bold">{{ number_format($item->selling_price, 2) }}</td>
+                                                <td class="text-main-1 font-weight-bold">{{ $item->quantity }}</td>
+                                                <td class="text-main-1 font-weight-bold">{{ number_format($item->subtotal, 2) }}</td>
                                                 <td>
                                                     <button value="{{ $item->id }}" class="btn btn-danger btn-sm delete-row" data-model="PurchaseItem" data-id="{{ $item->id }}">
                                                         <i class="fas fa-trash fa-xs"></i>
@@ -222,8 +222,8 @@
                                     <tfoot>
                                         <tr>
                                             <th colspan="1" class="text-right">TOTAL:</th>
-                                            <th id="totalCostDisplay" class="text-danger">{{ number_format($totalCost, 2) }}</th>
-                                            <th class="text-success">{{ number_format($totalSelling, 2) }}</th>
+                                            <th id="totalCostDisplay" class="text-main-1">{{ number_format($totalCost, 2) }}</th>
+                                            <th class="text-main-1">{{ number_format($totalSelling, 2) }}</th>
                                             <th></th>
                                             <th></th>
                                             <th></th>

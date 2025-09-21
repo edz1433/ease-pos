@@ -113,27 +113,26 @@
                 <div class="card-header">Bundle Items</div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm" width="100%">
+                        <table id="example3" class="table table-bordered table-sm" width="100%">
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
+                                    <th>Bundle description</th>
                                     <th>Quantity</th>
-                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($bundleitems as $item)
                                 <tr>
-                                    <td>{{ $item->product_name }}</td>
-                                    <td>{{ $item->rqty }}</td>
-                                    <td class="text-center">
-                                        <form action="{{ route('bundleRemoveItem', $item->id) }}" method="POST" style="display:inline-block;">
-                                            @csrf
-                                            <button class="btn btn-danger btn-sm">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                    <td class="align-middle text-main-8"><b>{{ $item->product_name }}</b></td>
+                                    <td class="align-middle text-main-8">
+                                        @foreach($productsbundle as $pb)
+                                            @if($pb->bundle_id == $item->id)
+                                                {{ $pb->product_name }}<br>
+                                            @endif
+                                        @endforeach
                                     </td>
+                                    <td class="text-center align-middle text-main-1">{{ $item->rqty }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

@@ -164,7 +164,7 @@
                                                     </td>
 
                                                     <!-- Barcodes -->
-                                                    <td class="align-middle">
+                                                    <td class="align-middle text-main-8">
                                                         {{ 'R-' . $product->barcode }}<br>
                                                         @if($product->w_barcode)
                                                             {{ 'W-' . $product->w_barcode }}
@@ -172,7 +172,7 @@
                                                     </td>
 
                                                     <!-- Packaging -->
-                                                    <td class="text-center align-middle">{{ $product->packaging }}</td>
+                                                    <td class="text-center align-middle text-main-8">{{ $product->packaging }}</td>
 
                                                     <!-- Wholesale -->
                                                     <td class="text-center align-middle">

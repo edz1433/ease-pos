@@ -121,7 +121,7 @@
             <table class="table table-bordered table-sm">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">#</th>
+                        <th class="text-center" style="width: 50px;">#</th>
                         <th>Icon</th>
                         <th>Category</th>
                         <th style="width: 100px;">Action</th>
@@ -130,9 +130,9 @@
                 <tbody>
                     @foreach ($categories as $index => $category)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td class="text-center"><i class="{{ $category->icon }}"></i></td>
-                            <td>{{ $category->name }}</td>
+                            <td class="text-center text-main-8 font-weight-bold">{{ $index + 1 }}</td>
+                            <td class="text-center text-main-8 font-weight-bold"><i class="{{ $category->icon }}"></i></td>
+                            <td class="text-main-8 bold font-weight-bold">{{ $category->name }}</td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-info edit-category"
                                     data-id="{{ $category->id }}"
@@ -180,16 +180,16 @@
             <table class="table table-bordered table-sm">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">#</th>
-                        <th>Unit</th>
+                        <th class="text-center" style="width: 50px;">#</th>
+                        <th class="text-center">Unit</th>
                         <th style="width: 100px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                      @foreach ($units as $index => $unit)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $unit->name }}</td>
+                            <td class="text-center text-main-8 font-weight-bold">{{ $index + 1 }}</td>
+                            <td class="text-center text-main-8 font-weight-bold">{{ $unit->name }}</td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-info edit-unit"
                                     data-id="{{ $unit->id }}"

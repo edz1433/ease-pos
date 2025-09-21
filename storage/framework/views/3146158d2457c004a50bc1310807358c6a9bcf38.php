@@ -121,7 +121,7 @@
             <table class="table table-bordered table-sm">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">#</th>
+                        <th class="text-center" style="width: 50px;">#</th>
                         <th>Icon</th>
                         <th>Category</th>
                         <th style="width: 100px;">Action</th>
@@ -130,9 +130,9 @@
                 <tbody>
                     <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
-                            <td><?php echo e($index + 1); ?></td>
-                            <td class="text-center"><i class="<?php echo e($category->icon); ?>"></i></td>
-                            <td><?php echo e($category->name); ?></td>
+                            <td class="text-center text-main-8 font-weight-bold"><?php echo e($index + 1); ?></td>
+                            <td class="text-center text-main-8 font-weight-bold"><i class="<?php echo e($category->icon); ?>"></i></td>
+                            <td class="text-main-8 bold font-weight-bold"><?php echo e($category->name); ?></td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-info edit-category"
                                     data-id="<?php echo e($category->id); ?>"
@@ -180,16 +180,16 @@
             <table class="table table-bordered table-sm">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">#</th>
-                        <th>Unit</th>
+                        <th class="text-center" style="width: 50px;">#</th>
+                        <th class="text-center">Unit</th>
                         <th style="width: 100px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                      <?php $__currentLoopData = $units; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
-                            <td><?php echo e($index + 1); ?></td>
-                            <td><?php echo e($unit->name); ?></td>
+                            <td class="text-center text-main-8 font-weight-bold"><?php echo e($index + 1); ?></td>
+                            <td class="text-center text-main-8 font-weight-bold"><?php echo e($unit->name); ?></td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-info edit-unit"
                                     data-id="<?php echo e($unit->id); ?>"

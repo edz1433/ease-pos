@@ -169,7 +169,7 @@
                         <hr>
                         <div class="card-body table-responsive p-0" style="height: 400px;">
                             <div class="card-header">
-                                <h3 class="card-title text-success">#: <b><?php echo e($purchasecheck->transaction_no); ?></b></h3>
+                                <h3 class="card-title text-main-8">#: <b><?php echo e($purchasecheck->transaction_no); ?></b></h3>
                                 <div class="card-tools mb-1">
                                     <div class="input-group input-group-sm" style="width: 200px;">
                                         <input type="text" id="table-search" name="table_search" class="form-control float-right" placeholder="Search">
@@ -206,11 +206,11 @@
                                                 $totalSelling += $subtotalSelling;
                                             ?>
                                             <tr id="row-<?php echo e($item->id); ?>">
-                                                <td><?php echo e($item->product_name); ?></td>
-                                                <td><?php echo e(number_format($item->price, 2)); ?></td>
-                                                <td><?php echo e(number_format($item->selling_price, 2)); ?></td>
-                                                <td><?php echo e($item->quantity); ?></td>
-                                                <td><?php echo e(number_format($item->subtotal, 2)); ?></td>
+                                                <td class="text-main-8 font-weight-bold"><?php echo e($item->product_name); ?></td>
+                                                <td class="text-main-1 font-weight-bold"><?php echo e(number_format($item->price, 2)); ?></td>
+                                                <td class="text-main-1 font-weight-bold"><?php echo e(number_format($item->selling_price, 2)); ?></td>
+                                                <td class="text-main-1 font-weight-bold"><?php echo e($item->quantity); ?></td>
+                                                <td class="text-main-1 font-weight-bold"><?php echo e(number_format($item->subtotal, 2)); ?></td>
                                                 <td>
                                                     <button value="<?php echo e($item->id); ?>" class="btn btn-danger btn-sm delete-row" data-model="PurchaseItem" data-id="<?php echo e($item->id); ?>">
                                                         <i class="fas fa-trash fa-xs"></i>
@@ -222,8 +222,8 @@
                                     <tfoot>
                                         <tr>
                                             <th colspan="1" class="text-right">TOTAL:</th>
-                                            <th id="totalCostDisplay" class="text-danger"><?php echo e(number_format($totalCost, 2)); ?></th>
-                                            <th class="text-success"><?php echo e(number_format($totalSelling, 2)); ?></th>
+                                            <th id="totalCostDisplay" class="text-main-1"><?php echo e(number_format($totalCost, 2)); ?></th>
+                                            <th class="text-main-1"><?php echo e(number_format($totalSelling, 2)); ?></th>
                                             <th></th>
                                             <th></th>
                                             <th></th>

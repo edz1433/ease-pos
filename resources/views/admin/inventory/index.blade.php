@@ -59,9 +59,9 @@
                                     <tbody>
                                         @foreach($inventories as $index => $inv)
                                             <tr id="row-{{ $inv->id }}">
-                                                <td class="text-center align-middle">{{ $index + 1 }}</td>
-                                                <td class="text-center align-middle">{{ \Carbon\Carbon::parse($inv->start_date)->format('M d, Y') }}</td>
-                                                <td class="text-center align-middle">{{ \Carbon\Carbon::parse($inv->end_date)->format('M d, Y') }}</td>
+                                                <td class="text-center align-middle text-main-8"><b>{{ $index + 1 }}</b></td>
+                                                <td class="text-center align-middle text-main-8"><b>{{ \Carbon\Carbon::parse($inv->start_date)->format('M d, Y') }}</b></td>
+                                                <td class="text-center align-middle text-main-8"><b>{{ \Carbon\Carbon::parse($inv->end_date)->format('M d, Y') }}</b></td>
                                                 <td class="text-center align-middle">
                                                     @if($inv->status == 1)
                                                         <span class="badge badge-warning">Ongoing</span>

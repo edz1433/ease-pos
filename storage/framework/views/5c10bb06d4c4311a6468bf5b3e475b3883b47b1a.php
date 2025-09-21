@@ -168,7 +168,7 @@
                                                     </td>
 
                                                     <!-- Barcodes -->
-                                                    <td class="align-middle">
+                                                    <td class="align-middle text-main-8">
                                                         <?php echo e('R-' . $product->barcode); ?><br>
                                                         <?php if($product->w_barcode): ?>
                                                             <?php echo e('W-' . $product->w_barcode); ?>
@@ -177,7 +177,7 @@
                                                     </td>
 
                                                     <!-- Packaging -->
-                                                    <td class="text-center align-middle"><?php echo e($product->packaging); ?></td>
+                                                    <td class="text-center align-middle text-main-8"><?php echo e($product->packaging); ?></td>
 
                                                     <!-- Wholesale -->
                                                     <td class="text-center align-middle">

@@ -59,9 +59,9 @@
                                     <tbody>
                                         <?php $__currentLoopData = $inventories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $inv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <tr id="row-<?php echo e($inv->id); ?>">
-                                                <td class="text-center align-middle"><?php echo e($index + 1); ?></td>
-                                                <td class="text-center align-middle"><?php echo e(\Carbon\Carbon::parse($inv->start_date)->format('M d, Y')); ?></td>
-                                                <td class="text-center align-middle"><?php echo e(\Carbon\Carbon::parse($inv->end_date)->format('M d, Y')); ?></td>
+                                                <td class="text-center align-middle text-main-8"><b><?php echo e($index + 1); ?></b></td>
+                                                <td class="text-center align-middle text-main-8"><b><?php echo e(\Carbon\Carbon::parse($inv->start_date)->format('M d, Y')); ?></b></td>
+                                                <td class="text-center align-middle text-main-8"><b><?php echo e(\Carbon\Carbon::parse($inv->end_date)->format('M d, Y')); ?></b></td>
                                                 <td class="text-center align-middle">
                                                     <?php if($inv->status == 1): ?>
                                                         <span class="badge badge-warning">Ongoing</span>

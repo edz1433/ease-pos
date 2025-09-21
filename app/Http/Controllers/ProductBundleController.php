@@ -13,12 +13,14 @@ class ProductBundleController extends Controller
     // Show all bundles (products that are bundles)
     public function bundleRead($id = null)
     {
-        // Get all products that are bundles
         $products = Product::all(); 
+        $productsbundle = BundleItem::join('products', 'bundle_items.product_id', '=', 'products.id')
+            ->select('products.*', 'bundle_items.product_id', 'bundle_items.bundle_id')
+            ->get(); 
         $categories = Category::all();
 
         $bundleitems = Product::where('is_bundle', 1)->get();
-        return view('admin.products.bundles', compact('products', 'bundleitems', 'categories'));
+        return view('admin.products.bundles', compact('products', 'bundleitems', 'categories', 'productsbundle'));
     }
 
     public function bundleCreate(Request $request)

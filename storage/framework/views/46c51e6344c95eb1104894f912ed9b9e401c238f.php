@@ -115,27 +115,26 @@
                 <div class="card-header">Bundle Items</div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm" width="100%">
+                        <table id="example3" class="table table-bordered table-sm" width="100%">
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
+                                    <th>Bundle description</th>
                                     <th>Quantity</th>
-                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php $__currentLoopData = $bundleitems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td><?php echo e($item->product_name); ?></td>
-                                    <td><?php echo e($item->rqty); ?></td>
-                                    <td class="text-center">
-                                        <form action="<?php echo e(route('bundleRemoveItem', $item->id)); ?>" method="POST" style="display:inline-block;">
-                                            <?php echo csrf_field(); ?>
-                                            <button class="btn btn-danger btn-sm">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                    <td class="align-middle text-main-8"><b><?php echo e($item->product_name); ?></b></td>
+                                    <td class="align-middle text-main-8">
+                                        <?php $__currentLoopData = $productsbundle; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if($pb->bundle_id == $item->id): ?>
+                                                <?php echo e($pb->product_name); ?><br>
+                                            <?php endif; ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </td>
+                                    <td class="text-center align-middle text-main-1"><?php echo e($item->rqty); ?></td>
                                 </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
