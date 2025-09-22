@@ -62,6 +62,10 @@ Route::group(['middleware' => ['login_auth']], function() {
         
     });
 
+    Route::prefix('warehouse')->group(function() {
+        Route::get('/',[MasterController::class,'warehouseRead'])->name('warehouseRead');
+    });
+
     Route::prefix('products')->group(function() {
         Route::get('/',[MasterController::class,'productRead'])->name('productRead');
         Route::post('/create',[ProductController::class,'productCreate'])->name('productCreate');

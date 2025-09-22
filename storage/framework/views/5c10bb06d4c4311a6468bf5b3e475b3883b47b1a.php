@@ -109,7 +109,7 @@
                                     </form>
                                 </div>
                             </div>
-                        </div>
+                        </div>  
 
                         <!-- Product Table Column -->
                         <div class="col-lg-9">
@@ -124,6 +124,7 @@
                                                 <th>Packaging</th>
                                                 <th>Wholesale</th>
                                                 <th>Retail</th>
+                                                <th>Sold</th>
                                                 <th class="text-center align-middle">Actions</th>
                                             </tr>
                                         </thead>
@@ -191,6 +192,12 @@
                                                                 <span class="badge bg-warning text-dark">Low</span>
                                                             <?php endif; ?>
                                                         </small>
+                                                    </td>
+
+                                                    <td class="text-left align-middle text-main-1">
+                                                        R-<?php echo e(number_format($product->total_sold_r) ?? 0); ?><br>
+                                                        W-<?php echo e(number_format($product->total_sold_w) ?? 0); ?>
+
                                                     </td>
 
                                                     <!-- Actions -->

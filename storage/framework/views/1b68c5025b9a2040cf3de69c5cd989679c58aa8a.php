@@ -29,6 +29,12 @@
                 <span>Purchases</span>
             </a>
         </li>
+        <li>
+            <a href="<?php echo e(route('warehouseRead')); ?>" class="<?php echo e(request()->is('purchases*') ? 'active' : ''); ?>">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Warehouse</span>
+            </a>
+        </li>
         <li class="has-submenu <?php echo e(request()->is('products*') || request()->is('categories*') || request()->is('bundles*') ? 'active-menu' : ''); ?>">
             <a href="<?php echo e(route('productRead')); ?>" class="<?php echo e(request()->is('products*') ? 'active' : ''); ?>">
                 <i class="fas fa-boxes"></i>

@@ -75,20 +75,34 @@ class MasterController extends Controller
         return view('admin.suppliers.index', compact('suppliers'));
     }
 
+    public function warehouseRead()
+    {
+        return view('admin.warehouse.index');
+    }
+
     public function productRead()
     {   
         $categories = Category::all();
         $units = Unit::all();
+
         $products = Product::select(
-            'products.*',
-            'categories.name as category_name',
-            'r_unit.name as r_unit_name',
-            'w_unit.name as w_unit_name'
-        )
-        ->leftJoin('categories', 'products.category', '=', 'categories.id')
-        ->leftJoin('units as r_unit', 'products.r_unit', '=', 'r_unit.id')
-        ->leftJoin('units as w_unit', 'products.w_unit', '=', 'w_unit.id')
-        ->get();
+                'products.*',
+                'categories.name as category_name',
+                'r_unit.name as r_unit_name',
+                'w_unit.name as w_unit_name',
+                DB::raw("(SELECT COALESCE(SUM(s.quantity),0) 
+                        FROM sales_orders s 
+                        WHERE s.product_id = products.id 
+                            AND s.price_type = 'retail') as total_sold_r"),
+                DB::raw("(SELECT COALESCE(SUM(s.quantity),0) 
+                        FROM sales_orders s 
+                        WHERE s.product_id = products.id 
+                            AND s.price_type = 'wholesale') as total_sold_w")
+            )
+            ->leftJoin('categories', 'products.category', '=', 'categories.id')
+            ->leftJoin('units as r_unit', 'products.r_unit', '=', 'r_unit.id')
+            ->leftJoin('units as w_unit', 'products.w_unit', '=', 'w_unit.id')
+            ->get();
 
         return view('admin.products.index', compact('categories', 'units', 'products'));
     }

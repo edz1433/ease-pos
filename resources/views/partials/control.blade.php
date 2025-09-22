@@ -28,6 +28,12 @@
                 <span>Purchases</span>
             </a>
         </li>
+        <li>
+            <a href="{{ route('warehouseRead') }}" class="{{ request()->is('purchases*') ? 'active' : '' }}">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Warehouse</span>
+            </a>
+        </li>
         <li class="has-submenu {{ request()->is('products*') || request()->is('categories*') || request()->is('bundles*') ? 'active-menu' : '' }}">
             <a href="{{ route('productRead') }}" class="{{ request()->is('products*') ? 'active' : '' }}">
                 <i class="fas fa-boxes"></i>
