@@ -109,22 +109,6 @@
         </div> <!-- end col -->
     </div>
 </div>
-
-<form id="post-form" action="<?php echo e(route('supplierEdit')); ?>" method="POST" style="display: none;">
-    <?php echo csrf_field(); ?>
-    <input type="hidden" name="id" id="id">
-</form>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".edit-btn").forEach(function (btn) {
-            btn.addEventListener("click", function () {
-                let supplierId = this.getAttribute("data-id");
-                document.getElementById("id").value = supplierId;
-                document.getElementById("post-form").submit();
-            });
-        });
-    });
-</script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH F:\xampp\htdocs\ease-pos\resources\views/admin/suppliers/index.blade.php ENDPATH**/ ?>

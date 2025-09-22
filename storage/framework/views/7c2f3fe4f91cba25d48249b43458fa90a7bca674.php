@@ -59,7 +59,7 @@
                                     <tbody>
                                         <?php $__currentLoopData = $purchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $purchase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <tr>
-                                                <td class="text-center  align-middle text-main-8 font-weight-bold"><?php echo e($index + 1); ?></td>
+                                                <td class="text-center  align-middle text-main-8 c"><?php echo e($index + 1); ?></td>
                                                 <td class="text-center  align-middle text-main-8 font-weight-bold"><?php echo e($purchase->transaction_no); ?></td>
                                                 <td class="text-center  align-middle text-main-8 font-weight-bold"><?php echo e($purchase->supplier_name ?? 'N/A'); ?></td>
                                                 <td class="text-center  align-middle text-main-8 font-weight-bold"><?php echo e($purchase->po_number ?? '-'); ?></td>

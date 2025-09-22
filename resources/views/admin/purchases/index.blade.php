@@ -59,7 +59,7 @@
                                     <tbody>
                                         @foreach($purchases as $index => $purchase)
                                             <tr>
-                                                <td class="text-center  align-middle text-main-8 font-weight-bold">{{ $index + 1 }}</td>
+                                                <td class="text-center  align-middle text-main-8 c">{{ $index + 1 }}</td>
                                                 <td class="text-center  align-middle text-main-8 font-weight-bold">{{ $purchase->transaction_no }}</td>
                                                 <td class="text-center  align-middle text-main-8 font-weight-bold">{{ $purchase->supplier_name ?? 'N/A' }}</td>
                                                 <td class="text-center  align-middle text-main-8 font-weight-bold">{{ $purchase->po_number ?? '-' }}</td>

@@ -56,12 +56,12 @@
                                     <tbody>
                                         <?php $__currentLoopData = $cashCounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cash): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
-                                            <td class="text-center"><?php echo e($cash->id); ?></td>
-                                            <td><?php echo e(number_format($cash->total_inflow, 2)); ?></td>
-                                            <td><?php echo e(number_format($cash->total_outflow, 2)); ?></td>
-                                            <td><?php echo e(number_format($cash->total_sales_today, 2)); ?></td>
-                                            <td><?php echo e($cash->variance); ?></td>
-                                            <td><?php echo e($cash->created_at->format('Y-m-d H:i')); ?></td>
+                                            <td class="text-center align-middle text-main-8 font-weight-bold"><?php echo e($cash->id); ?></td>
+                                            <td class="align-middle text-main-1 font-weight-bold"><?php echo e(number_format($cash->total_inflow, 2)); ?></td>
+                                            <td class="align-middle text-main-1 font-weight-bold"><?php echo e(number_format($cash->total_outflow, 2)); ?></td>
+                                            <td class="align-middle text-main-1 font-weight-bold"><?php echo e(number_format($cash->total_sales_today, 2)); ?></td>
+                                            <td class="align-middle text-main-1 font-weight-bold"><?php echo e($cash->variance); ?></td>
+                                            <td class="align-middle text-main-8 font-weight-bold"><?php echo e($cash->created_at->format('Y-m-d H:i')); ?></td>
                                             <td class="text-center">
                                                 <a href="<?php echo e(route('cashCountEntry', $cash->id)); ?>" class="btn btn-info btn-sm">
                                                     <i class="fas fa-info-circle"></i>

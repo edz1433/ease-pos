@@ -56,12 +56,12 @@
                                     <tbody>
                                         @foreach($cashCounts as $cash)
                                         <tr>
-                                            <td class="text-center">{{ $cash->id }}</td>
-                                            <td>{{ number_format($cash->total_inflow, 2) }}</td>
-                                            <td>{{ number_format($cash->total_outflow, 2) }}</td>
-                                            <td>{{ number_format($cash->total_sales_today, 2) }}</td>
-                                            <td>{{ $cash->variance }}</td>
-                                            <td>{{ $cash->created_at->format('Y-m-d H:i') }}</td>
+                                            <td class="text-center align-middle text-main-8 font-weight-bold">{{ $cash->id }}</td>
+                                            <td class="align-middle text-main-1 font-weight-bold">{{ number_format($cash->total_inflow, 2) }}</td>
+                                            <td class="align-middle text-main-1 font-weight-bold">{{ number_format($cash->total_outflow, 2) }}</td>
+                                            <td class="align-middle text-main-1 font-weight-bold">{{ number_format($cash->total_sales_today, 2) }}</td>
+                                            <td class="align-middle text-main-1 font-weight-bold">{{ $cash->variance }}</td>
+                                            <td class="align-middle text-main-8 font-weight-bold">{{ $cash->created_at->format('Y-m-d H:i') }}</td>
                                             <td class="text-center">
                                                 <a href="{{ route('cashCountEntry', $cash->id) }}" class="btn btn-info btn-sm">
                                                     <i class="fas fa-info-circle"></i>
