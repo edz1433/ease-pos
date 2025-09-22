@@ -123,9 +123,9 @@
                                             class="img-thumbnail"
                                             style="width:40px; height:40px; object-fit:cover; border-radius:50%;">
                                     </td>
-                                    <td>{{ $user->fname }} {{ $user->lname }}</td>
-                                    <td>{{ $user->gender }}</td>    
-                                    <td>
+                                    <td class="align-middle text-main-8 font-weight-bold">{{ $user->fname }} {{ $user->lname }}</td>
+                                    <td class="align-middle text-main-8 font-weight-bold">{{ $user->gender }}</td>    
+                                    <td class="align-middle text-main-8 font-weight-bold">
                                         @if ($user->role == 1)
                                             <span class="label label-danger">Administrator</span>
                                         @elseif($user->role == 2)
@@ -134,7 +134,7 @@
                                             <span class="label label-primary">Manager</span>
                                         @endif
                                     </td>
-                                    <td class="center">{{ $user->username }}</td>
+                                    <td class="align-middle text-main-8 font-weight-bold" class="center">{{ $user->username }}</td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-info btn-sm edit-btn" data-id="{{ $user->id }}">
                                             <i class="fas fa-info-circle"></i>

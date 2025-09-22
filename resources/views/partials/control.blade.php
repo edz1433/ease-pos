@@ -80,11 +80,28 @@
                 <span>Cash & Bank</span>
             </a>
         </li>
-        <li>
+        <li class="has-submenu {{ request()->is('cash-count*') ? 'active-menu' : '' }}">
             <a href="{{ route('cashCountRead') }}" class="{{ request()->is('cash-count*') ? 'active' : '' }}">
                 <i class="fas fa-coins"></i>
                 <span>Cash Count</span>
+                <i class="fas fa-chevron-down submenu-arrow"></i>
             </a>
+            <ul class="nav-treeview" style="display: none;">
+                <li class="nav-item">
+                    <a href="{{ route('cashCountRead') }}" 
+                    class="nav-link {{ request()->is('cash-count') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Cash Count List</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('cashCountEntry') }}" 
+                    class="nav-link {{ request()->is('cash-count/cash-entry*') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Cash Entry</p>
+                    </a>
+                </li>
+            </ul>
         </li>
         <li>
             <a href="{{ route('supplierRead') }}" class="{{ request()->is('suppliers*') ? 'active' : '' }}">

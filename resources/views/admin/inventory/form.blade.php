@@ -28,7 +28,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <table id="inventory-table" class="table table-head-fixed text-nowrap">
                             <thead>
                                 <tr>

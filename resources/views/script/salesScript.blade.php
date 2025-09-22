@@ -3,7 +3,7 @@
         // Initialize DataTable
         const table = $('#salesTable').DataTable({
             pageLength: 10,
-            lengthMenu: [10, 25, 50, 100],
+            lengthChange: false, // 🔹 hides the "Show entries" dropdown
             order: [[0, 'desc']] // Sort by date descending by default
         });
         

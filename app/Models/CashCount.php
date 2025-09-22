@@ -10,9 +10,8 @@ class CashCount extends Model
     use HasFactory;
 
     protected $fillable = [
-        'date',
-        'qty_025',
-        'qty_050',
+        'qty_0_25',
+        'qty_0_50',
         'qty_1',
         'qty_5',
         'qty_10',
@@ -23,8 +22,10 @@ class CashCount extends Model
         'qty_1000',
         'gcash',
         'bank',
-        'inflow',
-        'outflow',
-        'pirchases',
+        'total_inflow',
+        'total_outflow',
+        'total_purchases',
+        'total_sales_today',
+        'variance',
     ];
 }

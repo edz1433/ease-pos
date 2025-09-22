@@ -73,6 +73,7 @@ class SalesControllerApi extends Controller
                     'customer' => $data['customer'] ?? null,
                     'table_no' => $data['table_no'] ?? null,
                     'payment_method' => $paymentMethod,
+                    'user_id' => auth()->id(),
                 ]);
 
                 foreach ($data['items'] as $item) {

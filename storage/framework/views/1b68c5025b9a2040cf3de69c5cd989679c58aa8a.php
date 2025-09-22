@@ -81,11 +81,28 @@
                 <span>Cash & Bank</span>
             </a>
         </li>
-        <li>
+        <li class="has-submenu <?php echo e(request()->is('cash-count*') ? 'active-menu' : ''); ?>">
             <a href="<?php echo e(route('cashCountRead')); ?>" class="<?php echo e(request()->is('cash-count*') ? 'active' : ''); ?>">
                 <i class="fas fa-coins"></i>
                 <span>Cash Count</span>
+                <i class="fas fa-chevron-down submenu-arrow"></i>
             </a>
+            <ul class="nav-treeview" style="display: none;">
+                <li class="nav-item">
+                    <a href="<?php echo e(route('cashCountRead')); ?>" 
+                    class="nav-link <?php echo e(request()->is('cash-count') ? 'active' : ''); ?>">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Cash Count List</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo e(route('cashCountEntry')); ?>" 
+                    class="nav-link <?php echo e(request()->is('cash-count/cash-entry*') ? 'active' : ''); ?>">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Cash Entry</p>
+                    </a>
+                </li>
+            </ul>
         </li>
         <li>
             <a href="<?php echo e(route('supplierRead')); ?>" class="<?php echo e(request()->is('suppliers*') ? 'active' : ''); ?>">

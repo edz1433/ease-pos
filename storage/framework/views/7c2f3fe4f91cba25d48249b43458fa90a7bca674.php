@@ -76,7 +76,7 @@
 
                                                     <?php endif; ?>
                                                 </td>
-                                                <td class="text-danger align-middle"><b><?php echo e(number_format($purchase->total_amount, 2)); ?></b></td>
+                                                <td class="text-center text-main-1 align-middle"><b><?php echo e(number_format($purchase->total_amount, 2)); ?></b></td>
                                                 <td class="text-center align-middle">
                                                     <?php if($purchase->payment_status == "paid"): ?>
                                                         <span class="badge badge-success align-middle">paid</span>
@@ -85,9 +85,6 @@
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="text-center align-middle">
-                                                    <button type="button" class="btn btn-info btn-sm edit-btn" data-id="<?php echo e($purchase->id); ?>">
-                                                        <i class="fas fa-info-circle"></i>
-                                                    </button>
                                                     <button value="<?php echo e($purchase->id); ?>" class="btn btn-danger btn-sm delete-row" data-model="PurchaseItem" data-id="<?php echo e($purchase->id); ?>">
                                                         <i class="fas fa-trash"></i>
                                                     </button>

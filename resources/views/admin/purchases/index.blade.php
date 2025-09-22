@@ -75,7 +75,7 @@
                                                         <b>Check No:</b> {{ $purchase->check_number ?? '-' }}
                                                     @endif
                                                 </td>
-                                                <td class="text-danger align-middle"><b>{{ number_format($purchase->total_amount, 2) }}</b></td>
+                                                <td class="text-center text-main-1 align-middle"><b>{{ number_format($purchase->total_amount, 2) }}</b></td>
                                                 <td class="text-center align-middle">
                                                     @if($purchase->payment_status == "paid")
                                                         <span class="badge badge-success align-middle">paid</span>
@@ -84,9 +84,6 @@
                                                     @endif
                                                 </td>
                                                 <td class="text-center align-middle">
-                                                    <button type="button" class="btn btn-info btn-sm edit-btn" data-id="{{ $purchase->id }}">
-                                                        <i class="fas fa-info-circle"></i>
-                                                    </button>
                                                     <button value="{{ $purchase->id }}" class="btn btn-danger btn-sm delete-row" data-model="PurchaseItem" data-id="{{ $purchase->id }}">
                                                         <i class="fas fa-trash"></i>
                                                     </button>

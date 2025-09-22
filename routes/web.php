@@ -127,7 +127,7 @@ Route::group(['middleware' => ['login_auth']], function() {
     });
 
     Route::prefix('cash-bank')->middleware(['auth'])->group(function () {
-        Route::get('/', [MasterController::class, 'cashbankRead'])->name('cashbankRead');
+        Route::get('/{date?}', [MasterController::class, 'cashbankRead'])->name('cashbankRead');
         Route::post('/create', [CashBankController::class, 'cashbankCreate'])->name('cashbankCreate');
         Route::get('/edit/{id}', [CashBankController::class, 'cashbankEdit'])->name('cashbankEdit');
         Route::post('/update/{id}', [CashBankController::class, 'cashbankUpdate'])->name('cashbankUpdate');
@@ -136,6 +136,7 @@ Route::group(['middleware' => ['login_auth']], function() {
 
     Route::prefix('cash-count')->group(function () {
         Route::get('/', [MasterController::class, 'cashCountRead'])->name('cashCountRead'); 
+        Route::get('/cash-entry/{id?}', [CashCountController::class, 'cashCountEntry'])->name('cashCountEntry'); 
         Route::post('/cash-count-create', [CashCountController::class, 'cashCountCreate'])->name('cashCountCreate'); 
     });
 

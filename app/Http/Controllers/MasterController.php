@@ -95,48 +95,58 @@ class MasterController extends Controller
 
     public function salesRead(Request $request)
     {
-        $query = Sale::query();
+        $query = Sale::query()
+            ->join('users', 'sales.user_id', '=', 'users.id')
+            ->where('status', 1)
+            ->select(
+                'sales.*',
+                DB::raw("CONCAT(users.fname, ' ', users.lname) as full_name")
+            );
 
-        // Filter by Date Range (AdminLTE format: "MM/DD/YYYY - MM/DD/YYYY")
         if ($request->filled('date_range')) {
-            $dates = explode(' - ', $request->date_range);
+            $range = str_replace('+', ' ', $request->date_range); // normalize URL encoding
 
-            // If only one date is selected, treat start and end as the same
-            $start = trim($dates[0]);
-            $end = isset($dates[1]) ? trim($dates[1]) : $start;
+            // Split either " - " or "to"
+            if (strpos($range, ' - ') !== false) {
+                [$start, $end] = explode(' - ', $range);
+            } elseif (stripos($range, 'to') !== false) {
+                [$start, $end] = preg_split('/\s*to\s*/i', $range);
+            } else {
+                $start = $end = $range;
+            }
 
-            // Convert to Y-m-d format (AdminLTE usually sends m/d/Y)
-            $start = \Carbon\Carbon::createFromFormat('m/d/Y', $start)->format('Y-m-d');
-            $end   = \Carbon\Carbon::createFromFormat('m/d/Y', $end)->format('Y-m-d');
+            $start = trim($start);
+            $end   = trim($end ?? $start);
 
-            $query->whereDate('created_at', '>=', $start)
-                ->whereDate('created_at', '<=', $end);
+            // ✅ Expecting Y-m-d directly
+            $query->whereDate('sales.date', '>=', $start)
+                ->whereDate('sales.date', '<=', $end);
         } else {
-            // Default: today's sales
-            $query->whereDate('created_at', now()->format('Y-m-d'));
+            // Default: today
+            $query->whereDate('sales.date', now()->format('Y-m-d'));
         }
 
         // Transaction
         if ($request->filled('transaction')) {
-            $query->where('transaction_number', 'like', '%' . $request->transaction . '%');
+            $query->where('sales.transaction_number', 'like', '%' . $request->transaction . '%');
         }
 
         // Customer
         if ($request->filled('customer')) {
-            $query->where('customer', 'like', '%' . $request->customer . '%');
+            $query->where('sales.customer', 'like', '%' . $request->customer . '%');
         }
 
         // Payment Method
         if ($request->filled('payment_method')) {
-            $query->where('payment_method', $request->payment_method);
+            $query->where('sales.payment_method', $request->payment_method);
         }
 
         // Status
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->where('sales.status', $request->status);
         }
 
-        $sales = $query->orderBy('created_at', 'desc')->get();
+        $sales = $query->orderBy('sales.created_at', 'desc')->get();
 
         return view('admin.sales.index', compact('sales'));
     }
@@ -192,16 +202,28 @@ class MasterController extends Controller
         ));
     }
 
-    public function cashbankRead()
+    public function cashbankRead($date = null)
     {
-        $transactions = CashBankTransaction::orderByDesc('transaction_date')->get();
-        return view('admin.cash-bank.index', compact('transactions'));
+        // Ensure Carbon uses Asia/Manila timezone
+        $date = $date 
+            ? Carbon::parse($date)->timezone('Asia/Manila')->toDateString() 
+            : Carbon::now('Asia/Manila')->toDateString();
+
+        $transactions = CashBankTransaction::whereDate('transaction_date', $date)
+            ->orderByDesc('transaction_date')
+            ->get();
+
+        return view('admin.cash-bank.index', compact('transactions', 'date'));
     }
 
-    public function cashCountRead()
+    public function cashCountRead($id = null)
     {
         $today = Carbon::now('Asia/Manila')->toDateString();
-
+        if ($id) {
+            $cashcountdata = CashCount::find($id);
+        }{
+            $cashcountdata = null;
+        }
         // Total Inflow for Cash today
         $totalCashInflow = CashBankTransaction::where('category', 1)
             ->whereDate('created_at', $today)
@@ -227,6 +249,7 @@ class MasterController extends Controller
             'totalCashOutflow',
             'totalSalesToday',
             'totalPurchases',
+            'cashcountdata'
         ));
     }
 

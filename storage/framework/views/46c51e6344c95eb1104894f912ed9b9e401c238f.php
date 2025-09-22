@@ -22,7 +22,11 @@
         <!-- Bundle Info + Add Item -->
         <div class="col-lg-4 col-md-12">
             <div class="card">
-                <div class="card-header">Add Product to Bundle</div>
+                <div class="card-header">
+                    <h2 class="card-title text-gray mb-0">
+                        <b>BUNDLE FORM</b>
+                    </h2>
+                </div>
                 <div class="card-body bg-form">
                     <form method="POST" action="<?php echo e(route('bundleCreate')); ?>">
                         <?php echo csrf_field(); ?>
@@ -35,7 +39,7 @@
                         
                         <!-- Bundle Name -->
                         <div class="form-group mb-2">
-                            <label for="bundle_name">Bundle Name</label>
+                            <label for="bundle_name">Product Name</label>
                             <input type="text" name="bundle_name" id="bundle_name" class="form-control form-control-sm" required>
                         </div>
 
@@ -92,7 +96,7 @@
                         <!-- Price -->
                         <div class="form-group mb-2">
                             <label for="bundle_price">Bundle Price</label>
-                            <input type="number" name="r_price" id="bundle_price" class="form-control form-control-sm" required readonly>
+                            <input type="number" name="r_price" id="bundle_price" class="form-control form-control-sm" required>
                         </div>
 
                         <!-- Stock Alert -->
@@ -112,7 +116,11 @@
         <!-- Bundle Items Table -->
         <div class="col-lg-8 col-md-12">
             <div class="card">
-                <div class="card-header">Bundle Items</div>
+                <div class="card-header">
+                    <h2 class="card-title text-gray mb-0">
+                        <b>BUNDLE ITEMS</b>
+                    </h2>
+                </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table id="example3" class="table table-bordered table-sm" width="100%">
@@ -120,7 +128,7 @@
                                 <tr>
                                     <th>Product Name</th>
                                     <th>Bundle description</th>
-                                    <th>Quantity</th>
+                                    <th class="text-center">Quantity</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -134,7 +142,7 @@
                                             <?php endif; ?>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </td>
-                                    <td class="text-center align-middle text-main-1"><?php echo e($item->rqty); ?></td>
+                                    <td class="text-center align-middle text-main-1 font-weight-bold"><?php echo e(number_format($item->rqty)); ?></td>
                                 </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>

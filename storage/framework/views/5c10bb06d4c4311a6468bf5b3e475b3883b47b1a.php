@@ -16,18 +16,15 @@
                         <!-- Product Form Column -->
                         <div class="col-lg-3">
                             <div class="panel panel-default">
-                                <div class="panel-heading">ADD PRODUCT</div>
+                                <div class="panel-heading" id="formHeading">ADD PRODUCT</div>
                                 <div class="panel-body bg-form">
-                                    <form class="p-2" id="product_form_data" method="POST" action="<?php echo e(isset($productsedit) ? route('productUpdate', $productsedit->id) : route('productCreate')); ?>" enctype="multipart/form-data">
+                                    <form class="p-2" id="product_form_data" method="POST" action="<?php echo e(route('productCreate')); ?>" enctype="multipart/form-data">
                                         <?php echo csrf_field(); ?>
-                                        <?php if(isset($productsedit)): ?>
-                                            <input type="hidden" name="id" value="<?php echo e($productsedit->id); ?>">
-                                        <?php endif; ?>
+                                        <input type="hidden" name="id" id="product_id">
 
                                         <div class="form-group">
                                             <label for="barcode">Retail Barcode <i class="fas fa-sync" onclick="generateBarcode('barcode')"></i></label>
-                                            <input type="text" name="barcode" value="<?php echo e($productsedit->barcode ?? ''); ?>" 
-                                            class="form-control form-control-sm" id="barcode"
+                                            <input type="text" name="barcode" class="form-control form-control-sm" id="barcode"
                                             oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
                                             onkeydown="if(event.key === 'Enter'){event.preventDefault();}"
                                             required>
@@ -35,83 +32,70 @@
                                             <label for="w_barcode">Wholesale Barcode 
                                                 <i class="fas fa-sync" onclick="generateBarcode('w_barcode')"></i>
                                             </label>
-                                            <input type="text" name="w_barcode" value="<?php echo e($productsedit->w_barcode ?? ''); ?>" 
-                                                class="form-control form-control-sm" id="w_barcode"
+                                            <input type="text" name="w_barcode" class="form-control form-control-sm" id="w_barcode"
                                                 oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
                                                 onkeydown="if(event.key === 'Enter'){event.preventDefault();}">
                                             
                                             <label for="product_name">Product Name</label>
-                                            <input type="text" name="product_name" value="<?php echo e($productsedit->product_name ?? ''); ?>" class="form-control form-control-sm" id="product_name" required>
+                                            <input type="text" name="product_name" class="form-control form-control-sm" id="product_name" required>
 
                                             <label for="model">Model</label>
-                                            <input type="text" name="model" value="<?php echo e($productsedit->model ?? ''); ?>" class="form-control form-control-sm" id="model" required>
+                                            <input type="text" name="model" class="form-control form-control-sm" id="model" required>
 
                                             <label for="more_details">More Details</label>
-                                            <textarea name="more_details" rows="2" class="form-control form-control-sm" id="more_details">
-                                             <?php echo e($productsedit->more_details ?? ''); ?> 
-                                            </textarea>
+                                            <textarea name="more_details" rows="2" class="form-control form-control-sm" id="more_details"></textarea>
 
                                             <label for="product_name">Product Type</label>
                                             <select name="product_type" id="product_type" class="form-control form-control-sm" required>
                                                 <option value="">-- Select Type --</option>
-                                                <option value="1" <?php echo e(($productsedit->product_type ?? '') == '1' ? 'selected' : ''); ?>>Standard</option>
-                                                <option value="2" <?php echo e(($productsedit->product_type ?? '') == '2' ? 'selected' : ''); ?>>Made to Order</option>
+                                                <option value="1">Standard</option>
+                                                <option value="2">Made to Order</option>
                                             </select>
 
                                             <label for="category">Category</label>
                                             <select name="category" id="category" class="form-control form-control-sm" required>
                                                 <option value="">-- Select Category --</option>
                                                 <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <option value="<?php echo e($category->id); ?>" 
-                                                        <?php echo e(($productsedit->category ?? '') == $category->id ? 'selected' : ''); ?>>
-                                                        <?php echo e($category->name); ?>
-
-                                                    </option>
+                                                    <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
 
                                             <label for="packaging">Packaging</label>
-                                            <input type="number" name="packaging" value="<?php echo e($productsedit->packaging ?? ''); ?>" class="form-control form-control-sm" id="packaging" required>
+                                            <input type="number" name="packaging" class="form-control form-control-sm" id="packaging" required>
 
                                              <label for="w_capital">Wholesale Capital</label>
-                                            <input type="number" step="0.01" name="w_capital" value="<?php echo e($productsedit->w_capital ?? ''); ?>" class="form-control form-control-sm" id="whole_capital" required>
+                                            <input type="number" step="0.01" name="w_capital" class="form-control form-control-sm" id="whole_capital" required>
 
                                             <label for="w_price">Wholesale Price</label>
-                                            <input type="number" step="0.01" name="w_price" value="<?php echo e($productsedit->w_price ?? ''); ?>" class="form-control form-control-sm" id="whole_price" required>
+                                            <input type="number" step="0.01" name="w_price" class="form-control form-control-sm" id="whole_price" required>
 
                                             <label for="w_unit">Wholesale Unit</label>
                                             <select name="w_unit" class="form-control form-control-sm" id="wholesale_unit">
                                                 <option value="">-- Select Unit --</option>
                                                 <?php $__currentLoopData = $units; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <option value="<?php echo e($unit->id); ?>" <?php echo e(($productsedit->w_unit ?? '') == $unit->id ? 'selected' : ''); ?>>
-                                                        <?php echo e($unit->name); ?>
-
-                                                    </option>
+                                                    <option value="<?php echo e($unit->id); ?>"><?php echo e($unit->name); ?></option>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
 
                                             <label for="r_capital">Retail Capital</label>
-                                            <input type="number" step="0.01" name="r_capital" value="<?php echo e($productsedit->r_capital ?? ''); ?>" class="form-control form-control-sm" id="retail_capital" required>
+                                            <input type="number" step="0.01" name="r_capital" class="form-control form-control-sm" id="retail_capital" required>
 
                                             <label for="r_price">Retail Price</label>
-                                            <input type="number" step="0.01" name="r_price" value="<?php echo e($productsedit->r_price ?? ''); ?>" class="form-control form-control-sm" id="retail_price" required>
+                                            <input type="number" step="0.01" name="r_price" class="form-control form-control-sm" id="retail_price" required>
 
                                             <label for="r_unit">Retail Unit</label>
-                                            <select name="r_unit" class="form-control form-control-sm" id="wholesale_unit" required>
+                                            <select name="r_unit" class="form-control form-control-sm" id="retail_unit" required>
                                                 <option value="">-- Select Unit --</option>
                                                 <?php $__currentLoopData = $units; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <option value="<?php echo e($unit->id); ?>" <?php echo e(($productsedit->r_unit ?? '') == $unit->id ? 'selected' : ''); ?>>
-                                                        <?php echo e($unit->name); ?>
-
-                                                    </option>
+                                                    <option value="<?php echo e($unit->id); ?>"><?php echo e($unit->name); ?></option>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
 
                                             <label for="r_stock_alert">Retail Stock Alert</label>
-                                            <input type="number" step="0.01" name="r_stock_alert" value="<?php echo e($productsedit->r_stock_alert ?? ''); ?>" class="form-control form-control-sm" id="r_stock_alert" required>
+                                            <input type="number" step="0.01" name="r_stock_alert" class="form-control form-control-sm" id="r_stock_alert" required>
 
                                             <label for="w_stock_alert">Wholesale Stock Alert</label>
-                                            <input type="number" step="0.01" name="w_stock_alert" value="<?php echo e($productsedit->w_stock_alert ?? ''); ?>" class="form-control form-control-sm" id="w_stock_alert" required>
+                                            <input type="number" step="0.01" name="w_stock_alert" class="form-control form-control-sm" id="w_stock_alert" required>
 
                                         </div>
 
@@ -119,8 +103,8 @@
                                         <input type="file" name="image" class="form-control form-control-sm" id="image">
                                         
 
-                                        <button type="submit" class="btn bg-main-7 text-light mt-2 w-100">
-                                             <i class="fas fa-save"></i> Save
+                                        <button type="submit" class="btn bg-main-7 text-light mt-2 w-100" id="saveBtn">
+                                             <i class="fas fa-save"></i> Save Product
                                         </button>
                                     </form>
                                 </div>
@@ -218,9 +202,27 @@
                                                         title="Adjust Stock">
                                                         <i class="fas fa-cubes"></i>
                                                         </a>
-                                                        <a href="#" class="btn btn-info btn-sm edit-btn" data-id="<?php echo e($product->id); ?>" title="Edit">
-                                                            <i class="fas fa-info-circle"></i>
-                                                        </a>
+                                                        <button class="btn btn-info btn-sm edit-btn" 
+                                                            data-id="<?php echo e($product->id); ?>"
+                                                            data-barcode="<?php echo e($product->barcode); ?>"
+                                                            data-w_barcode="<?php echo e($product->w_barcode); ?>"
+                                                            data-product_name="<?php echo e($product->product_name); ?>"
+                                                            data-model="<?php echo e($product->model); ?>"
+                                                            data-more_details="<?php echo e($product->more_details); ?>"
+                                                            data-product_type="<?php echo e($product->product_type); ?>"
+                                                            data-category="<?php echo e($product->category); ?>"
+                                                            data-packaging="<?php echo e($product->packaging); ?>"
+                                                            data-w_capital="<?php echo e($product->w_capital); ?>"
+                                                            data-w_price="<?php echo e($product->w_price); ?>"
+                                                            data-w_unit="<?php echo e($product->w_unit); ?>"
+                                                            data-r_capital="<?php echo e($product->r_capital); ?>"
+                                                            data-r_price="<?php echo e($product->r_price); ?>"
+                                                            data-r_unit="<?php echo e($product->r_unit); ?>"
+                                                            data-r_stock_alert="<?php echo e($product->r_stock_alert); ?>"
+                                                            data-w_stock_alert="<?php echo e($product->w_stock_alert); ?>"
+                                                            title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
                                                         <a href="#" class="btn btn-danger btn-sm delete-row" data-model="Product" data-id="<?php echo e($product->id); ?>" title="Delete">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
@@ -239,7 +241,6 @@
     </div>
 </div>
 
-<!-- Stock Adjustment Modal -->
 <!-- Stock Adjustment Modal -->
 <div class="modal fade" id="stockAdjustmentModal" tabindex="-1" role="dialog" aria-labelledby="stockAdjustmentLabel" aria-hidden="true">
   <div class="modal-dialog modal-md" role="document">
@@ -316,22 +317,6 @@
   </div>
 </div>
 
-
-<form id="post-form" action="<?php echo e(route('productEdit')); ?>" method="POST" style="display: none;">
-    <?php echo csrf_field(); ?>
-    <input type="hidden" name="id" id="id">
-</form>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".edit-btn").forEach(function (btn) {
-            btn.addEventListener("click", function () {
-                let userId = this.getAttribute("data-id");
-                document.getElementById("id").value = userId;
-                document.getElementById("post-form").submit();
-            });
-        });
-    });
-</script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     // Show Sale ID only when reason is Customer Return
@@ -347,10 +332,50 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll(".adjust-stock-btn").forEach(function(button) {
         button.addEventListener("click", function() {
             let productId = this.getAttribute("data-id");
+            let productName = this.getAttribute("data-name");
             document.getElementById("adjustment_product_id").value = productId;
+            document.getElementById("adjustment_product_name").textContent = productName;
             $('#stockAdjustmentModal').modal('show');
         });
     });
+
+    // Prefill form for editing
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const form = document.getElementById('product_form_data');
+            const productId = this.dataset.id;
+
+            // Fill form fields
+            document.getElementById('product_id').value = productId;
+            document.getElementById('barcode').value = this.dataset.barcode;
+            document.getElementById('w_barcode').value = this.dataset.w_barcode;
+            document.getElementById('product_name').value = this.dataset.product_name;
+            document.getElementById('model').value = this.dataset.model;
+            document.getElementById('more_details').value = this.dataset.more_details;
+            document.getElementById('product_type').value = this.dataset.product_type;
+            document.getElementById('category').value = this.dataset.category;
+            document.getElementById('packaging').value = this.dataset.packaging;
+            document.getElementById('whole_capital').value = this.dataset.w_capital;
+            document.getElementById('whole_price').value = this.dataset.w_price;
+            document.getElementById('wholesale_unit').value = this.dataset.w_unit;
+            document.getElementById('retail_capital').value = this.dataset.r_capital;
+            document.getElementById('retail_price').value = this.dataset.r_price;
+            document.getElementById('retail_unit').value = this.dataset.r_unit;
+            document.getElementById('r_stock_alert').value = this.dataset.r_stock_alert;
+            document.getElementById('w_stock_alert').value = this.dataset.w_stock_alert;
+
+            // Update form action for update route
+            form.action = "<?php echo e(route('productUpdate', ':id')); ?>".replace(':id', productId);
+            form.querySelector('#saveBtn').innerHTML = '<i class="fas fa-save"></i> Update Product';
+            document.getElementById('formHeading').textContent = 'EDIT PRODUCT';
+            
+            // Scroll to form
+            document.getElementById('product_form_data').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Reset form when clicking on "Add Product" (if you add such a button)
+    // You might want to add a "Add New Product" button to clear the form
 });
 </script>
 <?php $__env->stopSection(); ?>

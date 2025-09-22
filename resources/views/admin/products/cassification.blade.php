@@ -32,8 +32,10 @@
     <div class="row">
         <!-- Categories Column -->
         <div class="col-md-6">
-            <h5 class="mb-3">Categories</h5>
-
+            <h2 class="card-title text-gray mb-0">
+                <b>CATEGORIES</b>
+            </h2>
+            <br>
             <!-- Add / Edit Category Form -->
             <form id="categoryForm" method="POST" action="{{ route('categoriesSave') }}">
                 @csrf
@@ -149,7 +151,10 @@
 
         <!-- Units Column -->
         <div class="col-md-6">
-            <h5 class="mb-3">Units</h5>
+            <h2 class="card-title text-gray mb-0">
+                <b>UNITS</b>
+            </h2>
+            <br>
 
             <!-- Add / Edit Unit Form -->
             <form id="addUnitForm" method="POST" action="{{ route('unitSave') }}">

@@ -102,6 +102,7 @@
 </div>
 
 <script>
+
 const denominations = [0.25,0.50,1,5,10,20,50,100,500,1000];
 const totalInflow = parseFloat("{{ $totalCashInflow->sum('amount') ?? 0 }}");
 const totalOutflow = parseFloat("{{ $totalCashOutflow->sum('amount') ?? 0 }}");
@@ -237,6 +238,7 @@ document.getElementById('saveBtn').addEventListener('click',function(){
                 let input=document.getElementById(inputId);
                 if(input) formData.append(inputId,input.value||0);
             });
+            formData.append('cashcount_id',document.getElementById('cashcount-id').value||0);
             formData.append('gcash',document.getElementById('gcash').value||0);
             formData.append('bank',document.getElementById('bank').value||0);
             formData.append('total_inflow',totalInflow);

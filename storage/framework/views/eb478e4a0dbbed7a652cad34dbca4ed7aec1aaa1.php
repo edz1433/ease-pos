@@ -124,9 +124,9 @@
                                             class="img-thumbnail"
                                             style="width:40px; height:40px; object-fit:cover; border-radius:50%;">
                                     </td>
-                                    <td><?php echo e($user->fname); ?> <?php echo e($user->lname); ?></td>
-                                    <td><?php echo e($user->gender); ?></td>    
-                                    <td>
+                                    <td class="align-middle text-main-8 font-weight-bold"><?php echo e($user->fname); ?> <?php echo e($user->lname); ?></td>
+                                    <td class="align-middle text-main-8 font-weight-bold"><?php echo e($user->gender); ?></td>    
+                                    <td class="align-middle text-main-8 font-weight-bold">
                                         <?php if($user->role == 1): ?>
                                             <span class="label label-danger">Administrator</span>
                                         <?php elseif($user->role == 2): ?>
@@ -135,7 +135,7 @@
                                             <span class="label label-primary">Manager</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="center"><?php echo e($user->username); ?></td>
+                                    <td class="align-middle text-main-8 font-weight-bold" class="center"><?php echo e($user->username); ?></td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-info btn-sm edit-btn" data-id="<?php echo e($user->id); ?>">
                                             <i class="fas fa-info-circle"></i>

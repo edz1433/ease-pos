@@ -1,40 +1,17 @@
 
 
 <?php $__env->startSection('body'); ?>
-<style>
-    .bg-form {
-        background-color: #e9ecef;
-    }
-    .form-control:disabled, .form-control[readonly] {
-        background-color: #ffffff;
-        opacity: 1;
-    }
-    .form-control-sm {
-        height: calc(1.5125rem + 2px);
-        padding: .15rem .5rem;
-        font-size: .750rem;
-        line-height: 1.5;
-        border-radius: .2rem;
-        background-color: #ffffff !important;
-    }
-    .btn-sm {
-        font-size: 10px !important;
-        height: 25px !important;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-    }
-    .bb {
-        border-bottom: 1px solid rgb(145, 138, 138);
-    }
-</style>
+<?php echo $__env->make('layouts.formStyle', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
 <div class="container-fluid">
     <div class="row">
         <!-- Transaction Form Column -->
         <div class="col-lg-4 col-md-12">
             <div class="card shadow-sm">
-                <div class="card-header text-dark text-light">
-                    <b>Add / Edit Transaction</b>
+                <div class="card-header">
+                    <h2 class="card-title text-gray mb-0">
+                        <b>TRANSACTION FORM</b>
+                    </h2>
                 </div>
                 <div class="card-body bg-form">
                     <form action="<?php echo e(route('cashbankCreate')); ?>" method="POST" id="cashBankForm">
@@ -93,7 +70,18 @@
         <!-- Transaction Table Column -->
         <div class="col-lg-8 col-md-12">
             <div class="card shadow-sm">
-                <div class="card-header text-dark"><b>Transaction History</b></div>
+                <div class="card-header text-dark">
+                    <h2 class="card-title text-gray mb-0">
+                        <b>TRANSACTION LIST</b>
+                    </h2>
+                    <div class="float-right">
+                        <form method="GET" id="dateForm">
+                            <input type="date" id="date" class="form-control form-control-sm w-auto d-inline-block"
+                                value="<?php echo e($date); ?>"
+                                onchange="window.location='<?php echo e(url('cash-bank')); ?>/' + this.value">
+                        </form>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table id="example3" class="table table-bordered table-hover" id="transactionsTable">
@@ -108,29 +96,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tx): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <tr>
-                                        <td><?php echo e($tx->transaction_date->format('M d, Y - h:i A')); ?></td>
-                                        <td><?php echo e($tx->category == 1 ? 'Inflow' : 'Outflow'); ?></td>
-                                        <td><?php echo e($tx->transaction_type); ?></td>
-                                        <td class="text-end">₱<?php echo e(number_format($tx->amount, 2)); ?></td>
-                                        <td><?php echo e($tx->description); ?></td>
+                                <?php $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $trans): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr id="row-<?php echo e($trans->id); ?>">
+                                        <td class="align-middle text-main-8 font-weight-bold"><?php echo e($trans->transaction_date->format('M d, Y - h:i A')); ?></td>
+                                        <td class="align-middle text-main-8 font-weight-bold">
+                                            <?php echo ($trans->category == 1) 
+                                            ? '<span class="badge badge-danger">Outflow</span>' 
+                                            : '<span class="badge badge-success">Inflow</span>'; ?>
+
+                                        </td>
+                                        <td class="align-middle text-main-8 font-weight-bold"><?php echo e($trans->transaction_type); ?></td>
+                                        <td class="text-center align-middle text-main-1 font-weight-bold">₱<?php echo e(number_format($trans->amount, 2)); ?></td>
+                                        <td class="align-middle text-main-8 font-weight-bold"><?php echo e($trans->description); ?></td>
                                         <td class="text-center">
-                                            <button class="btn btn-info btn-sm editBtn" data-id="<?php echo e($tx->id); ?>"
-                                                data-date="<?php echo e($tx->transaction_date->format('Y-m-d\TH:i')); ?>"
-                                                data-category="<?php echo e($tx->category); ?>"
-                                                data-trans="<?php echo e($tx->transaction_type); ?>"
-                                                data-amount="<?php echo e($tx->amount); ?>"
-                                                data-desc="<?php echo e($tx->description); ?>">
+                                            <button class="btn btn-info btn-sm editBtn" data-id="<?php echo e($trans->id); ?>"
+                                                data-date="<?php echo e($trans->transaction_date->format('Y-m-d\TH:i')); ?>"
+                                                data-category="<?php echo e($trans->category); ?>"
+                                                data-trans="<?php echo e($trans->transaction_type); ?>"
+                                                data-amount="<?php echo e($trans->amount); ?>"
+                                                data-desc="<?php echo e($trans->description); ?>">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <form action="<?php echo e(route('cashbankDelete', $tx->id)); ?>" method="POST" class="d-inline">
-                                                <?php echo csrf_field(); ?>
-                                                <?php echo method_field('DELETE'); ?>
-                                                <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this transaction?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            <button value="<?php echo e($trans->id); ?>" class="btn btn-danger btn-sm delete-row" data-model="CashBankTransaction" data-id="<?php echo e($trans->id); ?>">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
