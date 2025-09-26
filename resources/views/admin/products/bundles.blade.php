@@ -136,7 +136,7 @@
                                     <td class="align-middle text-main-8">
                                         @foreach($productsbundle as $pb)
                                             @if($pb->bundle_id == $item->id)
-                                                {{ $pb->product_name }}<br>
+                                                {{ $pb->product_name }} x {{ $pb->quantity }}<br>
                                             @endif
                                         @endforeach
                                     </td>

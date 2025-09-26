@@ -51,7 +51,8 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-sm-6 col-md-3">
+
+                <div class="col-6 col-sm-6 col-md-3">
                     <div class="info-box d-flex justify-content-between">
                         <div class="info-box-content text-left">
                             <span class="info-box-text">Total Profit</span>
@@ -62,27 +63,51 @@
                         </span>
                     </div>
                 </div>
-
                 
-                <div class="col-lg-7">
+                <div class="col-12 mb-3">
+                    <div class="float-right">
+                        <form id="filterForm" class="d-inline-flex align-items-center">
+                            <select name="filter" id="filterSelect" class="form-control form-control-sm mr-1">
+                                <option value="all">All</option>
+                                <option value="day">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month" selected>This Month</option>
+                                <option value="year">This Year</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+
+                            <select name="category" id="category" class="form-control form-control-sm mr-1">
+                                <option value="All">All</option>
+                                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($cat->id); ?>"><?php echo e($cat->name); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+
+                            <input type="date" name="start_date" id="startDate"
+                                class="form-control form-control-sm mr-1" style="display:none;">
+
+                            <input type="date" name="end_date" id="endDate"
+                                class="form-control form-control-sm mr-1" style="display:none;">
+
+                            <button type="submit" class="btn btn-sm bg-main text-light">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
                     <div class="card">
                         <div class="card-header border-0 d-flex justify-content-between">
                             <h3 class="card-title">Top Products</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-3"> <!-- smaller width -->
-                                    <ul class="list-group list-group-flush"> <!-- removes card borders/padding -->
-                                        <?php $__currentLoopData = $topProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <li class="list-group-item py-1 px-2" style="font-size: 0.7rem;">
-                                                <?php echo e($key + 1); ?>. <?php echo e($product->product_name); ?>
-
-                                            </li>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </ul>
+                                <div class="col-3">
+                                    <ul id="topProductsList" class="list-group list-group-flush"></ul>
                                 </div>
 
-                                <div class="col-9"> <!-- chart takes more space -->
+                                <div class="col-9">
                                     <div class="chart">
                                         <canvas id="topProducts" height="250"></canvas>
                                     </div>
@@ -91,46 +116,34 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header border-0 d-flex justify-content-between">
+                            <h3 class="card-title">Top Category</h3>
+                        </div>
+                        <div style="height: 380px;">
+                            <canvas id="categoryPie"></canvas>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="col-lg-5">
+                <div class="col-lg-6">
                     <div class="card">
                         <div class="card-header border-0 d-flex justify-content-between">
-                            <h3 class="card-title">Sales by Category</h3>
+                            <h3 class="card-title">Gross Profit</h3>
                         </div>
                         <div class="card-body">
-                            <div class="chart">
-                                <canvas id="salesCategoryChart" height="250"></canvas>
+                            <div class="chart"  style="height: 300px;">
+                                <canvas id="salesAnalyticsChart" height="280"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header border-0 d-flex justify-content-between">
-                            <h3 class="card-title">Monthly Sales</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart">
-                                <canvas id="monthlySalesChart" height="250"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header border-0 d-flex justify-content-between">
-                            <h3 class="card-title">Profit</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart">
-                                <canvas id="profitChart" height="250"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="col-lg-6">
                         <div class="card-header border-0 d-flex justify-content-between">
-                            <h3 class="card-title">Low Stock</h3>
+                             <h3 class="card-title">Net Profit</h3>
                         </div>
                         <div class="card-body">
                             <div class="chart">

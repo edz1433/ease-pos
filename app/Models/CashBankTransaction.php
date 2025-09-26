@@ -10,6 +10,7 @@ class CashBankTransaction extends Model
     use HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'transaction_date',
         'category',
         'transaction_type',

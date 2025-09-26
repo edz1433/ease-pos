@@ -20,7 +20,7 @@
                     <div class="table-responsive">
                         <div class="card-tools mb-1">
                             <div class="input-group input-group-sm">
-                                <input type="text" id="table-search" name="table_search" class="form-control float-right" placeholder="Search">
+                                <input type="text" id="table-search" name="table_search" class="form-control float-right m-1" placeholder="Search">
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-default">
                                         <i class="fas fa-search"></i>
@@ -46,25 +46,25 @@
                             <tbody>
                                 @foreach($inventoryItems as $index => $item)
                                 <tr class="">
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ ($item->price_type == 'retail') ? $item->barcode : $item->w_barcode}}</td>
-                                    <td>{{ $item->product_name }}</td>
-                                    <td>{{ $item->model }}</td>
-                                    <td>{{ ucfirst($item->price_type) }}</td>
-                                    <td>
+                                    <td class="align-middle text-main-8 font-weight-bold">{{ $index + 1 }}</td>
+                                    <td class="align-middle text-main-8 font-weight-bold">{{ ($item->price_type == 'retail') ? $item->barcode : $item->w_barcode}}</td>
+                                    <td class="align-middle text-main-8 font-weight-bold">{{ $item->product_name }}</td>
+                                    <td class="align-middle text-main-8 font-weight-bold">{{ $item->model }}</td>
+                                    <td class="align-middle text-main-8 font-weight-bold">{{ ucfirst($item->price_type) }}</td>
+                                    <td class="align-middle text-main-8 font-weight-bold">
                                         <input type="number" min="0" class="form-control form-control-sm qty-input" 
                                             data-id="{{ $item->id }}" data-type="{{ $item->price_type }}" 
                                             value="{{ $item->price_type == 'retail' ? $item->r_qty : $item->w_qty }}" {{ ($inventory->status != 1) ? 'readonly' : '' }}>
                                     </td>
-                                    <td>
+                                    <td class="align-middle text-main-8 font-weight-bold">
                                         <input type="number" min="0" step="0.01" class="form-control form-control-sm capital-input" 
                                             data-id="{{ $item->id }}" data-type="{{ $item->price_type }}" 
                                             value="{{ $item->price_type == 'retail' ? $item->r_capital : $item->w_capital }}" {{ ($inventory->status != 1) ? 'readonly' : '' }}>
                                     </td>
-                                    <td class="subtotal">
+                                    <td class="align-middle text-main-1 font-weight-bold" class="subtotal">
                                         {{ number_format($item->price_type == 'retail' ? $item->r_subtotal : $item->w_subtotal, 2) }}
                                     </td>
-                                    <td>
+                                    <td class="align-middle text-main-8 font-weight-bold">
                                         <span class="badge badge-{{ $item->status == 1 ? 'success' : 'warning' }}">{{ $item->status == 1 ? 'updated' : '' }}</span>
                                     </td>
                                 </tr>
@@ -72,8 +72,8 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" class="text-right">Total:</th>
-                                    <th id="grandTotal">{{ number_format($inventoryItems->sum(fn($i) => $i->r_subtotal + $i->w_subtotal), 2) }}</th>
+                                    <th colspan="7" class="text-right">Total:</th>
+                                    <th class="align-middle text-main-1 font-weight-bold" id="grandTotal">{{ number_format($inventoryItems->sum(fn($i) => $i->r_subtotal + $i->w_subtotal), 2) }}</th>
                                     <th></th>
                                 </tr>
                             </tfoot>

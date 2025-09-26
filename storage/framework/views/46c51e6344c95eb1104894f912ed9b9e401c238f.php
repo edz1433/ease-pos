@@ -138,7 +138,7 @@
                                     <td class="align-middle text-main-8">
                                         <?php $__currentLoopData = $productsbundle; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <?php if($pb->bundle_id == $item->id): ?>
-                                                <?php echo e($pb->product_name); ?><br>
+                                                <?php echo e($pb->product_name); ?> x <?php echo e($pb->quantity); ?><br>
                                             <?php endif; ?>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </td>

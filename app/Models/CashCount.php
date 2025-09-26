@@ -10,6 +10,7 @@ class CashCount extends Model
     use HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'qty_0_25',
         'qty_0_50',
         'qty_1',

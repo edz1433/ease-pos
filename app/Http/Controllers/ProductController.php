@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Product;
+use App\Models\BranchProduct;
 use App\Models\Inventory;
 use App\Models\InventoryItems;  
 use App\Models\ProductPreset;
@@ -24,17 +25,6 @@ class ProductController extends Controller
             'product_type' => 'required|in:1,2',
             'category' => 'required|string|max:255',
             'packaging' => 'required|numeric|min:1',
-
-            'w_capital' => 'nullable|numeric|min:0',
-            'w_price' => 'nullable|numeric|min:0',
-            'w_unit' => 'nullable|string|max:50',
-            'w_stock_alert' => 'nullable|numeric|min:0',
-
-            'r_capital' => 'nullable|numeric|min:0',
-            'r_price' => 'required|numeric|min:0',
-            'r_unit' => 'nullable|string|max:50',
-            'r_stock_alert' => 'nullable|numeric|min:0',
-
             'image' => 'nullable|image',
         ]);
 
@@ -46,13 +36,31 @@ class ProductController extends Controller
             $validated['image'] = 'default-product.png';
         }
 
+        // Create product
         $product = Product::create($validated);
 
-        $inventory = Inventory::where('status', 1)->first();
+        // Get branch ID from .env
+        $branchId = env('BRANCH_ID');
 
+        // Create branch product record
+        BranchProduct::create([
+            'branch_id' => $branchId,
+            'product_id' => $product->id,
+            'w_capital' => $request->w_capital ?? 0,
+            'w_price' => $request->w_price ?? 0,
+            'w_unit' => $request->w_unit,
+            'w_stock_alert' => $request->w_stock_alert ?? 0,
+            'r_capital' => $request->r_capital ?? 0,
+            'r_price' => $request->r_price ?? 0,
+            'r_unit' => $request->r_unit,
+            'r_stock_alert' => $request->r_stock_alert ?? 0,
+        ]);
+
+        // Add to inventory if active
+        $inventory = Inventory::where('status', 1)->first();
         if ($inventory) {
-            $r_capital = $validated['r_capital'] ?? 0;
-            $w_capital = $validated['w_capital'] ?? 0;
+            $w_capital = $request->w_capital ?? 0;
+            $r_capital = $request->r_capital ?? 0;
 
             if ($validated['packaging'] > 1) {
                 InventoryItems::create([
@@ -92,13 +100,16 @@ class ProductController extends Controller
         $units = Unit::all();
         $products = Product::select(
             'products.*',
+            'branch_products.*',
             'categories.name as category_name',
             'r_unit.name as r_unit_name',
             'w_unit.name as w_unit_name'
         )
+        ->leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
         ->leftJoin('categories', 'products.category', '=', 'categories.id')
         ->leftJoin('units as r_unit', 'products.r_unit', '=', 'r_unit.id')
         ->leftJoin('units as w_unit', 'products.w_unit', '=', 'w_unit.id')
+        ->where('branch_products.branch_id', env('BRANCH_ID'))
         ->get();
 
         $productsedit = Product::find($request->id);
@@ -108,8 +119,10 @@ class ProductController extends Controller
 
     public function productUpdate(Request $request, $id)
     {
+        // Find product
         $product = Product::findOrFail($id);
 
+        // Validate request
         $validated = $request->validate([
             'barcode' => 'required|string|max:255|unique:products,barcode,' . $id,
             'w_barcode' => 'nullable|string|max:255|unique:products,w_barcode,' . $id,
@@ -117,33 +130,58 @@ class ProductController extends Controller
             'model' => 'nullable|string|max:255',  
             'more_details' => 'nullable|string|max:1000',  
             'product_type' => 'required|in:1,2',
-            'category' => 'required|string|max:255',
+            'category' => 'required|integer|exists:categories,id',
             'packaging' => 'required|numeric|min:1',
             'w_capital' => 'nullable|numeric|min:0',
             'w_price' => 'nullable|numeric|min:0',
-            'w_unit' => 'nullable|string|max:50',
+            'w_unit' => 'nullable|integer|exists:units,id',
             'w_stock_alert' => 'nullable|numeric|min:0',
             'r_capital' => 'nullable|numeric|min:0',
             'r_price' => 'required|numeric|min:0',
-            'r_unit' => 'nullable|string|max:50',
+            'r_unit' => 'nullable|integer|exists:units,id',
             'r_stock_alert' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,bmp,gif|max:2048',
         ]);
 
-        // --- Handle new image upload ---
+        // Handle image upload
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
-            // Delete old image if it's not default
             if ($product->image && $product->image !== 'default-product.png') {
                 if (Storage::disk('public')->exists($product->image)) {
                     Storage::disk('public')->delete($product->image);
                 }
             }
-
-            // Store new image
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
-        $product->update($validated);
+        // Update product main info
+        $product->update([
+            'barcode' => $validated['barcode'],
+            'w_barcode' => $validated['w_barcode'] ?? null,
+            'product_name' => $validated['product_name'],
+            'model' => $validated['model'] ?? null,
+            'more_details' => $validated['more_details'] ?? null,
+            'product_type' => $validated['product_type'],
+            'category' => $validated['category'],
+            'packaging' => $validated['packaging'],
+            'image' => $validated['image'] ?? $product->image,
+        ]);
+
+        // Update branch_products table manually
+        $branchProduct = BranchProduct::where('product_id', $id)
+            ->where('branch_id', env('BRANCH_ID'))
+            ->first();
+      
+        $branchProduct->update([
+            'w_capital' => $validated['w_capital'] ?? 0,
+            'w_price' => $validated['w_price'] ?? 0,
+            'w_unit' => $validated['w_unit'] ?? null,
+            'w_stock_alert' => $validated['w_stock_alert'] ?? 0,
+            'r_capital' => $validated['r_capital'] ?? 0,
+            'r_price' => $validated['r_price'],
+            'r_unit' => $validated['r_unit'] ?? null,
+            'r_stock_alert' => $validated['r_stock_alert'] ?? 0,
+        ]);
+        
 
         return redirect()->back()->with('success', 'Product updated successfully!');
     }
@@ -190,195 +228,6 @@ class ProductController extends Controller
         }
 
         return response()->json(['next_barcode' => $nextBarcode]);
-    }
-
-    public function products($category = null)
-    {
-        if ($category) {
-            $products = Product::where('category', $category)
-                ->leftJoin('units as retail_units', 'products.r_unit', '=', 'retail_units.id')
-                ->leftJoin('units as wholesale_units', 'products.w_unit', '=', 'wholesale_units.id')
-                ->select(
-                    'products.*',
-                    'retail_units.name as retail_unit_name',
-                    'wholesale_units.name as wholesale_unit_name',
-                )
-                ->get();
-        } else {
-            $products = Product::query()
-                ->leftJoin('sales_orders', 'sales_orders.product_id', '=', 'products.id')
-                ->select(
-                    'products.id',
-                    'products.barcode',
-                    'products.product_name',
-                    'products.product_type',
-                    'products.category',
-                    'products.packaging',
-                    'products.r_capital',
-                    'products.r_price',
-                    'products.r_unit',
-                    'products.w_capital',
-                    'products.w_price',
-                    'products.w_unit',
-                    'products.rqty',
-                    'products.wqty',
-                    'products.vatable',
-                    'products.image',
-                    \DB::raw('COALESCE(SUM(sales_orders.quantity), 0) as total_sold')
-                )
-                ->groupBy(
-                    'products.id',
-                    'products.barcode',
-                    'products.product_name',
-                    'products.product_type',
-                    'products.category',
-                    'products.packaging',
-                    'products.r_capital',
-                    'products.r_price',
-                    'products.r_unit',
-                    'products.w_capital',
-                    'products.w_price',
-                    'products.w_unit',
-                    'products.rqty',
-                    'products.wqty',
-                    'products.vatable',
-                    'products.image'
-                )
-                ->orderByDesc('total_sold')
-                ->limit(15)
-                ->get();
-
-
-        }
-
-        return response()->json($products);
-    }
-
-    public function getAllProducts()
-    {
-        try {
-            $products = Product::query()
-                ->leftJoin('units as retail_units', 'products.r_unit', '=', 'retail_units.id')
-                ->leftJoin('units as wholesale_units', 'products.w_unit', '=', 'wholesale_units.id')
-                ->select(
-                    'products.id',
-                    'products.barcode',       // retail barcode
-                    'products.w_barcode',     // wholesale barcode
-                    'products.product_name',
-                    'products.model',
-                    'products.packaging',
-                    'products.r_capital',
-                    'products.r_price',
-                    'products.w_capital',
-                    'products.w_price',
-                    'products.rqty',
-                    'products.wqty',
-                    'products.vatable',
-                    'products.image',
-                    'retail_units.name as retail_unit_name',
-                    'wholesale_units.name as wholesale_unit_name'
-                )
-                ->get();
-
-            $finalProducts = collect();
-
-            foreach ($products as $product) {
-                // Retail row
-                $finalProducts->push([
-                    'id' => $product->id,
-                    'barcode' => $product->barcode,   // retail barcode
-                    'product_name' => $product->product_name,
-                    'model' => $product->model,
-                    'packaging' => $product->packaging,
-                    'capital' => $product->r_capital,
-                    'price' => $product->r_price,
-                    'qty' => $product->rqty,
-                    'vatable' => $product->vatable,
-                    'image' => $product->image,
-                    'unit_name' => $product->retail_unit_name,
-                    'type' => 'retail'
-                ]);
-
-                // Wholesale row (only if w_barcode exists)
-                if (!empty($product->w_barcode)) {
-                    $finalProducts->push([
-                        'id' => $product->id,
-                        'barcode' => $product->w_barcode,  // wholesale barcode
-                        'product_name' => $product->product_name,
-                        'model' => $product->model,
-                        'packaging' => $product->packaging,
-                        'capital' => $product->w_capital,
-                        'price' => $product->w_price,
-                        'qty' => $product->wqty,
-                        'vatable' => $product->vatable,
-                        'image' => $product->image,
-                        'unit_name' => $product->wholesale_unit_name,
-                        'type' => 'wholesale'
-                    ]);
-                }
-            }
-
-            return response()->json($finalProducts->values());
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to fetch products',
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function getProductByBarcode($barcode)
-    {
-        $type = null;
-
-        // First try to find product by retail barcode
-        $product = Product::where('barcode', $barcode)->first();
-        if ($product) {
-            $type = 'retail';
-        }
-
-        // If not found by retail barcode, try wholesale barcode
-        if (!$product) {
-            $product = Product::where('w_barcode', $barcode)->first();
-            if ($product) {
-                $type = 'wholesale';
-            }
-        }
-
-        if ($product) {
-            return response()->json([
-                'type'    => $type,
-                'product' => $product
-            ]);
-        } else {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
-    }
-
-    public function addToCart(Request $request)
-    {
-        $validated = $request->validate([
-            'user_id'    => 'required|integer',
-            'product_id' => 'required|integer',
-            'capital'    => 'required|numeric',
-            'price'      => 'required|numeric',
-            'price_type' => 'required|in:retail,wholesale',
-            'qty'        => 'required|integer|min:1'
-        ]);
-
-        $cartItem = Cart::where('user_id', $validated['user_id'])
-                        ->where('product_id', $validated['product_id'])
-                        ->where('price_type', $validated['price_type'])
-                        ->first();
-
-        if ($cartItem) {
-            $cartItem->qty += $validated['qty'];
-            $cartItem->save();
-        } else {
-            Cart::create($validated);
-        }
-
-        return response()->json(['success' => true]);
     }
 
 }

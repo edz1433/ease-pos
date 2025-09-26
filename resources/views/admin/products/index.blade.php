@@ -258,28 +258,42 @@
 
         <div class="modal-body">
           <input type="hidden" name="product_id" id="adjustment_product_id">
-        <div class="form-group">
-            <p id="adjustment_product_name" class="form-control-plaintext font-weight-bold"></p>
-        </div>
           <div class="form-group">
-            <label for="adjustment_type">Adjustment Type</label>
-            <select name="adjustment_type" id="adjustment_type" class="form-control" required>
-              <option value="">-- Select --</option>
-              <option value="restock">Restock</option>
-              <option value="sale">Sale</option>
-              <option value="return">Return</option>
-              <option value="damage">Damaged</option>
-              <option value="expired">Expired</option>
-              <option value="lost">Lost</option>
-              <option value="adjustment">Manual Adjustment</option>
-              <option value="inventory">Inventory Count</option>
-            </select>
+              <p id="adjustment_product_name" class="form-control-plaintext font-weight-bold"></p>
           </div>
 
-          <div class="form-group">
-            <label for="quantity">Quantity</label>
-            <input type="number" step="0.01" name="quantity" id="quantity" class="form-control" required>
-          </div>
+            <div class="form-group">
+                <label for="type">Price Type</label>
+                <select name="type" id="type" class="form-control" required>
+                    <option value="">-- Select --</option>
+                        <option value="retail">Retail</option>
+                        <option value="wholesale">Wholesale</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="adjustment_type">Adjustment Type</label>
+                <select name="adjustment_type" id="adjustment_type" class="form-control" required>
+                    <option value="">-- Select --</option>
+
+                    <!-- Group: Add Stock -->
+                    <optgroup label="Add Stock">
+                        <option value="restock">Restock</option>
+                        <option value="return">Return</option>
+                        <option value="inventory">Inventory Count</option>
+                        <option value="adjustment">Manual Adjustment</option>
+                    </optgroup>
+
+                    <!-- Group: Deduct Stock -->
+                    <optgroup label="Deduct Stock">
+                        <option value="sale">Sale</option>
+                        <option value="damage">Damaged</option>
+                        <option value="expired">Expired</option>
+                        <option value="lost">Lost</option>
+                    </optgroup>
+                </select>
+            </div>
+
 
           <div class="form-group">
             <label for="price_type">Price Type</label>
@@ -291,21 +305,39 @@
           </div>
 
           <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" step="0.01" name="quantity" id="quantity" class="form-control" required>
+          </div>
+
+        <div class="form-group">
             <label for="reason">Reason</label>
             <select name="reason" id="reason" class="form-control">
-              <option value="">-- Select Reason --</option>
-              <option value="Customer Return">Customer Return</option>
-              <option value="Damaged">Damaged</option>
-              <option value="Expired">Expired</option>
-              <option value="Lost">Lost</option>
-              <option value="Stock Count">Stock Count</option>
-              <option value="Manual Adjustment">Manual Adjustment</option>
-              <option value="Others">Others</option>
+                <option value="">-- Select Reason --</option>
+
+                <!-- Group: Add Stock -->
+                <optgroup label="Add Stock">
+                    <option value="Customer Return">Customer Return</option>
+                    <option value="Stock Count">Stock Count</option>
+                    <option value="Manual Adjustment">Manual Adjustment</option>
+                    <option value="Others">Others</option>
+                </optgroup>
+
+                <!-- Group: Deduct Stock -->
+                <optgroup label="Deduct Stock">
+                    <option value="Damaged">Damaged</option>
+                    <option value="Expired">Expired</option>
+                    <option value="Lost">Lost</option>
+                </optgroup>
             </select>
+        </div>
+
+          <div class="form-group" id="saleIdGroup" style="display: none;">
+            <label for="trans_number">Transaction Number</label>
+            <input type="number" name="trans_number" id="trans_number" class="form-control">
           </div>
 
           <div class="form-group" id="saleIdGroup" style="display: none;">
-            <label for="sale_id">Sale ID (if return)</label>
+            <label for="sale_id">Sale ID (if return or refund)</label>
             <input type="number" name="sale_id" id="sale_id" class="form-control">
           </div>
 

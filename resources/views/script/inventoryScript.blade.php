@@ -148,12 +148,12 @@ $('#saveInventoryBtn').on('click', function() {
                 success: function(res) {
                     let msg = res.message;
 
-                    if (res.updated_products && res.updated_products.length > 0) {
-                        msg += `\n\nUpdated Products:\n`;
-                        res.updated_products.forEach(p => {
-                            msg += `#${p.product_id}: R(${p.old_rqty} → ${p.new_rqty}), W(${p.old_wqty} → ${p.new_wqty})\n`;
-                        });
-                    }
+                    // if (res.updated_products && res.updated_products.length > 0) {
+                    //     msg += `\n\nUpdated Products:\n`;
+                    //     res.updated_products.forEach(p => {
+                    //         msg += `#${p.product_id}: R(${p.old_rqty} → ${p.new_rqty}), W(${p.old_wqty} → ${p.new_wqty})\n`;
+                    //     });
+                    // }
 
                     Swal.fire({
                         title: 'Saved!',

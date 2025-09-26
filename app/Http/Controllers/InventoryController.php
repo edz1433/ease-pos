@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\BranchProduct;
 use App\Models\Inventory;
 use App\Models\InventoryItems;
 use App\Models\SalesOrder;
@@ -20,13 +21,20 @@ class InventoryController extends Controller
 
         // Start inventory session
         $inventory = Inventory::create([
+            'branch_id' => env('BRANCH_ID'),
             'start_date' => $now,
             'end_date'   => $end,
             'status'     => 1
         ]);
 
         // Fetch all products
-        $products = Product::all();
+        $products = Product::select(
+            'products.*',
+            'branch_products.*',
+        )
+        ->leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
+        ->where('branch_products.branch_id', env('BRANCH_ID'))
+        ->get();
 
         $insertData = [];
 
@@ -163,14 +171,23 @@ class InventoryController extends Controller
                 DB::raw('SUM(CASE WHEN inventory_items.price_type = "wholesale" THEN inventory_items.w_qty ELSE 0 END) as w_qty')
             )
             ->groupBy('inventory_items.product_id')
-            ->get();
+            ->get(); // ✅ get() instead of first()
 
         $updatedProducts = [];
 
         foreach ($inventoryItems as $inventory) {
+            // Get product with packaging info
             $product = Product::find($inventory->product_id);
-
             if (!$product) {
+                continue;
+            }
+
+            // Get branch product record (stock lives here)
+            $branchProduct = BranchProduct::where('product_id', $inventory->product_id)
+                ->where('branch_id', env('BRANCH_ID'))
+                ->first();
+
+            if (!$branchProduct) {
                 continue;
             }
 
@@ -196,49 +213,50 @@ class InventoryController extends Controller
                 }
             }
 
-            // Update the product table with final quantities
+            // Update the branch product table with final quantities
             $changed = false;
-            $oldR = $product->rqty;
-            $oldW = $product->wqty;
+            $oldR = $branchProduct->rqty;
+            $oldW = $branchProduct->wqty;
 
-            if ($product->rqty != $finalRQty) {
-                $product->rqty = $finalRQty;
+            if ($branchProduct->rqty != $finalRQty) {
+                $branchProduct->rqty = $finalRQty;
                 $changed = true;
             }
 
             if ($product->packaging > 1) {
-                if ($product->wqty != $finalWQty) {
-                    $product->wqty = $finalWQty;
+                if ($branchProduct->wqty != $finalWQty) {
+                    $branchProduct->wqty = $finalWQty;
                     $changed = true;
                 }
             } else {
-                if ($product->wqty != 0) {
-                    $product->wqty = 0;
+                if ($branchProduct->wqty != 0) {
+                    $branchProduct->wqty = 0;
                     $changed = true;
                 }
             }
 
             if ($changed) {
-                $product->save();
+                $branchProduct->save();
 
                 $updatedProducts[] = [
                     'product_id' => $product->id,
                     'old_rqty'   => $oldR,
                     'new_rqty'   => $finalRQty,
                     'old_wqty'   => $oldW,
-                    'new_wqty'   => $product->wqty,
+                    'new_wqty'   => $branchProduct->wqty,
                 ];
             }
         }
 
-        // Mark all active inventories as finalized
-        Inventory::where('status', 1)->update(['status' => 2]);
+        // Mark all active inventories as finalized (branch-specific if needed)
+        Inventory::where('status', 1)
+            ->where('branch_id', env('BRANCH_ID'))
+            ->update(['status' => 2]);
 
         return response()->json([
             'message' => 'Inventory saved successfully',
             'updated_products' => $updatedProducts
         ]);
     }
-
 
 }

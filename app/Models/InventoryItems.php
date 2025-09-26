@@ -10,6 +10,7 @@ class InventoryItems extends Model
     use HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'inventory_id',
         'product_id',
         'r_qty',        // Retail quantity

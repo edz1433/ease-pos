@@ -21,40 +21,22 @@ use Carbon\Carbon;
 
 class MasterController extends Controller
 {
-    public function dashboard()
+    public function dashboard(request $request)
     {
-        // Totals
         $totalSales     = Sale::sum('total_wvat');      
         $totalPurchases = Purchase::sum('total_amount');   
-        $totalExpenses  = 0; // Update when you add an expenses table
+        $totalExpenses  = 0;
         $totalStaff     = User::where('role', 2)->count();  
-
-        $topProducts = SalesOrder::join('products', 'sales_orders.product_id', '=', 'products.id')
-            ->select(
-                'products.id as product_id',
-                'products.product_name',
-                \DB::raw('SUM(sales_orders.price * sales_orders.quantity) as total_wvat'),
-                \DB::raw('SUM(sales_orders.quantity) as total_items_sold') 
-            )
-            ->groupBy('sales_orders.product_id', 'products.id', 'products.product_name')
-            ->orderByDesc('total_items_sold')
-            ->limit(10)
-            ->get()
-            ->map(function ($item, $key) {
-                $item->row_number = $key + 1;
-                return $item;
-            });
-
+        $categories     = Category::all();  
 
         return view('admin.dashboard.index', compact(
             'totalSales',
             'totalPurchases',
             'totalExpenses',
             'totalStaff',
-            'topProducts'
+            'categories'
         ));
     }
-
     
     public function purchaseRead() 
     {
@@ -87,6 +69,7 @@ class MasterController extends Controller
 
         $products = Product::select(
                 'products.*',
+                'branch_products.*',
                 'categories.name as category_name',
                 'r_unit.name as r_unit_name',
                 'w_unit.name as w_unit_name',
@@ -99,9 +82,10 @@ class MasterController extends Controller
                         WHERE s.product_id = products.id 
                             AND s.price_type = 'wholesale') as total_sold_w")
             )
+            ->leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
             ->leftJoin('categories', 'products.category', '=', 'categories.id')
-            ->leftJoin('units as r_unit', 'products.r_unit', '=', 'r_unit.id')
-            ->leftJoin('units as w_unit', 'products.w_unit', '=', 'w_unit.id')
+            ->leftJoin('units as r_unit', 'branch_products.r_unit', '=', 'r_unit.id')
+            ->leftJoin('units as w_unit', 'branch_products.w_unit', '=', 'w_unit.id')
             ->get();
 
         return view('admin.products.index', compact('categories', 'units', 'products'));

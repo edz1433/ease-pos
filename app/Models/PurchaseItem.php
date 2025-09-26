@@ -10,7 +10,7 @@ class PurchaseItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
+        'branch_id',
         'purchase_id',
         'product_id',	
         'price',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\BranchProduct;
 use App\Models\BundleItem;
 use Illuminate\Support\Facades\DB;
 
@@ -15,7 +16,7 @@ class ProductBundleController extends Controller
     {
         $products = Product::all(); 
         $productsbundle = BundleItem::join('products', 'bundle_items.product_id', '=', 'products.id')
-            ->select('products.*', 'bundle_items.product_id', 'bundle_items.bundle_id')
+            ->select('products.*', 'bundle_items.product_id', 'bundle_items.bundle_id', 'bundle_items.quantity')
             ->get(); 
         $categories = Category::all();
 
@@ -44,13 +45,18 @@ class ProductBundleController extends Controller
                 'barcode' => $request->barcode,
                 'product_name' => $request->bundle_name,
                 'category' => $request->category,
+                'more_details' => $request->more_details,
+                'image' => 'default-product.png',
+                'is_bundle' => 1
+            ]);
+
+            BranchProduct::create([
+                'branch_id' => env('BRANCH_ID'),
+                'product_id' => $bundle->id,
                 'r_price' => $request->r_price,
                 'r_capital' => $request->r_capital,
                 'r_stock_alert' => $request->r_stock_alert,
-                'more_details' => $request->more_details,
                 'rqty' => $request->quantity,
-                'image' => 'default-product.png',
-                'is_bundle' => 1
             ]);
 
             // 2. Loop through selected products and quantities
@@ -65,7 +71,7 @@ class ProductBundleController extends Controller
                 ]);
 
                 // Deduct quantity from product
-                $product = Product::find($productId);
+                $product = BranchProduct::where('product_id', $productId)->first();
                 if ($product) {
                     $product->rqty = max(0, $product->rqty - ($qty * $request->quantity)); // avoid negative
                     $product->save();

@@ -20,7 +20,7 @@
                     <div class="table-responsive">
                         <div class="card-tools mb-1">
                             <div class="input-group input-group-sm">
-                                <input type="text" id="table-search" name="table_search" class="form-control float-right" placeholder="Search">
+                                <input type="text" id="table-search" name="table_search" class="form-control float-right m-1" placeholder="Search">
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-default">
                                         <i class="fas fa-search"></i>
@@ -28,7 +28,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <table id="inventory-table" class="table table-head-fixed text-nowrap">
                             <thead>
                                 <tr>
@@ -46,26 +46,26 @@
                             <tbody>
                                 <?php $__currentLoopData = $inventoryItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr class="">
-                                    <td><?php echo e($index + 1); ?></td>
-                                    <td><?php echo e(($item->price_type == 'retail') ? $item->barcode : $item->w_barcode); ?></td>
-                                    <td><?php echo e($item->product_name); ?></td>
-                                    <td><?php echo e($item->model); ?></td>
-                                    <td><?php echo e(ucfirst($item->price_type)); ?></td>
-                                    <td>
+                                    <td class="align-middle text-main-8 font-weight-bold"><?php echo e($index + 1); ?></td>
+                                    <td class="align-middle text-main-8 font-weight-bold"><?php echo e(($item->price_type == 'retail') ? $item->barcode : $item->w_barcode); ?></td>
+                                    <td class="align-middle text-main-8 font-weight-bold"><?php echo e($item->product_name); ?></td>
+                                    <td class="align-middle text-main-8 font-weight-bold"><?php echo e($item->model); ?></td>
+                                    <td class="align-middle text-main-8 font-weight-bold"><?php echo e(ucfirst($item->price_type)); ?></td>
+                                    <td class="align-middle text-main-8 font-weight-bold">
                                         <input type="number" min="0" class="form-control form-control-sm qty-input" 
                                             data-id="<?php echo e($item->id); ?>" data-type="<?php echo e($item->price_type); ?>" 
                                             value="<?php echo e($item->price_type == 'retail' ? $item->r_qty : $item->w_qty); ?>" <?php echo e(($inventory->status != 1) ? 'readonly' : ''); ?>>
                                     </td>
-                                    <td>
+                                    <td class="align-middle text-main-8 font-weight-bold">
                                         <input type="number" min="0" step="0.01" class="form-control form-control-sm capital-input" 
                                             data-id="<?php echo e($item->id); ?>" data-type="<?php echo e($item->price_type); ?>" 
                                             value="<?php echo e($item->price_type == 'retail' ? $item->r_capital : $item->w_capital); ?>" <?php echo e(($inventory->status != 1) ? 'readonly' : ''); ?>>
                                     </td>
-                                    <td class="subtotal">
+                                    <td class="align-middle text-main-1 font-weight-bold" class="subtotal">
                                         <?php echo e(number_format($item->price_type == 'retail' ? $item->r_subtotal : $item->w_subtotal, 2)); ?>
 
                                     </td>
-                                    <td>
+                                    <td class="align-middle text-main-8 font-weight-bold">
                                         <span class="badge badge-<?php echo e($item->status == 1 ? 'success' : 'warning'); ?>"><?php echo e($item->status == 1 ? 'updated' : ''); ?></span>
                                     </td>
                                 </tr>
@@ -73,8 +73,8 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" class="text-right">Total:</th>
-                                    <th id="grandTotal"><?php echo e(number_format($inventoryItems->sum(fn($i) => $i->r_subtotal + $i->w_subtotal), 2)); ?></th>
+                                    <th colspan="7" class="text-right">Total:</th>
+                                    <th class="align-middle text-main-1 font-weight-bold" id="grandTotal"><?php echo e(number_format($inventoryItems->sum(fn($i) => $i->r_subtotal + $i->w_subtotal), 2)); ?></th>
                                     <th></th>
                                 </tr>
                             </tfoot>

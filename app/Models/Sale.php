@@ -10,6 +10,7 @@ class Sale extends Model
     use HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'transaction_number',
         'date',
         'total',

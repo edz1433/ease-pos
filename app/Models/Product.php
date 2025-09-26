@@ -18,19 +18,11 @@ class Product extends Model
         'product_type',
         'category',
         'packaging',
-        'w_capital',
-        'w_price',
-        'wqty',
-        'w_unit',
-        'r_capital',
-        'r_price',
-        'r_unit',
-        'rqty',
+        'warranty',
+        'rep_duration',
         'image',
         'vatable',
         'is_bundle',
-        'r_stock_alert',
-        'w_stock_alert',
     ];
 
 }

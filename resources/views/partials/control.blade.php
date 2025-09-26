@@ -29,7 +29,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('warehouseRead') }}" class="{{ request()->is('purchases*') ? 'active' : '' }}">
+            <a href="{{ route('warehouseRead') }}" class="{{ request()->is('warehouse*') ? 'active' : '' }}">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Warehouse</span>
             </a>
@@ -119,6 +119,12 @@
             <a href="#" class="{{ request()->is('reports*') ? 'active' : '' }}">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('userRead') }}" class="{{ request()->is('customer*') ? 'active' : '' }}">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
             </a>
         </li>
         <li>

@@ -18,6 +18,7 @@ class CashBankController extends Controller
         ]);
         
         CashBankTransaction::create([
+            'branch_id' => env('BRANCH_ID'),
             'transaction_date' => $request->transaction_date,
             'transaction_type' => $request->transaction_type,
             'category' => $request->category,

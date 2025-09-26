@@ -101,8 +101,8 @@
                                         <td class="align-middle text-main-8 font-weight-bold"><?php echo e($trans->transaction_date->format('M d, Y - h:i A')); ?></td>
                                         <td class="align-middle text-main-8 font-weight-bold">
                                             <?php echo ($trans->category == 1) 
-                                            ? '<span class="badge badge-danger">Outflow</span>' 
-                                            : '<span class="badge badge-success">Inflow</span>'; ?>
+                                            ? '<span class="badge badge-success">Inflow</span>' 
+                                            : '<span class="badge badge-danger">Outflow</span>'; ?>
 
                                         </td>
                                         <td class="align-middle text-main-8 font-weight-bold"><?php echo e($trans->transaction_type); ?></td>
@@ -126,9 +126,25 @@
                             </tbody>
                             <tfoot class="table-light">
                                 <tr>
-                                    <th colspan="4" class="text-end">Total</th>
-                                    <th class="text-end">₱<?php echo e(number_format($transactions->sum('amount'),2)); ?></th>
-                                    <th colspan="2"></th>
+                                    <th colspan="4" class="text-end">Total Inflow</th>
+                                    <th colspan="2" class="text-end text-success">
+                                        ₱<?php echo e(number_format($transactions->where('category', 1)->sum('amount'), 2)); ?>
+
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" class="text-end">Total Outflow</th>
+                                    <th colspan="2" class="text-end text-danger">
+                                        ₱<?php echo e(number_format($transactions->where('category', 0)->sum('amount'), 2)); ?>
+
+                                    </th>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <th colspan="4" class="text-end">Net Total</th>
+                                    <th colspan="2" class="text-end">
+                                        ₱<?php echo e(number_format($transactions->sum('amount'), 2)); ?>
+
+                                    </th>
                                 </tr>
                             </tfoot>
                         </table>

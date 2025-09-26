@@ -1,71 +1,213 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const ctx = document.getElementById('topProducts').getContext('2d');
+    const topProductsCtx   = document.getElementById('topProducts').getContext('2d');
+    const categoryPieCtx   = document.getElementById('categoryPie').getContext('2d');
+    const salesProfitCtx   = document.getElementById('salesAnalyticsChart').getContext('2d');
 
-    const labels = @json($topProducts->pluck('row_number'));        // 1,2,3...
-    const data = @json($topProducts->pluck('total_items_sold'));
-    const names = @json($topProducts->pluck('product_name'));       // for tooltips
+    let topProductsChart, categoryPieChart, salesProfitChart;
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Total Sold',
-                data: data.map(Number),
-                backgroundColor: [
-                    'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)',
-                    'rgba(252, 32, 120, 0.8)', 'rgba(252, 32, 140, 0.8)',
-                    'rgba(252, 32, 160, 0.8)', 'rgba(32, 252, 194, 0.8)',
-                    'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)',
-                    'rgba(32, 140, 194, 0.8)', 'rgba(32, 110, 194, 0.8)'
-                ],
-                borderColor: 'rgba(0,0,0,0.1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        title: context => names[context[0].dataIndex], // show product_name in tooltip
-                        label: context => {
-                            const value = parseFloat(context.raw) || 0;
-                            return '₱' + value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    function loadDashboardData(filter = 'month', category = null, startDate = null, endDate = null) {
+        $.ajax({
+            url: "{{ route('dashboardData') }}",
+            method: "GET",
+            data: { filter, category, start_date: startDate, end_date: endDate },
+            success: function (res) {
+                // ---------------- Top Products (Bar) ----------------
+                if (topProductsChart) topProductsChart.destroy();
+
+                topProductsChart = new Chart(topProductsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: res.labels,
+                        datasets: [{
+                            label: 'Total Sold',
+                            data: res.data.map(Number),
+                            backgroundColor: [
+                                'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)',
+                                'rgba(252, 32, 120, 0.8)', 'rgba(252, 32, 140, 0.8)',
+                                'rgba(252, 32, 160, 0.8)', 'rgba(32, 252, 194, 0.8)',
+                                'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)',
+                                'rgba(32, 140, 194, 0.8)', 'rgba(32, 110, 194, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: ctx => res.names[ctx[0].dataIndex],
+                                    label: ctx => `Sold: ${ctx.raw}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true },
+                            x: { ticks: { autoSkip: false, maxRotation: 45 } }
                         }
                     }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        display: false
+                });
+
+                // ---------------- Categories (Modern Doughnut) ----------------
+                if (categoryPieChart) categoryPieChart.destroy();
+
+                categoryPieChart = new Chart(categoryPieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: res.categories.labels,
+                        datasets: [{
+                            data: res.categories.data.map(Number),
+                            backgroundColor: [
+                                'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)',
+                                'rgba(252, 32, 120, 0.8)', 'rgba(252, 32, 140, 0.8)',
+                                'rgba(252, 32, 160, 0.8)', 'rgba(32, 252, 194, 0.8)',
+                                'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)',
+                                'rgba(32, 140, 194, 0.8)', 'rgba(32, 110, 194, 0.8)'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff',
+                            hoverOffset: 12,
+                            borderRadius: 6
+                        }]
                     },
-                    grid: {
-                        drawTicks: false
-                    }
-                },
-                x: {
-                    ticks: {
-                        autoSkip: false,
-                        maxRotation: 45,
-                        minRotation: 0
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => `${ctx.label}: ${ctx.raw}%`
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Category Sales Distribution',
+                                font: { size: 18, weight: 'bold' },
+                                padding: { top: 10, bottom: 20 }
+                            },
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    padding: 15,
+                                    font: { size: 13 }
+                                }
+                            }
+                        }
                     },
-                    grid: {
-                        drawTicks: false
+                    plugins: [
+                        {
+                            id: 'centerText',
+                            beforeDraw(chart) {
+                                const {width, height} = chart;
+                                const ctx = chart.ctx;
+                                ctx.save();
+                                const total = res.categories.data.reduce((a, b) => a + Number(b), 0);
+                                ctx.font = "bold 16px sans-serif";
+                                ctx.fillStyle = "#444";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText("Total", width / 2, height / 2 - 10);
+                                ctx.font = "bold 18px sans-serif";
+                                ctx.fillStyle = "#111";
+                                ctx.fillText(total + "%", width / 2, height / 2 + 15);
+                                ctx.restore();
+                            }
+                        }
+                    ]
+                });
+
+                // ---------------- Sales & Profit (Line) ----------------
+                if (salesProfitChart) salesProfitChart.destroy();
+
+                salesProfitChart = new Chart(salesProfitCtx, {
+                    type: 'line',
+                    data: {
+                        labels: res.analytics.labels,
+                        datasets: [
+                            {
+                                label: 'Sales',
+                                data: res.analytics.sales.map(Number),
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Profit',
+                                data: res.analytics.profit.map(Number),
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: { display: true, text: 'POS Daily Sales & Profit', font: { size: 18 } },
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: val => '₱' + val.toLocaleString() }
+                            },
+                            x: { title: { display: true, text: 'Date' } }
+                        }
                     }
-                }
+                });
+
+                // ---------------- Top Products List ----------------
+                const listContainer = document.getElementById("topProductsList");
+                listContainer.innerHTML = "";
+                res.list.forEach(item => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item py-1 px-2";
+                    li.style.fontSize = "0.8rem";
+                    li.textContent = `${item.rank}. ${item.name}`;
+                    listContainer.appendChild(li);
+                });
             }
+        });
+    }
+
+    // ---------------- Filter Form ----------------
+    $("#filterForm").on("submit", function (e) {
+        e.preventDefault();
+        const filter = $("#filterSelect").val();
+        const category = $("#category").val();
+        const start = $("#startDate").val();
+        const end = $("#endDate").val();
+        loadDashboardData(filter, category, start, end);
+    });
+
+    $("#filterSelect").on("change", function () {
+        if ($(this).val() === "custom") {
+            $("#startDate, #endDate").show();
+        } else {
+            $("#startDate, #endDate").hide().val("");
         }
     });
+
+    // ---------------- Initial Load ----------------
+    loadDashboardData();
 });
 </script>
 
-
+<script>
+document.getElementById('filterSelect').addEventListener('change', function () {
+    const showCustom = this.value === 'custom';
+    document.getElementById('startDate').style.display = showCustom ? 'inline-block' : 'none';
+    document.getElementById('endDate').style.display = showCustom ? 'inline-block' : 'none';
+});
+</script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById('monthlySalesChart').getContext('2d');
@@ -115,163 +257,67 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const ctx = document.getElementById('salesCategoryChart').getContext('2d');
+const ctx = document.getElementById('salesProfitChart').getContext('2d');
 
-    const data = [30000, 25000, 20000, 15600, 10500]; // sample values
-    const total = data.reduce((a, b) => a + b, 0);
-
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Food', 'Beverage', 'Grocery', 'Health', 'Others'],
-            datasets: [{
-                data: data,
-                backgroundColor: [
-                    'rgba(252, 32, 140, 0.8)',  'rgba(32, 252, 194, 0.8)', 'rgba(252, 32, 160, 0.8)', 
-                    'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)',
-                ],
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            const value = context.raw;
-                            const percent = ((value / total) * 100).toFixed(1);
-                            return `${context.label}: ₱${value.toLocaleString()} (${percent}%)`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const ctx = document.getElementById('profitChart').getContext('2d');
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ],
-            datasets: [{
-                label: 'Profit Margin (Avg: 48.2%)',
-                data: [42.1, 45.0, 47.2, 46.3, 48.5, 49.1, 50.2, 48.9, 47.0, 46.5, 49.4, 50.1],
-                borderColor: 'rgba(32, 252, 194, 0.8)',
-                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                pointBackgroundColor: 'rgba(32, 252, 194, 0.8)',
-                borderWidth: 2,
-                tension: 0.4,
+const salesProfitChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Sep 1', 'Sep 2', 'Sep 3', 'Sep 4', 'Sep 5', 'Sep 6', 'Sep 7'], // Dates
+        datasets: [
+            {
+                label: 'Sales',
+                data: [5000, 7000, 6500, 8000, 9000, 7500, 8500],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.3,
                 fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        callback: value => value + '%'
-                    }
-                }
             },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: context => context.raw + '%'
-                    }
-                }
+            {
+                label: 'Profit',
+                data: [2500, 3200, 3000, 4000, 4500, 3700, 4200],
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                tension: 0.3,
+                fill: true
             }
-        }
-    });
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const ctx = document.getElementById('lowStockChart').getContext('2d');
-
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: [
-                <?php
-                    echo "'Coke 1L', 'Sprite 1.5L', 'Pepsi 500ml', 'Royal 1L', 'Mountain Dew 330ml', 'C2 Apple', 'Mineral Water', 'Iced Tea', 'Gatorade Blue', 'Nestea'";
-                ?>
-            ],
-            datasets: [{
-                label: 'Remaining Stocks',
-                data: [
-                    <?php
-                        echo "4, 6, 3, 2, 8, 5, 1, 7, 3, 0";
-                    ?>
-                ],
-                backgroundColor: [
-                    <?php
-                        echo "'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)', 'rgba(252, 32, 120, 0.8)',";
-                        echo "'rgba(252, 32, 140, 0.8)', 'rgba(252, 32, 160, 0.8)', 'rgba(32, 252, 194, 0.8)',";
-                        echo "'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)', 'rgba(32, 140, 194, 0.8)', 'rgba(32, 110, 194, 0.8)'";
-                    ?>
-                ],
-                borderRadius: 4
-            }]
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'POS Daily Sales & Profit',
+                font: { size: 18 }
+            },
+            legend: {
+                position: 'top'
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false
+            }
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return context.parsed.y + ' remaining';
-                        }
-                    }
-                },
+        interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
                 title: {
                     display: true,
-                    text: 'Low Stock Alert (Threshold: 5)',
-                    font: { size: 16 }
+                    text: 'Amount (₱)'
                 }
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 10,
-                    ticks: {
-                        stepSize: 1
-                    },
-                    grid: {
-                        color: '#eaeaea'
-                    }
-                },
-                x: {
-                    ticks: {
-                        autoSkip: false,
-                        maxRotation: 40,
-                        minRotation: 40
-                    }
+            x: {
+                title: {
+                    display: true,
+                    text: 'Date'
                 }
             }
         }
-    });
+    }
 });
 </script>

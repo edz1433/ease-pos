@@ -30,7 +30,7 @@
             </a>
         </li>
         <li>
-            <a href="<?php echo e(route('warehouseRead')); ?>" class="<?php echo e(request()->is('purchases*') ? 'active' : ''); ?>">
+            <a href="<?php echo e(route('warehouseRead')); ?>" class="<?php echo e(request()->is('warehouse*') ? 'active' : ''); ?>">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Warehouse</span>
             </a>
@@ -120,6 +120,12 @@
             <a href="#" class="<?php echo e(request()->is('reports*') ? 'active' : ''); ?>">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo e(route('userRead')); ?>" class="<?php echo e(request()->is('customer*') ? 'active' : ''); ?>">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
             </a>
         </li>
         <li>

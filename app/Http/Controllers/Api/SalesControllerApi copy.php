@@ -5,17 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\BranchProduct;
-use Illuminate\Support\Facades\DB;
 use App\Models\Sale;
+use App\Models\InventoryItems;
+use App\Models\InventoryLog;
 use App\Models\SalesOrder;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
-class SalesController extends Controller
+class SalesControllerApi extends Controller
 {
-    public function nextTransactionNumber()
+        public function nextTransactionNumber()
     {
-        $todayCount = Sale::where('branch_id', env('BRANCH_ID'))->whereDate('created_at', now()->toDateString())->count();
+        $todayCount = Sale::whereDate('created_at', now()->toDateString())->count();
         $nextNumber = str_pad($todayCount + 1, 4, '0', STR_PAD_LEFT);
         $transactionNumber = now()->format('mdyHis') . '-' . $nextNumber;
 
@@ -55,9 +57,10 @@ class SalesController extends Controller
 
             $status = isset($data['status']) ? intval($data['status']) : 1;
 
-            DB::transaction(function () use ($data, $status, $vat, $totalWithVat) {
+            $paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : 'Cash';
+
+            DB::transaction(function () use ($data, $status, $vat, $totalWithVat, $paymentMethod) {
                 $sale = Sale::create([
-                    
                     'transaction_number' => $data['transaction_number'],
                     'date' => Carbon::now('Asia/Manila')->toDateString(),
                     'total' => $data['total'],
@@ -69,6 +72,8 @@ class SalesController extends Controller
                     'status' => $status,
                     'customer' => $data['customer'] ?? null,
                     'table_no' => $data['table_no'] ?? null,
+                    'payment_method' => $paymentMethod,
+                    'user_id' => auth()->id(),
                 ]);
 
                 foreach ($data['items'] as $item) {
@@ -151,7 +156,6 @@ class SalesController extends Controller
 
             $sales = DB::table('sales')
                 ->whereDate('date', $targetDate->format('Y-m-d'))
-                ->where('branch_id', env('BRANCH_ID'))
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -199,16 +203,6 @@ class SalesController extends Controller
 
             // Process image data for each sales order
             $processedOrders = $salesOrders->map(function($order) {
-                $imageBase64 = null;
-                if ($order->image) {
-                    $imagePath = public_path('uploads/products/' . $order->image);
-                    if (file_exists($imagePath)) {
-                        $imageData = base64_encode(file_get_contents($imagePath));
-                        $mimeType = mime_content_type($imagePath);
-                        $imageBase64 = "data:$mimeType;base64,$imageData";  
-                    }
-                }
-
                 return [
                     'id' => $order->id,
                     'product_id' => $order->product_id,
@@ -222,7 +216,7 @@ class SalesController extends Controller
                         'product_name' => $order->product_name,
                         'retail_unit_name' => $order->retail_unit_name,
                         'wholesale_unit_name' => $order->wholesale_unit_name,
-                        'image_base64' => $imageBase64
+                        'image' => $order->image
                     ]
                 ];
             });
@@ -377,5 +371,157 @@ class SalesController extends Controller
         }
     }
 
+    public function cancelOrReturnSale($saleId)
+    {
+        DB::beginTransaction();
 
+        try {
+            // Find the sale with its sales orders
+            $sale = Sale::with('salesorder')->findOrFail($saleId);
+            
+            // Get request data
+            $isPartialReturn = request('is_partial_return', false);
+            $returnItems = request('return_items', []);
+
+            // Determine action based on status
+            if ($sale->status == 1) { // Paid → Return
+                $targetStatus = $isPartialReturn ? 5 : 4; // Partially Returned or Returned
+                $adjustmentType = 'return';
+            } elseif ($sale->status == 2) { // Unpaid → Cancel
+                $targetStatus = 3; // Cancelled
+                $adjustmentType = 'cancellation_restock';
+            } elseif ($sale->status == 3) { // Already cancelled
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Sale has already been cancelled.'
+                ], 422);
+            } elseif ($sale->status == 4 || $sale->status == 5) { // Already returned
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Sale has already been returned.'
+                ], 422);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot process this sale status.'
+                ], 422);
+            }
+
+            // Handle partial returns
+            if ($isPartialReturn && !empty($returnItems)) {
+                foreach ($returnItems as $returnItem) {
+                    $order = $sale->salesorder->where('id', $returnItem['sales_order_id'])->first();
+                    if (!$order) continue;
+
+                    $product = Product::find($order->product_id);
+                    if (!$product) continue;
+
+                    $returnQty = min($returnItem['quantity'], $order->quantity);
+                    if ($returnQty <= 0) continue;
+
+                    $previousQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
+
+                    if ($order->price_type === 'retail') {
+                        $product->increment('rqty', $returnQty);
+                    } else {
+                        $product->increment('wqty', $returnQty);
+                    }
+
+                    $newQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
+
+                    // Log inventory change
+                    InventoryLog::create([
+                        'product_id' => $order->product_id,
+                        'quantity' => $returnQty,
+                        'adjustment_type' => $adjustmentType,
+                        'price_type' => $order->price_type,
+                        'previous_quantity' => $previousQty,
+                        'new_quantity' => $newQty,
+                        'reason' => ucfirst($adjustmentType) . ' - ' . $sale->transaction_number,
+                        'sale_id' => $saleId,
+                        'user_id' => auth()->id(),
+                        'price' => $order->unit_price
+                    ]);
+
+                    // Update the sales order quantity if not returning all
+                    if ($returnQty < $order->quantity) {
+                        $order->decrement('quantity', $returnQty);
+                    } else {
+                        $order->update(['is_returned' => true]);
+                    }
+                }
+
+                // Recalculate sale total
+                $newTotal = $sale->salesorder
+                    ->where('is_returned', false)
+                    ->sum(fn($o) => $o->quantity * $o->unit_price);
+
+                $sale->update([
+                    'total' => $newTotal,
+                    'status' => $targetStatus
+                ]);
+
+            } else {
+                // Full return/cancellation
+                $salesOrders = $sale->salesorder;
+
+                if ($adjustmentType) {
+                    foreach ($salesOrders as $order) {
+                        $product = Product::find($order->product_id);
+                        if (!$product) continue;
+
+                        $previousQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
+
+                        if ($order->price_type === 'retail') {
+                            $product->increment('rqty', $order->quantity);
+                        } else {
+                            $product->increment('wqty', $order->quantity);
+                        }
+
+                        $newQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
+
+                        InventoryLog::create([
+                            'product_id' => $order->product_id,
+                            'quantity' => $order->quantity,
+                            'adjustment_type' => $adjustmentType,
+                            'price_type' => $order->price_type,
+                            'previous_quantity' => $previousQty,
+                            'new_quantity' => $newQty,
+                            'reason' => ucfirst($adjustmentType) . ' - ' . $sale->transaction_number,
+                            'sale_id' => $saleId,
+                            'user_id' => auth()->id(),
+                            'price' => $order->unit_price
+                        ]);
+                    }
+                }
+
+                $sale->update([
+                    'status' => $targetStatus,
+                    'cancelled_at' => now(),
+                    'cancelled_by' => auth()->id()
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => $targetStatus === 3 ? 'Sale cancelled successfully' : 
+                            ($targetStatus === 4 ? 'Sale returned successfully' : 'Partial return processed successfully'),
+                'data' => [
+                    'sale_id' => $saleId,
+                    'status' => $sale->status,
+                    'cancelled_at' => $sale->cancelled_at
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to process sale: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

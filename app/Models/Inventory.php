@@ -10,6 +10,7 @@ class Inventory extends Model
     use HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'start_date',
         'end_date',
         'status',

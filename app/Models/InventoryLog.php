@@ -9,6 +9,7 @@ class InventoryLog extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'branch_id',
         'product_id',
         'quantity',
         'adjustment_type', // 'sale', 'return', 'restock', 'adjustment', 'cancellation_restock'

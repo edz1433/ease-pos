@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\BranchProduct;
 use App\Models\Sale;
 use App\Models\InventoryItems;
 use App\Models\InventoryLog;
@@ -15,9 +16,9 @@ use Illuminate\Support\Facades\Validator;
 
 class SalesControllerApi extends Controller
 {
-        public function nextTransactionNumber()
+    public function nextTransactionNumber()
     {
-        $todayCount = Sale::whereDate('created_at', now()->toDateString())->count();
+        $todayCount = Sale::whereDate('created_at', now()->toDateString())->where('branch_id', env('BRANCH_ID'))->count();
         $nextNumber = str_pad($todayCount + 1, 4, '0', STR_PAD_LEFT);
         $transactionNumber = now()->format('mdyHis') . '-' . $nextNumber;
 
@@ -61,6 +62,7 @@ class SalesControllerApi extends Controller
 
             DB::transaction(function () use ($data, $status, $vat, $totalWithVat, $paymentMethod) {
                 $sale = Sale::create([
+                    'branch_id' => env('BRANCH_ID'),
                     'transaction_number' => $data['transaction_number'],
                     'date' => Carbon::now('Asia/Manila')->toDateString(),
                     'total' => $data['total'],
@@ -77,7 +79,7 @@ class SalesControllerApi extends Controller
                 ]);
 
                 foreach ($data['items'] as $item) {
-                    $product = Product::find($item['product_id']);
+                    $product = BranchProduct::where('product_id', $item['product_id'])->first();
                     if (!$product) continue;
 
                     $quantity = $item['quantity'];
@@ -110,6 +112,7 @@ class SalesControllerApi extends Controller
                     $product->save();
 
                     SalesOrder::create([
+                        'branch_id' => env('BRANCH_ID'),
                         'sales_id' => $sale->id,
                         'product_id' => $item['product_id'],
                         'capital' => $item['capital'],
@@ -156,6 +159,7 @@ class SalesControllerApi extends Controller
 
             $sales = DB::table('sales')
                 ->whereDate('date', $targetDate->format('Y-m-d'))
+                ->where('branch_id', env('BRANCH_ID'))
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -196,8 +200,10 @@ class SalesControllerApi extends Controller
                     'wholesale_unit.name as wholesale_unit_name'
                 )
                 ->leftJoin('products', 'sales_orders.product_id', '=', 'products.id')
-                ->leftJoin('units as retail_unit', 'products.r_unit', '=', 'retail_unit.id')
-                ->leftJoin('units as wholesale_unit', 'products.w_unit', '=', 'wholesale_unit.id')
+                ->leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
+                ->leftJoin('units as retail_unit', 'branch_products.r_unit', '=', 'retail_unit.id')
+                ->leftJoin('units as wholesale_unit', 'branch_products.w_unit', '=', 'wholesale_unit.id')
+                ->where('sales_orders.branch_id', env('BRANCH_ID'))
                 ->where('sales_orders.sales_id', $saleId)
                 ->get();
 
@@ -278,6 +284,7 @@ class SalesControllerApi extends Controller
 
                 // Update sale but keep original date
                 $sale->update([
+                    'branch_id' => env('BRANCH_ID'),
                     'date' => $originalDate,   // keep old order date
                     'total' => $data['total'],
                     'discount' => $data['discount'],
@@ -296,7 +303,7 @@ class SalesControllerApi extends Controller
                 $oldOrders = SalesOrder::where('sales_id', $sale->id)->get();
 
                 foreach ($oldOrders as $order) {
-                    $product = Product::find($order->product_id);
+                    $product = BranchProduct::where('product_id', $order['product_id'])->first();
                     if (!$product) continue;
 
                     if ($order->price_type === 'retail') {
@@ -313,7 +320,7 @@ class SalesControllerApi extends Controller
 
                 // 2️⃣ Insert new items and deduct stock again
                 foreach ($data['items'] as $item) {
-                    $product = Product::find($item['product_id']);
+                    $product = BranchProduct::where('product_id', $item['product_id'])->first();
                     if (!$product) continue;
 
                     $quantity = $item['quantity'];
@@ -341,6 +348,7 @@ class SalesControllerApi extends Controller
                     $product->save();
 
                     SalesOrder::create([
+                        'branch_id' => env('BRANCH_ID'),
                         'sales_id' => $sale->id,
                         'product_id' => $item['product_id'],
                         'capital' => $item['capital'],
@@ -413,7 +421,8 @@ class SalesControllerApi extends Controller
                     $order = $sale->salesorder->where('id', $returnItem['sales_order_id'])->first();
                     if (!$order) continue;
 
-                    $product = Product::find($order->product_id);
+                    $product = BranchProduct::where('product_id', $order->product_id)->first();
+
                     if (!$product) continue;
 
                     $returnQty = min($returnItem['quantity'], $order->quantity);
@@ -431,6 +440,7 @@ class SalesControllerApi extends Controller
 
                     // Log inventory change
                     InventoryLog::create([
+                        'branch_id' => env('BRANCH_ID'),
                         'product_id' => $order->product_id,
                         'quantity' => $returnQty,
                         'adjustment_type' => $adjustmentType,
@@ -467,7 +477,7 @@ class SalesControllerApi extends Controller
 
                 if ($adjustmentType) {
                     foreach ($salesOrders as $order) {
-                        $product = Product::find($order->product_id);
+                        $product = BranchProduct::where('product_id', $order->product_id)->first();
                         if (!$product) continue;
 
                         $previousQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
@@ -481,6 +491,7 @@ class SalesControllerApi extends Controller
                         $newQty = $order->price_type === 'retail' ? $product->rqty : $product->wqty;
 
                         InventoryLog::create([
+                            'branch_id' => env('BRANCH_ID'),    
                             'product_id' => $order->product_id,
                             'quantity' => $order->quantity,
                             'adjustment_type' => $adjustmentType,

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginAuthController;
 use App\Http\Controllers\MasterController;
+use App\Http\Controllers\DashboardController    ;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\Api\AuthCheckController;
+use App\Http\Controllers\Api\ProductsControllerApi;
 use App\Http\Controllers\Api\SalesControllerApi;
 
 Route::get('/', function () {
@@ -33,9 +35,9 @@ Route::prefix('api')->group(function () {
     Route::get('/auth/status', [AuthCheckController::class, 'authStatus']);
 
     Route::get('/categories', [CategoryController::class, 'categories'])->name('categories');
-    Route::get('/products/{category?}', [ProductController::class, 'products'])->name('products');
-    Route::get('/all-products', [ProductController::class, 'getAllProducts'])->name('getAllProducts');
-    Route::get('/products-by-barcode/{barcode}', [ProductController::class, 'getProductByBarcode'])->name('getAllProducts');
+    Route::get('/products/{category?}', [ProductsControllerApi::class, 'products'])->name('products');
+    Route::get('/all-products', [ProductsControllerApi::class, 'getAllProducts'])->name('getAllProducts');
+    Route::get('/products-by-barcode/{barcode}', [ProductsControllerApi::class, 'getProductByBarcode'])->name('getAllProducts');
     Route::post('/checkout', [SalesControllerApi::class, 'checkout']);
     Route::get('/next-transaction-number', [SalesControllerApi::class, 'nextTransactionNumber']);
     
@@ -50,6 +52,9 @@ Route::prefix('api')->group(function () {
 // Authenticated routes
 Route::group(['middleware' => ['login_auth']], function() {
     Route::get('dashboard', [MasterController::class, 'dashboard'])->name('dashboard');
+    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // JSON endpoint for AJAX
+    Route::get('/dashboard/data', [DashboardController::class, 'dashboardData'])->name('dashboardData');
 
     Route::prefix('purchases')->group(function () {
         Route::get('/', [MasterController::class, 'purchaseRead'])->name('purchaseRead'); 

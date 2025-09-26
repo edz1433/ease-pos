@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Product;
+use App\Models\BranchProduct;
 use App\Models\Sale;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
@@ -17,14 +18,14 @@ class PurchasesController extends Controller
 {
     public function purchaseForm() 
     {
-        $products = Product::where('product_type', 1)->get();
+        $products = Product::where('product_type', 1)
+            ->leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
+            ->get();
+
         $purchasecheck = Purchase::where('status', 0)->first(); // ongoing purchase (optional)
         
         $suppliers = Supplier::all();
 
-        // -------------------------
-        // Generate next transaction number
-        // -------------------------
         $lastPurchase = Purchase::where('status', 1) // look for last completed purchase
             ->orderBy('id', 'desc')
             ->first();
@@ -38,9 +39,6 @@ class PurchasesController extends Controller
 
         $transactionNo = 'PUR-' . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
 
-        // -------------------------
-        // Get purchase items for ongoing purchase
-        // -------------------------
         $purchaseitems = [];
         if($purchasecheck){
             $purchaseitems = PurchaseItem::select(
@@ -166,6 +164,7 @@ class PurchasesController extends Controller
         ]);
 
         $purchase = Purchase::findOrFail($id);
+        $branchId = env('BRANCH_ID');
 
         // Update purchase main data
         $purchase->supplier_id   = $validated['supplier_id'];
@@ -193,8 +192,8 @@ class PurchasesController extends Controller
         $purchaseItems = PurchaseItem::where('purchase_id', $id)->get();
 
         foreach ($purchaseItems as $item) {
-            $product = Product::find($item->product_id);
-
+            $product = BranchProduct::where('product_id', $item->product_id)->where('branch_id', $branchId)->first();
+            
             if ($product) {
                 if ($item->price_type === 'retail') {
                     // Update retail fields

@@ -10,6 +10,7 @@ class SalesOrder extends Model
     use HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'sales_id',
         'product_id',
         'capital',
