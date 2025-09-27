@@ -25,6 +25,8 @@ class ProductController extends Controller
             'product_type' => 'required|in:1,2',
             'category' => 'required|string|max:255',
             'packaging' => 'required|numeric|min:1',
+            'warranty' => 'nullable',
+            'rep_duration' => 'nullable',
             'image' => 'nullable|image',
         ]);
 
@@ -132,6 +134,8 @@ class ProductController extends Controller
             'product_type' => 'required|in:1,2',
             'category' => 'required|integer|exists:categories,id',
             'packaging' => 'required|numeric|min:1',
+            'warranty' => 'nullable',
+            'rep_duration' => 'nullable',
             'w_capital' => 'nullable|numeric|min:0',
             'w_price' => 'nullable|numeric|min:0',
             'w_unit' => 'nullable|integer|exists:units,id',
@@ -162,7 +166,9 @@ class ProductController extends Controller
             'more_details' => $validated['more_details'] ?? null,
             'product_type' => $validated['product_type'],
             'category' => $validated['category'],
+            'warranty' => $validated['warranty'],
             'packaging' => $validated['packaging'],
+            'rep_duration' => $validated['rep_duration'],
             'image' => $validated['image'] ?? $product->image,
         ]);
 

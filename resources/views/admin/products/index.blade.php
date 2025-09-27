@@ -79,6 +79,13 @@
 
                                             <label for="r_capital">Retail Capital</label>
                                             <input type="number" step="0.01" name="r_capital" class="form-control form-control-sm" id="retail_capital" required>
+                                            
+                                            <label for="warranty">Warranty</label>
+                                            <input type="text" step="0.01" name="warranty" class="form-control form-control-sm" id="warranty">
+                                            
+                                            <label for="rep_duration">Replacement Duration</label>
+                                            <input type="text" step="0.01" name="rep_duration" class="form-control form-control-sm" id="rep_duration">
+
 
                                             <label for="r_price">Retail Price</label>
                                             <input type="number" step="0.01" name="r_price" class="form-control form-control-sm" id="retail_price" required>
@@ -146,8 +153,12 @@
                                                     <td class="align-middle">
                                                         <strong class="text-main-8">{{ $product->product_name }}</strong><br>
                                                         <span class="text-main-1">{{ $product->category_name }}</span><br>
-                                                        <small class="text-main-3">
-                                                            {{ $product->product_type == '1' ? 'Standard' : 'Made to Order' }}
+                                                        <small class="text-main-1">
+                                                            {{-- {{ $product->product_type == '1' ? 'Standard' : 'Made to Order' }} --}}
+                                                            Warranty: {{ $product->warranty }}
+                                                        </small><br>
+                                                        <small class="text-main-1">
+                                                            Replacement duration: {{ $product->warranty }}
                                                         </small>
                                                     </td>
 
@@ -213,7 +224,9 @@
                                                             data-more_details="{{ $product->more_details }}"
                                                             data-product_type="{{ $product->product_type }}"
                                                             data-category="{{ $product->category }}"
+                                                            data-warranty="{{ $product->warranty }}"
                                                             data-packaging="{{ $product->packaging }}"
+                                                            data-rep_duration="{{ $product->rep_duration }}"
                                                             data-w_capital="{{ $product->w_capital }}"
                                                             data-w_price="{{ $product->w_price }}"
                                                             data-w_unit="{{ $product->w_unit }}"
@@ -389,6 +402,8 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('product_type').value = this.dataset.product_type;
             document.getElementById('category').value = this.dataset.category;
             document.getElementById('packaging').value = this.dataset.packaging;
+            document.getElementById('warranty').value = this.dataset.warranty;
+            document.getElementById('rep_duration').value = this.dataset.rep_duration;
             document.getElementById('whole_capital').value = this.dataset.w_capital;
             document.getElementById('whole_price').value = this.dataset.w_price;
             document.getElementById('wholesale_unit').value = this.dataset.w_unit;
