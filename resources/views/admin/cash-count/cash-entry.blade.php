@@ -176,7 +176,7 @@
                             <input type="hidden" name="total_inflow" value="{{ $totalCashInflow->sum('amount') ?? 0 }}">
                             <input type="hidden" name="total_outflow" value="{{ $totalCashOutflow->sum('amount') ?? 0 }}">
                             <input type="hidden" name="total_purchases" value="{{ $totalPurchases ?? 0 }}">
-                            <input type="hidden" name="total_sales_today" value="{{ $totalSalesToday ?? 0 }}">
+                            <input type="hidden" name="total_sales_today" value="{{ $totalSalesToday + $totalCreditPayment->sum('amount') ?? 0 }}">
 
                             <!-- Will be set dynamically by JS -->
                             <input type="hidden" name="variance" id="variance_field">
@@ -198,7 +198,7 @@
                         <!-- Sales Today -->
                         <div class="d-flex justify-content-between mb-3">
                             <span class="fw-bold">Total Sales {{($cashcounts == NULL) ? 'Today' : ''}}:</span>
-                            <span class="text-primary">₱{{ number_format($totalSalesToday, 2) }}</span>
+                            <span class="text-primary">₱{{ number_format($totalSalesToday + $totalCreditPayment->sum('amount'), 2) }}</span>
                         </div>
 
                         <!-- INFLOW Section -->

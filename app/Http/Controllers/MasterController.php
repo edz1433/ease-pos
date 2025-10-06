@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Customer;
 use App\Models\Category;
 use App\Models\Unit;
+use App\Models\Branch;
 use App\Models\Product;
 use App\Models\Inventory;
 use App\Models\Sale;
@@ -57,15 +59,11 @@ class MasterController extends Controller
         return view('admin.suppliers.index', compact('suppliers'));
     }
 
-    public function warehouseRead()
-    {
-        return view('admin.warehouse.index');
-    }
-
     public function productRead()
     {   
         $categories = Category::all();
         $units = Unit::all();
+        $branches = Branch::where('id', '!=', env('BRANCH_ID'))->get();
 
         $products = Product::select(
                 'products.*',
@@ -88,7 +86,39 @@ class MasterController extends Controller
             ->leftJoin('units as w_unit', 'branch_products.w_unit', '=', 'w_unit.id')
             ->get();
 
-        return view('admin.products.index', compact('categories', 'units', 'products'));
+        return view('admin.products.index', compact('categories', 'units', 'branches', 'products'));
+    }
+
+    public function warehouseRead()
+    {   
+        $categories = Category::all();
+        $units = Unit::all();
+        $branches = Branch::where('id', '!=', env('BRANCH_ID'))->get();
+
+        $products = Product::select(
+                'products.*',
+                'branch_products.*',
+                'categories.name as category_name',
+                'r_unit.name as r_unit_name',
+                'w_unit.name as w_unit_name',
+                DB::raw("(SELECT COALESCE(SUM(s.quantity),0) 
+                        FROM sales_orders s 
+                        WHERE s.product_id = products.id 
+                            AND s.price_type = 'retail') as total_sold_r"),
+                DB::raw("(SELECT COALESCE(SUM(s.quantity),0) 
+                        FROM sales_orders s 
+                        WHERE s.product_id = products.id 
+                            AND s.price_type = 'wholesale') as total_sold_w")
+            )
+            ->leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
+            ->leftJoin('categories', 'products.category', '=', 'categories.id')
+            ->leftJoin('units as r_unit', 'branch_products.r_unit', '=', 'r_unit.id')
+            ->leftJoin('units as w_unit', 'branch_products.w_unit', '=', 'w_unit.id')
+            ->leftJoin('branches', 'branch_products.branch_id', '=', 'branches.id')
+            ->where('branches.type', '=', 'warehouse')
+            ->get();
+
+        return view('admin.warehouse.index', compact('categories', 'units', 'branches', 'products'));
     }
 
     public function salesRead(Request $request)
@@ -155,6 +185,12 @@ class MasterController extends Controller
         $checkinv = Inventory::where('status', 1)->first();
 
         return view('admin.inventory.index', compact('inventories', 'checkinv'));
+    }
+
+    public function customerRead()
+    {
+        $customers = Customer::all();
+        return view('admin.customers.index', compact('customers'));
     }
 
     public function userRead()

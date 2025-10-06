@@ -212,7 +212,7 @@
                                                         class="btn btn-warning btn-sm adjust-stock-btn" 
                                                         data-id="{{ $product->id }}" 
                                                         data-name="{{ $product->product_name }} {{ $product->model }}"
-                                                        title="Adjust Stock">
+                                                        title="Stock Management">
                                                         <i class="fas fa-cubes"></i>
                                                         </a>
                                                         <button class="btn btn-info btn-sm edit-btn" 
@@ -260,27 +260,27 @@
 <div class="modal fade" id="stockAdjustmentModal" tabindex="-1" role="dialog" aria-labelledby="stockAdjustmentLabel" aria-hidden="true">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
-      <form id="stockAdjustmentForm" method="POST" action="{{ route('stockAdjustmentCreate') }}">
+        <form id="stockAdjustmentForm" method="POST" action="{{ route('stockAdjustmentCreate') }}">
         @csrf
         <div class="modal-header">
-          <h5 class="modal-title" id="stockAdjustmentLabel">Stock Adjustment</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <h5 class="modal-title" id="stockAdjustmentLabel">Stock Management</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
-          </button>
+            </button>
         </div>
 
         <div class="modal-body">
-          <input type="hidden" name="product_id" id="adjustment_product_id">
-          <div class="form-group">
-              <p id="adjustment_product_name" class="form-control-plaintext font-weight-bold"></p>
-          </div>
+            <input type="hidden" name="product_id" id="adjustment_product_id">
+            <div class="form-group">
+                <p id="adjustment_product_name" class="form-control-plaintext font-weight-bold"></p>
+            </div>
 
             <div class="form-group">
                 <label for="type">Price Type</label>
                 <select name="type" id="type" class="form-control" required>
                     <option value="">-- Select --</option>
-                        <option value="retail">Retail</option>
-                        <option value="wholesale">Wholesale</option>
+                    <option value="retail">Retail</option>
+                    <option value="wholesale">Wholesale</option>
                 </select>
             </div>
 
@@ -303,81 +303,116 @@
                         <option value="damage">Damaged</option>
                         <option value="expired">Expired</option>
                         <option value="lost">Lost</option>
+                        <option value="transfer">Transfer (Branch/Warehouse)</option> <!-- NEW -->
                     </optgroup>
                 </select>
             </div>
 
-
-          <div class="form-group">
+            <div class="form-group">
             <label for="price_type">Price Type</label>
             <select name="price_type" id="price_type" class="form-control">
-              <option value="retail">Retail</option>
-              <option value="wholesale">Wholesale</option>
-              <option value="special">Special</option>
+                <option value="retail">Retail</option>
+                <option value="wholesale">Wholesale</option>
+                <option value="special">Special</option>
             </select>
-          </div>
+            </div>
 
-          <div class="form-group">
+            <div class="form-group">
             <label for="quantity">Quantity</label>
             <input type="number" step="0.01" name="quantity" id="quantity" class="form-control" required>
-          </div>
+            </div>
 
-        <div class="form-group">
-            <label for="reason">Reason</label>
-            <select name="reason" id="reason" class="form-control">
-                <option value="">-- Select Reason --</option>
+            <div class="form-group">
+                <label for="reason">Reason</label>
+                <select name="reason" id="reason" class="form-control">
+                    <option value="">-- Select Reason --</option>
 
-                <!-- Group: Add Stock -->
-                <optgroup label="Add Stock">
-                    <option value="Customer Return">Customer Return</option>
-                    <option value="Stock Count">Stock Count</option>
-                    <option value="Manual Adjustment">Manual Adjustment</option>
-                    <option value="Others">Others</option>
-                </optgroup>
+                    <!-- Group: Add Stock -->
+                    <optgroup label="Add Stock">
+                        <option value="Customer Return">Customer Return</option>
+                        <option value="Stock Count">Stock Count</option>
+                        <option value="Manual Adjustment">Manual Adjustment</option>
+                        <option value="Others">Others</option>
+                    </optgroup>
 
-                <!-- Group: Deduct Stock -->
-                <optgroup label="Deduct Stock">
-                    <option value="Damaged">Damaged</option>
-                    <option value="Expired">Expired</option>
-                    <option value="Lost">Lost</option>
-                </optgroup>
+                    <!-- Group: Deduct Stock -->
+                    <optgroup label="Deduct Stock">
+                        <option value="Damaged">Damaged</option>
+                        <option value="Expired">Expired</option>
+                        <option value="Lost">Lost</option>
+                        <option value="Transfer">Transfer</option> <!-- NEW -->
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Branch Transfer Selection -->
+            <div class="form-group" id="branchTransferGroup" style="display: none;">
+            <label for="branch_id">Transfer To</label>
+            <select name="branch_id" id="branch_id" class="form-control">
+                @foreach($branches as $index => $branch)
+                    <option value="{{ $branch->id }}" {{ $index == 0 ? 'selected' : '' }}>
+                        {{ $branch->branch_name }} ({{ $branch->type }})
+                    </option>
+                @endforeach
             </select>
-        </div>
+            </div>
 
-          <div class="form-group" id="saleIdGroup" style="display: none;">
+            <div class="form-group" id="transNumberGroup" style="display: none;">
             <label for="trans_number">Transaction Number</label>
             <input type="number" name="trans_number" id="trans_number" class="form-control">
-          </div>
+            </div>
 
-          <div class="form-group" id="saleIdGroup" style="display: none;">
+            <div class="form-group" id="saleIdGroup" style="display: none;">
             <label for="sale_id">Sale ID (if return or refund)</label>
             <input type="number" name="sale_id" id="sale_id" class="form-control">
-          </div>
+            </div>
 
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn bg-main-7 text-light">Save Adjustment</button>
+            <button type="submit" class="btn bg-main-7 text-light">Save Adjustment</button>
         </div>
-      </form>
+        </form>
     </div>
   </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Show Sale ID only when reason is Customer Return
-    document.getElementById('reason').addEventListener('change', function () {
-        if (this.value === 'Customer Return') {
-            document.getElementById('saleIdGroup').style.display = 'block';
+    const reasonSelect = document.getElementById('reason');
+    const adjustmentTypeSelect = document.getElementById('adjustment_type');
+    const saleIdGroup = document.getElementById('saleIdGroup');
+    const branchTransferGroup = document.getElementById('branchTransferGroup');
+
+    // Function to toggle fields
+    function toggleFields() {
+        // Sale ID only for Customer Return
+        if (reasonSelect.value === 'Customer Return') {
+            saleIdGroup.style.display = 'block';
         } else {
-            document.getElementById('saleIdGroup').style.display = 'none';
+            saleIdGroup.style.display = 'none';
+            document.getElementById('sale_id').value = ''; // reset
         }
-    });
+
+        // Branch Transfer if reason = Transfer OR adjustment_type = transfer
+        if (reasonSelect.value === 'Transfer' || adjustmentTypeSelect.value === 'transfer') {
+            branchTransferGroup.style.display = 'block';
+        } else {
+            branchTransferGroup.style.display = 'none';
+            // document.getElementById('branch_id').value = ''; // reset
+        }
+    }
+
+    // Attach listeners
+    reasonSelect.addEventListener('change', toggleFields);
+    adjustmentTypeSelect.addEventListener('change', toggleFields);
+
+    // Run once on load (in case modal pre-filled)
+    toggleFields();
 
     // Open modal with product_id
-    document.querySelectorAll(".adjust-stock-btn").forEach(function(button) {
-        button.addEventListener("click", function() {
+    document.querySelectorAll(".adjust-stock-btn").forEach(function (button) {
+        button.addEventListener("click", function () {
             let productId = this.getAttribute("data-id");
             let productName = this.getAttribute("data-name");
             document.getElementById("adjustment_product_id").value = productId;

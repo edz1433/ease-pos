@@ -10,6 +10,7 @@ use App\Models\Sale;
 use App\Models\InventoryItems;
 use App\Models\InventoryLog;
 use App\Models\SalesOrder;
+use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -60,6 +61,13 @@ class SalesControllerApi extends Controller
 
             $paymentMethod = isset($data['payment_method']) ? $data['payment_method'] : 'Cash';
 
+            if ($paymentMethod == "Credit") {
+                $creditAmount = $data['total'] - $data['discount'];
+
+                Customer::where('id', $data['customer_id'])
+                    ->increment('amount_credited', $creditAmount);
+            }
+
             DB::transaction(function () use ($data, $status, $vat, $totalWithVat, $paymentMethod) {
                 $sale = Sale::create([
                     'branch_id' => env('BRANCH_ID'),
@@ -73,6 +81,7 @@ class SalesControllerApi extends Controller
                     'total_wvat' => $totalWithVat,
                     'status' => $status,
                     'customer' => $data['customer'] ?? null,
+                    'customer_id' => $data['customer_id'] ?? null,
                     'table_no' => $data['table_no'] ?? null,
                     'payment_method' => $paymentMethod,
                     'user_id' => auth()->id(),

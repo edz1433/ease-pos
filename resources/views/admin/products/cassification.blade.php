@@ -140,7 +140,7 @@
                                     data-id="{{ $category->id }}"
                                     data-icon="{{ $category->icon }}"
                                     data-name="{{ $category->name }}">
-                                    <i class="fas fa-info-circle"></i>
+                                    <i class="fas fa-edit"></i>
                                 </button>
                             </td>
                         </tr>
@@ -199,7 +199,7 @@
                                 <button type="button" class="btn btn-sm btn-info edit-unit"
                                     data-id="{{ $unit->id }}"
                                     data-name="{{ $unit->name }}">
-                                    <i class="fas fa-info-circle"></i>
+                                    <i class="fas fa-edit"></i>
                                 </button>
                             </td>
                         </tr>

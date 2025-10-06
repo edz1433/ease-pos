@@ -92,7 +92,7 @@
                                     <td class="text-main-8 font-weight-bold">{{ $supplier->address }}</td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-info btn-sm edit-btn" data-id="{{ $supplier->id }}">
-                                            <i class="fas fa-info-circle"></i>
+                                            <i class="fas fa-edit"></i>
                                         </button>
                                         <button value="{{ $supplier->id }}" class="btn btn-danger btn-sm delete-row" data-model="Supplier" data-id="{{ $supplier->id }}">
                                             <i class="fas fa-trash"></i>

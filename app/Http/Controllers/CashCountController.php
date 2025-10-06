@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\CustomerPayment;
 use App\Models\CashCount;
 use App\Models\CashBankTransaction;
 use App\Models\Purchase;
@@ -26,9 +27,14 @@ class CashCountController extends Controller
                 ->whereDate('transaction_date', $date) 
                 ->get(); 
 
+            $totalCreditPayment = CustomerPayment::whereDate('created_at', $date) 
+                ->get(); 
+
             $totalSalesToday = Sale::whereDate('date', $date)
-            ->where('status', 1)
-            ->sum('total');
+                ->where('status', 1)
+                ->selectRaw('SUM(total - COALESCE(discount, 0)) as net_total')
+                ->value('net_total');
+
 
             $totalPurchases = Purchase::where('payment_mode', 'Cash')->whereDate('created_at', $date)
             ->sum('total_amount');
@@ -37,10 +43,14 @@ class CashCountController extends Controller
             $totalCashInflow = CashBankTransaction::where('category', 1)
                 ->whereDate('created_at', $today)
                 ->get();
-            
-            $totalSalesToday = Sale::whereDate('date', Carbon::now('Asia/Manila')->toDateString()) // today in Manila
+
+            $totalCreditPayment = CustomerPayment::whereDate('created_at', $today) 
+            ->get(); 
+        
+            $totalSalesToday = Sale::whereDate('date', $today) // today in Manila
             ->where('status', 1)
-            ->sum('total');
+            ->selectRaw('SUM(total - COALESCE(discount, 0)) as net_total')
+            ->value('net_total');
 
             $totalCashOutflow = CashBankTransaction::where('category', 2)
                 ->whereDate('created_at', $today)
@@ -58,6 +68,7 @@ class CashCountController extends Controller
             'totalCashOutflow',
             'totalSalesToday',
             'totalPurchases',
+            'totalCreditPayment',
         ));
     }
 
@@ -96,9 +107,12 @@ class CashCountController extends Controller
             $data[$key] = is_null($value) ? 0 : $value;
         }
 
+        $data['branch_id'] = env('BRANCH_ID');
+        
         if ($data['cashcount_id'] != 0) {
             // Update existing record
             $cashCount = CashCount::find($data['cashcount_id']);
+            
             $cashCount->update($data);
             $message = 'Cash count updated successfully';
         } else {

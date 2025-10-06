@@ -142,14 +142,14 @@
                 </div>
 
                 <div class="col-lg-6">
-                        <div class="card-header border-0 d-flex justify-content-between">
-                             <h3 class="card-title">Net Profit</h3>
+                    <div class="card-header border-0 d-flex justify-content-between">
+                            <h3 class="card-title">Net Profit</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <canvas id="lowStockChart" height="350"></canvas>
                         </div>
-                        <div class="card-body">
-                            <div class="chart">
-                                <canvas id="lowStockChart" height="350"></canvas>
-                            </div>
-                        </div>
+                    </div>
                 </div>
             </div>
         </section>

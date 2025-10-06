@@ -71,7 +71,7 @@
                                                 </td>
                                                 <td class="text-center align-middle">
                                                     <a class="btn btn-info btn-sm" href="{{ route('inventoryForm', $inv->id) }}">
-                                                        <i class="fas fa-info-circle"></i>
+                                                        <i class="fas fa-edit"></i>
                                                     </a>
                                                     <button class="btn btn-danger btn-sm delete-row" data-model="Inventory" data-id="{{ $inv->id }}">
                                                         <i class="fas fa-trash"></i>

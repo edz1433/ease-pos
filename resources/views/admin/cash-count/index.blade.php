@@ -64,7 +64,7 @@
                                             <td class="align-middle text-main-8 font-weight-bold">{{ $cash->created_at->format('Y-m-d H:i') }}</td>
                                             <td class="text-center">
                                                 <a href="{{ route('cashCountEntry', $cash->id) }}" class="btn btn-info btn-sm">
-                                                    <i class="fas fa-info-circle"></i>
+                                                    <i class="fas fa-edit"></i>
                                                 </a>
                                             </td>
                                         </tr>

@@ -21,6 +21,7 @@ class Sale extends Model
         'amount_change',
         'table_no',
         'customer',
+        'customer_id',
         'payment_method',
         'status',
         'user_id'

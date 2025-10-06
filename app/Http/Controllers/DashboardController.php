@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\CustomerPayment;
 use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Product;
@@ -161,8 +162,8 @@ class DashboardController extends Controller
         // Compute sales & profit
         $salesAnalytics = $salesQuery
             ->selectRaw('DATE(sales.created_at) as date')
-            ->selectRaw('SUM(sales_orders.price * sales_orders.quantity) - SUM(sales.discount) as total_sales')
-            ->selectRaw('SUM((sales_orders.price - sales_orders.capital) * sales_orders.quantity) - SUM(sales.discount) as total_profit')
+            ->selectRaw('SUM(sales_orders.price * sales_orders.quantity) as total_sales')
+            ->selectRaw('SUM((sales_orders.price - sales_orders.capital) * sales_orders.quantity) as total_profit')
             ->groupBy(\DB::raw('DATE(sales.created_at)'))
             ->orderBy('date', 'asc')
             ->get();

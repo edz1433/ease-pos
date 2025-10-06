@@ -122,7 +122,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('userRead') }}" class="{{ request()->is('customer*') ? 'active' : '' }}">
+            <a href="{{ route('customerRead') }}" class="{{ request()->is('customer*') ? 'active' : '' }}">
                 <i class="fas fa-user"></i>
                 <span>Customer</span>
             </a>

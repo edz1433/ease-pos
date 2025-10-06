@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginAuthController;
 use App\Http\Controllers\MasterController;
-use App\Http\Controllers\DashboardController    ;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductsClassController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\Api\AuthCheckController;
 use App\Http\Controllers\Api\ProductsControllerApi;
+use App\Http\Controllers\Api\CustomerControllerApi;
 use App\Http\Controllers\Api\SalesControllerApi;
 
 Route::get('/', function () {
@@ -40,7 +42,10 @@ Route::prefix('api')->group(function () {
     Route::get('/products-by-barcode/{barcode}', [ProductsControllerApi::class, 'getProductByBarcode'])->name('getAllProducts');
     Route::post('/checkout', [SalesControllerApi::class, 'checkout']);
     Route::get('/next-transaction-number', [SalesControllerApi::class, 'nextTransactionNumber']);
-    
+
+    //customers
+    Route::get('/customers', [CustomerControllerApi::class, 'getCustomers'])->name('getCustomers');
+
     // Sales routes
     Route::get('/sales/{date?}', [SalesControllerApi::class, 'getSales'])->name('getSales');
     Route::get('/edit-sales/{saleId}', [SalesControllerApi::class, 'editSales'])->name('editSales');
@@ -147,6 +152,15 @@ Route::group(['middleware' => ['login_auth']], function() {
         Route::get('/', [MasterController::class, 'cashCountRead'])->name('cashCountRead'); 
         Route::get('/cash-entry/{id?}', [CashCountController::class, 'cashCountEntry'])->name('cashCountEntry'); 
         Route::post('/cash-count-create', [CashCountController::class, 'cashCountCreate'])->name('cashCountCreate'); 
+    });
+
+    Route::prefix('customers')->group(function() {
+        Route::get('/',[MasterController::class,'customerRead'])->name('customerRead');
+        Route::post('/ceate', [CustomerController::class, 'customerCreate'])->name('customerCreate');
+        Route::post('/update/{id}', [CustomerController::class, 'customerUpdate'])->name('customerUpdate');
+
+        Route::post('/customers-payment', [CustomerController::class, 'customerPayment'])->name('customerPayment');
+        Route::get('/customers-payment-history/{customerId}', [CustomerController::class, 'customerPaymentsHistory'])->name('customerPaymentsHistory');
     });
 
     Route::prefix('user')->group(function() {

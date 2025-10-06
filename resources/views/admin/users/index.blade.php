@@ -137,7 +137,7 @@
                                     <td class="align-middle text-main-8 font-weight-bold" class="center">{{ $user->username }}</td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-info btn-sm edit-btn" data-id="{{ $user->id }}">
-                                            <i class="fas fa-info-circle"></i>
+                                            <i class="fas fa-edit"></i>
                                         </button>
                                         <button value="{{ $user->id }}" class="btn btn-danger btn-sm delete-row" data-model="User" data-id="{{ $user->id }}">
                                             <i class="fas fa-trash"></i>
