@@ -8,6 +8,7 @@ return [
     'allowed_origins' => [
         'http://localhost:3000',
         'http://192.168.1.21',
+        'http://192.168.1.21/pos',
         'http://192.168.1.21/ease-pos-cashier',
         'https://pos.kerritsolutions.com',
         'https://admin.kerritsolutions.com',
