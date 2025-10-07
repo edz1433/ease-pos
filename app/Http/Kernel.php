@@ -44,6 +44,7 @@ class Kernel extends HttpKernel
             \Illuminate\Session\Middleware\StartSession::class,
             \App\Http\Middleware\AuthenticateApi::class,
             'throttle:api',
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class, // ✅ must be first in api group
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];

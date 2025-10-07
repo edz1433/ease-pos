@@ -32,27 +32,27 @@ Route::get('/',[LoginAuthController::class,'getLogin'])->name('getLogin');
 Route::post('/login',[LoginAuthController::class,'postLogin'])->name('postLogin');
 Route::get('/logout', [MasterController::class, 'logout'])->name('logout');
 
-Route::prefix('api')->group(function () {
-    Route::get('/auth/check', [AuthCheckController::class, 'checkAuth']);
-    Route::get('/auth/status', [AuthCheckController::class, 'authStatus']);
+// Route::prefix('api')->middleware(['cors', 'api'])->group(function () {
+//     Route::get('/auth/check', [AuthCheckController::class, 'checkAuth']);
+//     Route::get('/auth/status', [AuthCheckController::class, 'authStatus']);
 
-    Route::get('/categories', [CategoryController::class, 'categories'])->name('categories');
-    Route::get('/products/{category?}', [ProductsControllerApi::class, 'products'])->name('products');
-    Route::get('/all-products', [ProductsControllerApi::class, 'getAllProducts'])->name('getAllProducts');
-    Route::get('/products-by-barcode/{barcode}', [ProductsControllerApi::class, 'getProductByBarcode'])->name('getAllProducts');
-    Route::post('/checkout', [SalesControllerApi::class, 'checkout']);
-    Route::get('/next-transaction-number', [SalesControllerApi::class, 'nextTransactionNumber']);
+//     Route::get('/categories', [CategoryController::class, 'categories'])->name('categories');
+//     Route::get('/products/{category?}', [ProductsControllerApi::class, 'products'])->name('products');
+//     Route::get('/all-products', [ProductsControllerApi::class, 'getAllProducts'])->name('getAllProducts');
+//     Route::get('/products-by-barcode/{barcode}', [ProductsControllerApi::class, 'getProductByBarcode'])->name('getAllProducts');
+//     Route::post('/checkout', [SalesControllerApi::class, 'checkout']);
+//     Route::get('/next-transaction-number', [SalesControllerApi::class, 'nextTransactionNumber']);
 
-    //customers
-    Route::get('/customers', [CustomerControllerApi::class, 'getCustomers'])->name('getCustomers');
+//     //customers
+//     Route::get('/customers', [CustomerControllerApi::class, 'getCustomers'])->name('getCustomers');
 
-    // Sales routes
-    Route::get('/sales/{date?}', [SalesControllerApi::class, 'getSales'])->name('getSales');
-    Route::get('/edit-sales/{saleId}', [SalesControllerApi::class, 'editSales'])->name('editSales');
-    Route::put('/update-sales/{saleId}', [SalesControllerApi::class, 'updateSales'])->name('updateSales');
-    // Cancel an order    // Cancel sale
-    Route::post('/sales/{saleId}/cancel-or-return', [SalesControllerApi::class, 'cancelOrReturnSale']);
-});
+//     // Sales routes
+//     Route::get('/sales/{date?}', [SalesControllerApi::class, 'getSales'])->name('getSales');
+//     Route::get('/edit-sales/{saleId}', [SalesControllerApi::class, 'editSales'])->name('editSales');
+//     Route::put('/update-sales/{saleId}', [SalesControllerApi::class, 'updateSales'])->name('updateSales');
+//     // Cancel an order    // Cancel sale
+//     Route::post('/sales/{saleId}/cancel-or-return', [SalesControllerApi::class, 'cancelOrReturnSale']);
+// });
 
 // Authenticated routes
 Route::group(['middleware' => ['login_auth']], function() {
