@@ -40,14 +40,13 @@ body.sidebar-text-hide .content-wrapper {
     top: 0;
     left: 0;
     z-index: 1030;
-    transition: width 0.3s ease, padding 0.3s ease;
+    transition: width 0.3s ease, transform 0.3s ease;
 }
 
 .content-wrapper {
     margin-left: 250px;
     transition: margin-left 0.3s ease;
 }
-
 
 /* === LOGO === */
 .custom-sidebar-logo img {
@@ -87,7 +86,7 @@ body.sidebar-text-hide .content-wrapper {
     color: #333;
     border-radius: 8px;
     text-decoration: none;
-    transition: 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 .custom-sidebar-menu a i {
     margin-right: 10px;
@@ -145,7 +144,7 @@ body.sidebar-text-hide .content-wrapper {
     font-size: 14px !important;
     color: #666 !important;
     text-decoration: none !important;
-    transition: 0.3s ease !important;
+    transition: background-color 0.3s ease, color 0.3s ease !important;
     border-radius: 6px !important;
     background: transparent !important;
     border: none !important;
@@ -219,8 +218,9 @@ body.sidebar-text-hide .content-wrapper {
 }
 
 .custom-sidebar-menu li.has-submenu > a .submenu-arrow {
-    display: inline-block !important; /* Ensure it's always visible */
+    display: inline-block !important;
 }
+
 /* Collapsed state */
 body.sidebar-text-hide .custom-sidebar-menu .nav-treeview {
     display: none !important;
@@ -278,14 +278,78 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
     padding-left: 15px !important;
 }
 
-body.sidebar-mini.sidebar-collapse .main-sidebar:hover {
-    width: 80px !important;
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 991px) {
+    .custom-sidebar {
+        width: 60px;
+        transform: translateX(-100%);
+    }
+    .custom-sidebar.active {
+        transform: translateX(0);
+    }
+    .content-wrapper {
+        margin-left: 0;
+        transition: margin-left 0.3s ease;
+    }
+    body.sidebar-text-hide .content-wrapper {
+        margin-left: 0;
+    }
+    .custom-sidebar-menu a span {
+        display: none;
+    }
+    .custom-sidebar-menu a i {
+        margin-right: 0;
+    }
+    .custom-sidebar-logo img {
+        width: 40px;
+        height: 40px;
+    }
+    .sidebar-user img {
+        width: 40px;
+        height: 40px;
+    }
+    .sidebar-user h6,
+    .sidebar-user small {
+        display: none;
+    }
+    body.sidebar-text-hide .custom-sidebar-menu li:hover .nav-treeview {
+        left: 60px;
+        width: 200px;
+    }
 }
 
-body.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-link span,
-body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text,
-body.sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel {
-    display: none !important;
+@media (min-width: 992px) {
+    .custom-sidebar.active {
+        width: 250px;
+    }
+    .custom-sidebar.active + .content-wrapper {
+        margin-left: 250px;
+    }
+}
+
+/* Hamburger menu for mobile */
+.nav-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1031;
+    font-size: 24px;
+    color: #fc204f;
+    cursor: pointer;
+}
+
+@media (max-width: 991px) {
+    .nav-toggle {
+        display: block;
+    }
+}
+
+/* Smooth transitions for mobile */
+.custom-sidebar,
+.custom-sidebar-menu a,
+.content-wrapper {
+    transition: all 0.3s ease-in-out;
 }
 
 /* === BUTTONS === */
@@ -327,7 +391,6 @@ body.sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel {
     color: #ffc107 !important;
 }
 
-/* Text Colors */
 .text-main { color: #fc204f !important }
 .text-main-1 { color: rgba(252, 32, 79, 1) !important; }
 .text-main-2 { color: rgba(252, 32, 100, 1) !important; }
@@ -352,7 +415,6 @@ body.sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel {
 .bg-main-8 { background-color: rgba(32, 170, 194, 1) !important; }
 .bg-main-9 { background-color: rgba(32, 140, 194, 1) !important; }
 .bg-main-10 { background-color: rgba(32, 110, 194, 1) !important; }
-
 
 /* === TABLE === */
 .table td, .table th {
@@ -407,8 +469,8 @@ body.sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel {
 
 /* === CONTAINER === */
 .container-fluid {
-    padding-right: 2 !important;
-    padding-left: 2 !important;
+    padding-right: 15px !important;
+    padding-left: 15px !important;
     margin-right: auto !important;
     margin-left: auto !important;
 }

@@ -14,10 +14,17 @@ class ProductBundleController extends Controller
     // Show all bundles (products that are bundles)
     public function bundleRead($id = null)
     {
-        $products = Product::all(); 
+        $branchId = env('BRANCH_ID');
+        
+        $products = Product::join('branch_products', 'products.id', '=', 'branch_products.product_id')
+            ->select('products.*', 'branch_products.*')
+            ->where('branch_products.branch_id', $branchId)
+            ->get(); 
+
         $productsbundle = BundleItem::join('products', 'bundle_items.product_id', '=', 'products.id')
             ->select('products.*', 'bundle_items.product_id', 'bundle_items.bundle_id', 'bundle_items.quantity')
             ->get(); 
+
         $categories = Category::all();
 
         $bundleitems = Product::where('is_bundle', 1)->get();
