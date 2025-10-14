@@ -2,9 +2,10 @@
 document.addEventListener("DOMContentLoaded", function () {
     const topProductsCtx   = document.getElementById('topProducts').getContext('2d');
     const categoryPieCtx   = document.getElementById('categoryPie').getContext('2d');
-    const salesProfitCtx   = document.getElementById('salesAnalyticsChart').getContext('2d');
+    const grossSalesProfitCtx   = document.getElementById('grossSalesAnalyticsChart').getContext('2d');
+    const netSalesProfitCtx   = document.getElementById('netSalesAnalyticsChart').getContext('2d');
 
-    let topProductsChart, categoryPieChart, salesProfitChart;
+    let topProductsChart, categoryPieChart, grossSalesProfitChart, netSalesProfitChart;
 
     function loadDashboardData(filter = 'month', category = null, startDate = null, endDate = null) {
         $.ajax({
@@ -121,10 +122,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     ]
                 });
 
-                // ---------------- Sales & Profit (Line) ----------------
-                if (salesProfitChart) salesProfitChart.destroy();
+                // ---------------- Top Products List ----------------
+                const listContainer = document.getElementById("topProductsList");
+                listContainer.innerHTML = "";
+                res.list.forEach(item => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item py-1 px-2";
+                    li.style.fontSize = "0.8rem";
+                    li.textContent = `${item.rank}. ${item.name}`;
+                    listContainer.appendChild(li);
+                });
 
-                salesProfitChart = new Chart(salesProfitCtx, {
+                // ---------------- Gross Sales & Profit (Line) ----------------
+                if (grossSalesProfitChart) grossSalesProfitChart.destroy();
+
+                grossSalesProfitChart = new Chart(grossSalesProfitCtx, {
                     type: 'line',
                     data: {
                         labels: res.analytics.labels,
@@ -164,16 +176,49 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 });
 
-                // ---------------- Top Products List ----------------
-                const listContainer = document.getElementById("topProductsList");
-                listContainer.innerHTML = "";
-                res.list.forEach(item => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item py-1 px-2";
-                    li.style.fontSize = "0.8rem";
-                    li.textContent = `${item.rank}. ${item.name}`;
-                    listContainer.appendChild(li);
+                // ---------------- Net Sales & Profit (Line) ----------------
+                if (netSalesProfitChart) netSalesProfitChart.destroy();
+
+                netSalesProfitChart = new Chart(netSalesProfitCtx, {
+                    type: 'line',
+                    data: {
+                        labels: res.analytics.labels,
+                        datasets: [
+                            {
+                                label: 'Sales',
+                                data: res.analytics.sales.map(Number),
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Profit',
+                                data: res.analytics.profit.map(Number),
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: { display: true, text: 'POS Daily Sales & Profit', font: { size: 18 } },
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: val => '₱' + val.toLocaleString() }
+                            },
+                            x: { title: { display: true, text: 'Date' } }
+                        }
+                    }
                 });
+
             }
         });
     }
@@ -257,9 +302,9 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <script>
-const ctx = document.getElementById('salesProfitChart').getContext('2d');
+const ctx = document.getElementById('grossSalesProfitChart').getContext('2d');
 
-const salesProfitChart = new Chart(ctx, {
+const grossSalesProfitChart = new Chart(ctx, {
     type: 'line',
     data: {
         labels: ['Sep 1', 'Sep 2', 'Sep 3', 'Sep 4', 'Sep 5', 'Sep 6', 'Sep 7'], // Dates

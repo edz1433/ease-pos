@@ -98,7 +98,7 @@ class ProductController extends Controller
             // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 // Store image in /storage/app/public/products
-                $path = $request->file('image')->store('products', 'public');
+                $path = $request->file('image')->store('uploads/products', 'public');
 
                 // Extract only the filename (no folder path)
                 $validated['image'] = basename($path);
@@ -106,13 +106,13 @@ class ProductController extends Controller
                 if ($isUpdate) {
                     $product = Product::findOrFail($productId);
                     if ($product->image && $product->image !== 'default-product.png') {
-                        Storage::disk('public')->delete('products/' . $product->image);
+                        Storage::disk('public')->delete('uploads/products/' . $product->image);
                     }
                 }
             } elseif ($request->input('remove_image', 0) && $isUpdate) {
                 $product = Product::findOrFail($productId);
                 if ($product->image && $product->image !== 'default-product.png') {
-                    Storage::disk('public')->delete('products/' . $product->image);
+                    Storage::disk('public')->delete('uploads/products/' . $product->image);
                 }
                 $validated['image'] = 'default-product.png';
             } elseif (!$isUpdate && !$request->hasFile('image')) {

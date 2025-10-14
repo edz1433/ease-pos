@@ -96,7 +96,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-8">
+                <div class="col-lg-6">
                     <div class="card">
                         <div class="card-header border-0 d-flex justify-content-between">
                             <h3 class="card-title">Top Products</h3>
@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="card">
                         <div class="card-header border-0 d-flex justify-content-between">
                             <h3 class="card-title">Top Category</h3>
@@ -134,20 +134,22 @@
                             <h3 class="card-title">Gross Profit</h3>
                         </div>
                         <div class="card-body">
-                            <div class="chart"  style="height: 300px;">
-                                <canvas id="salesAnalyticsChart" height="280"></canvas>
+                            <div class="chart">
+                                <canvas id="grossSalesAnalyticsChart" height="280"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-6">
-                    <div class="card-header border-0 d-flex justify-content-between">
-                            <h3 class="card-title">Net Profit</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart">
-                            <canvas id="lowStockChart" height="350"></canvas>
+                    <div class="card">
+                        <div class="card-header border-0 d-flex justify-content-between">
+                            <h3 class="card-title">Gross Profit</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart">
+                                <canvas id="netSalesAnalyticsChart" height="280"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>

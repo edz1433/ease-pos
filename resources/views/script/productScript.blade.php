@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const storagePath = "{{ asset('storage/products') }}";
+    const storagePath = "{{ asset('storage/uploads/products') }}";
     // ✅ Function to set form mode dynamically
     function setFormMode(isUpdate, productId = null) {
         const methodInput = document.querySelector('input[name="_method"]');

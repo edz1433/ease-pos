@@ -196,8 +196,16 @@ class DashboardController extends Controller
                 'data'   => $categories->pluck('percentage'), // return percentages
             ],
 
-            // Sales Analytics
+            // Gross Sales Analytics
             'analytics' => [
+                'labels'  => $analyticsLabels,
+                'sales'   => $salesData,
+                'profit'  => $grossprofitData,
+                'summary' => $analyticsSummary,
+            ],
+
+            // Net Profit Sales Analytics
+            'analytics1' => [
                 'labels'  => $analyticsLabels,
                 'sales'   => $salesData,
                 'profit'  => $grossprofitData,
