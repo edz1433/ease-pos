@@ -229,6 +229,7 @@ $(document).on('click', '.delete-row', function(e){
 
     var id = $(this).data('id');  
     var model = $(this).data('model');  
+    const productTable = $('.product-table').DataTable();
 
     var url = "{{ route('delete') }}";
 
@@ -268,6 +269,9 @@ $(document).on('click', '.delete-row', function(e){
 
                     if(model == "PurchaseItem"){
                        location.reload();
+                    }
+                    if(model == "Product"){
+                       productTable.ajax.reload(null, false);
                     }
                 },
                 error: function(xhr) {

@@ -239,8 +239,280 @@ document.addEventListener("DOMContentLoaded", function () {
 @endif
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const storagePath = "{{ asset('storage/products') }}";
+    // ✅ Function to set form mode dynamically
+    function setFormMode(isUpdate, productId = null) {
+        const methodInput = document.querySelector('input[name="_method"]');
+        const idInput = document.getElementById('product_id');
+        if (methodInput && idInput) {
+            methodInput.value = isUpdate ? 'PUT' : 'POST';
+            idInput.value = isUpdate ? productId : '';
+        }
+    }
+
+    // Initialize DataTable
+    const productTable = document.querySelector('.product-table');
+    if (!productTable) {
+        console.error('Product table element not found.');
+        return;
+    }
+
+    if (typeof $.fn.DataTable !== 'undefined' && $.fn.DataTable.isDataTable(productTable)) {
+        $(productTable).DataTable().clear().destroy();
+    }
+
+    const dataTable = $(productTable).DataTable({
+        processing: true,
+        ajax: {
+            url: "{{ route('products.ajax') }}",
+            error: function(xhr, error, thrown) {
+                console.error('DataTable AJAX error:', error, thrown);
+                alert('Failed to load product data. Please try again.');
+            }
+        },
+        columns: [
+            {
+                data: 'image',
+                className: 'text-center align-middle',
+                render: function(data) {
+                    return data
+                        ? `<img src="${storagePath}/${encodeURIComponent(data)}" class="product-img" alt="Product Image" style="max-width: 50px;">`
+                        : '<span>No image</span>';
+                }
+            },
+            { 
+                data: null,
+                className: 'align-middle',
+                render: function(data) {
+                    return `
+                        <strong class="text-main-8">${data.product_name || 'N/A'}</strong><br>
+                        <span class="text-main-1">${data.category_name || 'No category'}</span><br>
+                        <small class="text-main-1">Warranty: ${data.warranty || 'None'}</small><br>
+                        <small class="text-main-1">Replacement duration: ${data.rep_duration || 'N/A'}</small>
+                    `;
+                }
+            },
+            { 
+                data: null,
+                className: 'align-middle',
+                render: data => `R-${data.barcode || 'N/A'}${data.w_barcode ? '<br>W-' + data.w_barcode : ''}`
+            },
+            { data: 'packaging', className: 'align-middle', render: data => data || 'N/A' },
+            { 
+                data: null,
+                className: 'align-middle',
+                render: function(data) {
+                    let badge = '';
+                    if (data.wqty == 0) badge = '<span class="badge bg-danger">Out</span>';
+                    else if (data.wqty < 10) badge = '<span class="badge bg-warning text-dark">Low</span>';
+                    return `
+                        <small>Cap: ₱${parseFloat(data.w_capital || 0).toFixed(2)}</small><br>
+                        <small>Price: ₱${parseFloat(data.w_price || 0).toFixed(2)}</small><br>
+                        <small>Qty: ${data.wqty || 0} ${data.w_unit_name || ''} ${badge}</small>
+                    `;
+                }
+            },
+            { 
+                data: null,
+                className: 'align-middle',
+                render: function(data) {
+                    let badge = '';
+                    if (data.rqty == 0) badge = '<span class="badge bg-danger">Out</span>';
+                    else if (data.rqty < 10) badge = '<span class="badge bg-warning text-dark">Low</span>';
+                    return `
+                        <small>Cap: ₱${parseFloat(data.r_capital || 0).toFixed(2)}</small><br>
+                        <small>Price: ₱${parseFloat(data.r_price || 0).toFixed(2)}</small><br>
+                        <small>Qty: ${data.rqty || 0} ${data.r_unit_name || ''} ${badge}</small>
+                    `;
+                }
+            },
+            { 
+                data: null,
+                className: 'align-middle',
+                render: data => `R-${data.total_sold_r || 0}<br>W-${data.total_sold_w || 0}`
+            },
+            {
+                data: null,
+                className: 'text-center align-middle',
+                render: function(data) {
+                    return `
+                        <a href="javascript:void(0)" 
+                        class="btn btn-warning btn-sm adjust-stock-btn" 
+                        data-id="${data.id || ''}" 
+                        data-name="${encodeURIComponent(data.product_name || '') + ' ' + (data.model || '')}" 
+                        title="Stock Management">
+                        <i class="fas fa-cubes"></i>
+                        </a>
+                        <button class="btn btn-info btn-sm edit-btn" 
+                                data-id="${data.id || ''}"
+                                data-barcode="${encodeURIComponent(data.barcode || '')}"
+                                data-w_barcode="${encodeURIComponent(data.w_barcode || '')}"
+                                data-product_name="${encodeURIComponent(data.product_name || '')}"
+                                data-model="${encodeURIComponent(data.model || '')}"
+                                data-more_details="${encodeURIComponent(data.more_details || '')}"
+                                data-product_type="${encodeURIComponent(data.product_type || '')}"
+                                data-category="${encodeURIComponent(data.category || '')}"
+                                data-packaging="${encodeURIComponent(data.packaging || '')}"
+                                data-warranty="${encodeURIComponent(data.warranty || '')}"
+                                data-rep_duration="${encodeURIComponent(data.rep_duration || '')}"
+                                data-w_capital="${data.w_capital || ''}"
+                                data-w_price="${data.w_price || ''}"
+                                data-w_unit="${encodeURIComponent(data.w_unit || '')}"
+                                data-r_capital="${data.r_capital || ''}"
+                                data-r_price="${data.r_price || ''}"
+                                data-r_unit="${encodeURIComponent(data.r_unit || '')}"
+                                data-r_stock_alert="${data.r_stock_alert || ''}"
+                                data-w_stock_alert="${data.w_stock_alert || ''}"
+                                title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <a href="#" class="btn btn-danger btn-sm delete-row" 
+                        data-model="Product" 
+                        data-id="${data.id || ''}" 
+                        title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    `;
+                }
+            }
+        ],
+        responsive: true,
+        autoWidth: false,
+        order: [],
+        drawCallback: attachEditButtonListeners
+    });
+
+    // Cache DOM elements
+    const productForm = document.getElementById('product_form_data');
+    const saveBtn = productForm.querySelector('#saveBtn');
+    const formHeading = document.getElementById('formHeading');
+
+    // Populate form
+    function populateForm(data) {
+        const safeValue = (v) => v ? decodeURIComponent(v) : '';
+        document.getElementById('barcode').value = safeValue(data.barcode);
+        document.getElementById('w_barcode').value = safeValue(data.w_barcode);
+        document.getElementById('product_name').value = safeValue(data.product_name);
+        document.getElementById('model').value = safeValue(data.model);
+        document.getElementById('more_details').value = safeValue(data.more_details);
+        document.getElementById('product_type').value = safeValue(data.product_type);
+        document.getElementById('category').value = safeValue(data.category);
+        document.getElementById('packaging').value = safeValue(data.packaging);
+        document.getElementById('warranty').value = safeValue(data.warranty);
+        document.getElementById('rep_duration').value = safeValue(data.rep_duration);
+        document.getElementById('whole_capital').value = safeValue(data.w_capital);
+        document.getElementById('whole_price').value = safeValue(data.w_price);
+        document.getElementById('wholesale_unit').value = safeValue(data.w_unit);
+        document.getElementById('retail_capital').value = safeValue(data.r_capital);
+        document.getElementById('retail_price').value = safeValue(data.r_price);
+        document.getElementById('retail_unit').value = safeValue(data.r_unit);
+        document.getElementById('r_stock_alert').value = safeValue(data.r_stock_alert);
+        document.getElementById('w_stock_alert').value = safeValue(data.w_stock_alert);
+
+        // ✅ Set form to UPDATE mode
+        setFormMode(true, data.id);
+        formHeading.textContent = 'EDIT PRODUCT';
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Update Product';
+        productForm.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Reset form to create new product
+    function resetForm() {
+        productForm.reset();
+        setFormMode(false);
+        formHeading.textContent = 'ADD PRODUCT';
+        saveBtn.innerHTML = '<i class="fas fa-plus"></i> Add Product';
+    }
+
+    function handleEditClick(event) {
+        const btn = event.currentTarget;
+        const data = { ...btn.dataset };
+        populateForm(data);
+    }
+
+    function attachEditButtonListeners() {
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.removeEventListener('click', handleEditClick);
+            btn.addEventListener('click', handleEditClick);
+        });
+    }
+
+    // Attach add button handler
+    document.querySelectorAll('.add-product-btn').forEach(btn => {
+        btn.addEventListener('click', resetForm);
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('product_form_data');
+    const saveBtn = document.getElementById('saveBtn');
+    const productTable = $('.product-table').DataTable(); // use existing DataTable
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<i class="fas fa-save"></i> Save Product`;
+
+            if (data.success) {
+                Swal.fire({ icon: 'success', title: 'Success', text: data.message, timer: 1500, showConfirmButton: false });
+                form.reset();
+                $('#remove_image').val(0);
+                productTable.ajax.reload(null, false); // 🔁 reload DataTable (stay on current page)
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: data.message });
+            }
+        })
+        .catch(() => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<i class="fas fa-save"></i> Save Product`;
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong.' });
+        });
+    });
+});
+</script>
+<script>
 $(document).ready(function () {
-    // Show Sale ID only when reason is Customer Return
+    // ✅ Delegated event listener for dynamically loaded DataTable buttons
+    $(document).on('click', '.adjust-stock-btn', function () {
+        const productId = $(this).data('id');
+        const productName = decodeURIComponent($(this).data('name'));
+
+        $('#adjustment_product_id').val(productId);
+        $('#adjustment_product_name').text(productName);
+        
+        // Reset optional fields
+        $('#stockAdjustmentForm')[0].reset();
+        $('#branchTransferGroup, #saleIdGroup, #transNumberGroup').hide();
+
+        // Show modal
+        $('#stockAdjustmentModal').modal('show');
+    });
+
+    // ✅ Toggle "Transfer To" branch dropdown
+    $('#adjustment_type').on('change', function () {
+        const type = $(this).val();
+        if (type === 'transfer') {
+            $('#branchTransferGroup, #transNumberGroup').show();
+        } else {
+            $('#branchTransferGroup, #transNumberGroup').hide();
+        }
+    });
+
+    // ✅ Show Sale ID only when reason is "Customer Return"
     $('#reason').on('change', function () {
         if ($(this).val() === 'Customer Return') {
             $('#saleIdGroup').show();
@@ -248,17 +520,62 @@ $(document).ready(function () {
             $('#saleIdGroup').hide();
         }
     });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stockForm = document.getElementById('stockAdjustmentForm');
+    const productTable = $('.product-table').DataTable();
 
-    // Open modal with product_id
-    $('.adjust-stock-btn').on('click', function () {
-        let productId = $(this).data('id');
-        let productName = $(this).data('name');
+    stockForm.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-        $('#adjustment_product_id').val(productId);
-        $('#adjustment_product_name').text(productName);
-        
-        $('#stockAdjustmentModal').modal('show');
+        const formData = new FormData(stockForm);
+        const submitBtn = stockForm.querySelector('button[type="submit"]');
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+
+        fetch(stockForm.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value },
+            body: formData
+        })
+        .then(async res => {
+            const contentType = res.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return res.json();
+            } else {
+                // Fallback for redirect responses (like Laravel redirect()->back())
+                return { success: res.ok, message: res.ok ? 'Stock adjusted successfully!' : 'An error occurred.' };
+            }
+        })
+        .then(data => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `Save Adjustment`;
+
+            if (data.success) {
+                $('#stockAdjustmentModal').modal('hide'); // hide modal
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message || 'Stock adjusted successfully!',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                stockForm.reset();
+                productTable.ajax.reload(null, false); // 🔁 reload DataTable without losing pagination
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Something went wrong.' });
+            }
+        })
+        .catch(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `Save Adjustment`;
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong. Please try again.' });
+        });
     });
 });
 </script>
+
 

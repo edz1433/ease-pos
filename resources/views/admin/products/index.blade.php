@@ -2,6 +2,14 @@
 
 @section('body')
 @include('layouts.formStyle')
+<style>
+.product-img {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 5% !important;
+}
+</style>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
@@ -18,100 +26,159 @@
                             <div class="panel panel-default">
                                 <div class="panel-heading" id="formHeading">ADD PRODUCT</div>
                                 <div class="panel-body bg-form">
-                                    <form class="p-2" id="product_form_data" method="POST" action="{{ route('productCreate') }}" enctype="multipart/form-data">
+                                    <form class="p-2" id="product_form_data" method="POST" enctype="multipart/form-data" action="{{ route('storeOrUpdate') }}">
                                         @csrf
+                                        <input type="hidden" name="_method" id="form_method" value="POST">
                                         <input type="hidden" name="id" id="product_id">
+                                        <input type="hidden" name="remove_image" id="remove_image" value="0">
 
-                                        <div class="form-group">
-                                            <label for="barcode">Retail Barcode <i class="fas fa-sync" onclick="generateBarcode('barcode')"></i></label>
-                                            <input type="text" name="barcode" class="form-control form-control-sm" id="barcode"
-                                            oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
-                                            onkeydown="if(event.key === 'Enter'){event.preventDefault();}"
-                                            required>
+                                        <div class="row g-3">
+                                            <!-- Retail & Wholesale Barcode -->
+                                            <div class="col-md-6">
+                                                <label for="barcode">Retail Barcode 
+                                                    <i class="fas fa-sync" onclick="generateBarcode('barcode')"></i>
+                                                </label>
+                                                <input type="text" name="barcode" class="form-control form-control-sm" id="barcode"
+                                                    oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
+                                                    onkeydown="if(event.key === 'Enter'){event.preventDefault();}" required>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="w_barcode">Wholesale Barcode 
+                                                    <i class="fas fa-sync" onclick="generateBarcode('w_barcode')"></i>
+                                                </label>
+                                                <input type="text" name="w_barcode" class="form-control form-control-sm" id="w_barcode"
+                                                    oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
+                                                    onkeydown="if(event.key === 'Enter'){event.preventDefault();}">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                            <label for="w_barcode">Wholesale Barcode 
-                                                <i class="fas fa-sync" onclick="generateBarcode('w_barcode')"></i>
-                                            </label>
-                                            <input type="text" name="w_barcode" class="form-control form-control-sm" id="w_barcode"
-                                                oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
-                                                onkeydown="if(event.key === 'Enter'){event.preventDefault();}">
-                                            
-                                            <label for="product_name">Product Name</label>
-                                            <input type="text" name="product_name" class="form-control form-control-sm" id="product_name" required>
+                                            <!-- Product Name & Model -->
+                                            <div class="col-md-12">
+                                                <label for="product_name">Product Name</label>
+                                                <input type="text" name="product_name" class="form-control form-control-sm" id="product_name" required>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="model">Model</label>
+                                                <input type="text" name="model" class="form-control form-control-sm" id="model">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                            <label for="model">Model</label>
-                                            <input type="text" name="model" class="form-control form-control-sm" id="model" required>
+                                            <!-- More Details & Product Type -->
+                                            <div class="col-md-12">
+                                                <label for="more_details">More Details</label>
+                                                <textarea name="more_details" rows="2" class="form-control form-control-sm" id="more_details"></textarea>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="product_type">Product Type</label>
+                                                <select name="product_type" id="product_type" class="form-control form-control-sm" required>
+                                                    <option value="" disabled selected>-- Select Type --</option>
+                                                    <option value="1">Standard</option>
+                                                    <option value="2">Made to Order</option>
+                                                </select>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                            <label for="more_details">More Details</label>
-                                            <textarea name="more_details" rows="2" class="form-control form-control-sm" id="more_details"></textarea>
+                                            <!-- Category & Packaging -->
+                                            <div class="col-md-6">
+                                                <label for="category">Category</label>
+                                                <select name="category" id="category" class="form-control form-control-sm" required>
+                                                    <option value="" disabled selected>-- Select Category --</option>
+                                                    @foreach ($categories as $category)
+                                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="packaging">Packaging</label>
+                                                <input type="number" name="packaging" class="form-control form-control-sm" id="packaging" min="1" step="1" required>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                            <label for="product_name">Product Type</label>
-                                            <select name="product_type" id="product_type" class="form-control form-control-sm" required>
-                                                <option value="">-- Select Type --</option>
-                                                <option value="1">Standard</option>
-                                                <option value="2">Made to Order</option>
-                                            </select>
+                                            <!-- Wholesale Capital & Price -->
+                                            <div class="col-md-6">
+                                                <label for="whole_capital">Wholesale Capital</label>
+                                                <input type="number" step="0.01" name="w_capital" class="form-control form-control-sm" id="whole_capital" min="0" required>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="whole_price">Wholesale Price</label>
+                                                <input type="number" step="0.01" name="w_price" class="form-control form-control-sm" id="whole_price" min="0" required>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                            <label for="category">Category</label>
-                                            <select name="category" id="category" class="form-control form-control-sm" required>
-                                                <option value="">-- Select Category --</option>
-                                                @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <!-- Wholesale & Retail Unit -->
+                                            <div class="col-md-6">
+                                                <label for="wholesale_unit">Wholesale Unit</label>
+                                                <select name="w_unit" class="form-control form-control-sm" id="wholesale_unit">
+                                                    <option value="" disabled selected>-- Select Unit --</option>
+                                                    @foreach ($units as $unit)
+                                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="retail_unit">Retail Unit</label>
+                                                <select name="r_unit" class="form-control form-control-sm" id="retail_unit" required>
+                                                    <option value="" disabled selected>-- Select Unit --</option>
+                                                    @foreach ($units as $unit)
+                                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                            <label for="packaging">Packaging</label>
-                                            <input type="number" name="packaging" class="form-control form-control-sm" id="packaging" required>
+                                            <!-- Retail Capital & Price -->
+                                            <div class="col-md-6">
+                                                <label for="retail_capital">Retail Capital</label>
+                                                <input type="number" step="0.01" name="r_capital" class="form-control form-control-sm" id="retail_capital" min="0" required>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="retail_price">Retail Price</label>
+                                                <input type="number" step="0.01" name="r_price" class="form-control form-control-sm" id="retail_price" min="0" required>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                             <label for="w_capital">Wholesale Capital</label>
-                                            <input type="number" step="0.01" name="w_capital" class="form-control form-control-sm" id="whole_capital" required>
+                                            <!-- Stock Alerts -->
+                                            <div class="col-md-6">
+                                                <label for="r_stock_alert">Retail Stock Alert</label>
+                                                <input type="number" name="r_stock_alert" class="form-control form-control-sm" id="r_stock_alert" min="0" step="1" required>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="w_stock_alert">Wholesale Stock Alert</label>
+                                                <input type="number" name="w_stock_alert" class="form-control form-control-sm" id="w_stock_alert" min="0" step="1">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                            <label for="w_price">Wholesale Price</label>
-                                            <input type="number" step="0.01" name="w_price" class="form-control form-control-sm" id="whole_price" required>
+                                            <!-- Warranty & Replacement Duration -->
+                                            <div class="col-md-12">
+                                                <label for="warranty">Warranty</label>
+                                                <input type="text" name="warranty" class="form-control form-control-sm" id="warranty">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label for="rep_duration">Replacement Duration</label>
+                                                <input type="text" name="rep_duration" class="form-control form-control-sm" id="rep_duration">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
 
-                                            <label for="w_unit">Wholesale Unit</label>
-                                            <select name="w_unit" class="form-control form-control-sm" id="wholesale_unit">
-                                                <option value="">-- Select Unit --</option>
-                                                @foreach ($units as $unit)
-                                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                                @endforeach
-                                            </select>
-
-                                            <label for="r_capital">Retail Capital</label>
-                                            <input type="number" step="0.01" name="r_capital" class="form-control form-control-sm" id="retail_capital" required>
-                                            
-                                            <label for="warranty">Warranty</label>
-                                            <input type="text" step="0.01" name="warranty" class="form-control form-control-sm" id="warranty">
-                                            
-                                            <label for="rep_duration">Replacement Duration</label>
-                                            <input type="text" step="0.01" name="rep_duration" class="form-control form-control-sm" id="rep_duration">
-
-
-                                            <label for="r_price">Retail Price</label>
-                                            <input type="number" step="0.01" name="r_price" class="form-control form-control-sm" id="retail_price" required>
-
-                                            <label for="r_unit">Retail Unit</label>
-                                            <select name="r_unit" class="form-control form-control-sm" id="retail_unit" required>
-                                                <option value="">-- Select Unit --</option>
-                                                @foreach ($units as $unit)
-                                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                                @endforeach
-                                            </select>
-
-                                            <label for="r_stock_alert">Retail Stock Alert</label>
-                                            <input type="number" step="0.01" name="r_stock_alert" class="form-control form-control-sm" id="r_stock_alert" required>
-
-                                            <label for="w_stock_alert">Wholesale Stock Alert</label>
-                                            <input type="number" step="0.01" name="w_stock_alert" class="form-control form-control-sm" id="w_stock_alert" required>
-
+                                            <!-- Product Image -->
+                                            <div class="col-md-12">
+                                                <label for="image">Image</label>
+                                                <input type="file" name="image" class="form-control form-control-sm" id="image" accept="image/jpeg,image/png,image/jpg,image/gif">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
                                         </div>
 
-                                        <label for="image">Image</label>
-                                        <input type="file" name="image" class="form-control form-control-sm" id="image">
-                                        
-
-                                        <button type="submit" class="btn bg-main-7 text-light mt-2 w-100" id="saveBtn">
-                                             <i class="fas fa-save"></i> Save Product
+                                        <!-- Submit Button -->
+                                        <button type="submit" class="btn bg-main-7 text-light mt-3 w-100" id="saveBtn">
+                                            <i class="fas fa-save"></i> Save Product
                                         </button>
                                     </form>
                                 </div>
@@ -122,7 +189,7 @@
                         <div class="col-lg-9">
                             <div class="card">
                                 <div class="table-responsive">
-                                    <table id="example3" class="table table-bordered table-hover" width="100%">
+                                    <table class="table table-bordered table-hover product-table" width="100%">
                                         <thead class="bg-main-9 text-dark">
                                             <tr>
                                                 <th>Image</th>
@@ -136,114 +203,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($products as $product)
-                                                <tr id="row-{{ $product->id }}">
-                                                    <!-- Image -->
-                                                    <td class="text-center align-middle">
-                                                        @if(!empty($product->image) && Storage::disk('public')->exists('uploads/products/' . $product->image))
-                                                            <img src="{{ asset('storage/uploads/products/' . $product->image) }}" 
-                                                                width="40" height="40" 
-                                                                style="border-radius: 5%;"  
-                                                                class="product-image" 
-                                                                alt="Product Image">
-                                                        @endif
-                                                    </td>
-
-                                                    <!-- Product Info -->
-                                                    <td class="align-middle">
-                                                        <strong class="text-main-8">{{ $product->product_name }}</strong><br>
-                                                        <span class="text-main-1">{{ $product->category_name }}</span><br>
-                                                        <small class="text-main-1">
-                                                            {{-- {{ $product->product_type == '1' ? 'Standard' : 'Made to Order' }} --}}
-                                                            Warranty: {{ $product->warranty }}
-                                                        </small><br>
-                                                        <small class="text-main-1">
-                                                            Replacement duration: {{ $product->warranty }}
-                                                        </small>
-                                                    </td>
-
-                                                    <!-- Barcodes -->
-                                                    <td class="align-middle text-main-8">
-                                                        {{ 'R-' . $product->barcode }}<br>
-                                                        @if($product->w_barcode)
-                                                            {{ 'W-' . $product->w_barcode }}
-                                                        @endif
-                                                    </td>
-
-                                                    <!-- Packaging -->
-                                                    <td class="text-center align-middle text-main-8">{{ $product->packaging }}</td>
-
-                                                    <!-- Wholesale -->
-                                                    <td class="text-center align-middle">
-                                                        <small>Cap: ₱{{ number_format($product->w_capital, 2) }}</small><br>
-                                                        <small>Price: ₱{{ number_format($product->w_price, 2) }}</small><br>
-                                                        <small>
-                                                            Qty: {{ number_format($product->wqty) }} {{ $product->w_unit_name ?? '' }}
-                                                            @if($product->wqty == 0)
-                                                                <span class="badge bg-danger">Out</span>
-                                                            @elseif($product->wqty < 10)
-                                                                <span class="badge bg-warning text-dark">Low</span>
-                                                            @endif
-                                                        </small>
-                                                    </td>
-
-                                                    <!-- Retail -->
-                                                    <td class="text-center align-middle">
-                                                        <small>Cap: ₱{{ number_format($product->r_capital, 2) }}</small><br>
-                                                        <small>Price: ₱{{ number_format($product->r_price, 2) }}</small><br>
-                                                        <small>
-                                                            Qty: {{ number_format($product->rqty) }} {{ $product->r_unit_name ?? '' }}
-                                                            @if($product->rqty == 0)
-                                                                <span class="badge bg-danger">Out</span>
-                                                            @elseif($product->rqty < 10)
-                                                                <span class="badge bg-warning text-dark">Low</span>
-                                                            @endif
-                                                        </small>
-                                                    </td>
-
-                                                    <td class="text-left align-middle text-main-1">
-                                                        R-{{ number_format($product->total_sold_r) ?? 0}}<br>
-                                                        W-{{ number_format($product->total_sold_w) ?? 0}}
-                                                    </td>
-
-                                                    <!-- Actions -->
-                                                    <td class="text-center align-middle">
-                                                        <a href="javascript:void(0)" 
-                                                        class="btn btn-warning btn-sm adjust-stock-btn" 
-                                                        data-id="{{ $product->id }}" 
-                                                        data-name="{{ $product->product_name }} {{ $product->model }}"
-                                                        title="Stock Management">
-                                                        <i class="fas fa-cubes"></i>
-                                                        </a>
-                                                        <button class="btn btn-info btn-sm edit-btn" 
-                                                            data-id="{{ $product->id }}"
-                                                            data-barcode="{{ $product->barcode }}"
-                                                            data-w_barcode="{{ $product->w_barcode }}"
-                                                            data-product_name="{{ $product->product_name }}"
-                                                            data-model="{{ $product->model }}"
-                                                            data-more_details="{{ $product->more_details }}"
-                                                            data-product_type="{{ $product->product_type }}"
-                                                            data-category="{{ $product->category }}"
-                                                            data-warranty="{{ $product->warranty }}"
-                                                            data-packaging="{{ $product->packaging }}"
-                                                            data-rep_duration="{{ $product->rep_duration }}"
-                                                            data-w_capital="{{ $product->w_capital }}"
-                                                            data-w_price="{{ $product->w_price }}"
-                                                            data-w_unit="{{ $product->w_unit }}"
-                                                            data-r_capital="{{ $product->r_capital }}"
-                                                            data-r_price="{{ $product->r_price }}"
-                                                            data-r_unit="{{ $product->r_unit }}"
-                                                            data-r_stock_alert="{{ $product->r_stock_alert }}"
-                                                            data-w_stock_alert="{{ $product->w_stock_alert }}"
-                                                            title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <a href="#" class="btn btn-danger btn-sm delete-row" data-model="Product" data-id="{{ $product->id }}" title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -377,89 +336,4 @@
   </div>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const reasonSelect = document.getElementById('reason');
-    const adjustmentTypeSelect = document.getElementById('adjustment_type');
-    const saleIdGroup = document.getElementById('saleIdGroup');
-    const branchTransferGroup = document.getElementById('branchTransferGroup');
-
-    // Function to toggle fields
-    function toggleFields() {
-        // Sale ID only for Customer Return
-        if (reasonSelect.value === 'Customer Return') {
-            saleIdGroup.style.display = 'block';
-        } else {
-            saleIdGroup.style.display = 'none';
-            document.getElementById('sale_id').value = ''; // reset
-        }
-
-        // Branch Transfer if reason = Transfer OR adjustment_type = transfer
-        if (reasonSelect.value === 'Transfer' || adjustmentTypeSelect.value === 'transfer') {
-            branchTransferGroup.style.display = 'block';
-        } else {
-            branchTransferGroup.style.display = 'none';
-            // document.getElementById('branch_id').value = ''; // reset
-        }
-    }
-
-    // Attach listeners
-    reasonSelect.addEventListener('change', toggleFields);
-    adjustmentTypeSelect.addEventListener('change', toggleFields);
-
-    // Run once on load (in case modal pre-filled)
-    toggleFields();
-
-    // Open modal with product_id
-    document.querySelectorAll(".adjust-stock-btn").forEach(function (button) {
-        button.addEventListener("click", function () {
-            let productId = this.getAttribute("data-id");
-            let productName = this.getAttribute("data-name");
-            document.getElementById("adjustment_product_id").value = productId;
-            document.getElementById("adjustment_product_name").textContent = productName;
-            $('#stockAdjustmentModal').modal('show');
-        });
-    });
-
-    // Prefill form for editing
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const form = document.getElementById('product_form_data');
-            const productId = this.dataset.id;
-
-            // Fill form fields
-            document.getElementById('product_id').value = productId;
-            document.getElementById('barcode').value = this.dataset.barcode;
-            document.getElementById('w_barcode').value = this.dataset.w_barcode;
-            document.getElementById('product_name').value = this.dataset.product_name;
-            document.getElementById('model').value = this.dataset.model;
-            document.getElementById('more_details').value = this.dataset.more_details;
-            document.getElementById('product_type').value = this.dataset.product_type;
-            document.getElementById('category').value = this.dataset.category;
-            document.getElementById('packaging').value = this.dataset.packaging;
-            document.getElementById('warranty').value = this.dataset.warranty;
-            document.getElementById('rep_duration').value = this.dataset.rep_duration;
-            document.getElementById('whole_capital').value = this.dataset.w_capital;
-            document.getElementById('whole_price').value = this.dataset.w_price;
-            document.getElementById('wholesale_unit').value = this.dataset.w_unit;
-            document.getElementById('retail_capital').value = this.dataset.r_capital;
-            document.getElementById('retail_price').value = this.dataset.r_price;
-            document.getElementById('retail_unit').value = this.dataset.r_unit;
-            document.getElementById('r_stock_alert').value = this.dataset.r_stock_alert;
-            document.getElementById('w_stock_alert').value = this.dataset.w_stock_alert;
-
-            // Update form action for update route
-            form.action = "{{ route('productUpdate', ':id') }}".replace(':id', productId);
-            form.querySelector('#saveBtn').innerHTML = '<i class="fas fa-save"></i> Update Product';
-            document.getElementById('formHeading').textContent = 'EDIT PRODUCT';
-            
-            // Scroll to form
-            document.getElementById('product_form_data').scrollIntoView({ behavior: 'smooth' });
-        });
-    });
-
-    // Reset form when clicking on "Add Product" (if you add such a button)
-    // You might want to add a "Add New Product" button to clear the form
-});
-</script>
 @endsection

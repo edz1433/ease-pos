@@ -10,10 +10,215 @@ use App\Models\BranchProduct;
 use App\Models\Inventory;
 use App\Models\InventoryItems;  
 use App\Models\ProductPreset;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    public function productReadAjax(Request $request)
+    {
+        $products = Product::select(
+                'products.*',
+                'branch_products.*',
+                'categories.name as category_name',
+                'r_unit.name as r_unit_name',
+                'w_unit.name as w_unit_name',
+                DB::raw("(SELECT COALESCE(SUM(s.quantity),0) 
+                        FROM sales_orders s 
+                        WHERE s.product_id = products.id 
+                            AND s.price_type = 'retail') as total_sold_r"),
+                DB::raw("(SELECT COALESCE(SUM(s.quantity),0) 
+                        FROM sales_orders s 
+                        WHERE s.product_id = products.id 
+                            AND s.price_type = 'wholesale') as total_sold_w")
+            )
+            ->leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
+            ->leftJoin('categories', 'products.category', '=', 'categories.id')
+            ->leftJoin('units as r_unit', 'branch_products.r_unit', '=', 'r_unit.id')
+            ->leftJoin('units as w_unit', 'branch_products.w_unit', '=', 'w_unit.id')
+            ->where('branch_products.branch_id', env('BRANCH_ID'))
+            ->get();
+
+        return response()->json(['data' => $products]);
+    }
+
+    public function storeOrUpdate(Request $request)
+    {
+        $isUpdate = strtoupper($request->input('_method')) === 'PUT' && $request->filled('id');
+        $productId = $request->input('id');
+
+        // Adjust unique rule for updates
+        $rules = [
+            'barcode' => [
+                'required',
+                'string',
+                'max:255',
+                $isUpdate ? 'unique:products,barcode,' . $productId : 'unique:products,barcode'
+            ],
+            'w_barcode' => [
+                'nullable',
+                'string',
+                'max:255',
+                $isUpdate ? 'unique:products,w_barcode,' . $productId : 'unique:products,w_barcode'
+            ],
+            'product_name' => 'required|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'more_details' => 'nullable|string|max:1000',
+            'product_type' => 'required|in:1,2',
+            'category' => 'required|integer|exists:categories,id', // Ensure category exists
+            'packaging' => 'required|integer|min:1', // Changed to integer for consistency
+            'warranty' => 'nullable|string|max:255',
+            'rep_duration' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'w_capital' => 'required|numeric|min:0',
+            'w_price' => 'required|numeric|min:0',
+            'w_unit' => 'nullable|integer|exists:units,id', // Ensure unit exists
+            'w_stock_alert' => 'nullable|numeric|min:0',
+            'r_capital' => 'required|numeric|min:0',
+            'r_price' => 'required|numeric|min:0',
+            'r_unit' => 'required|integer|exists:units,id', // Ensure unit exists
+            'r_stock_alert' => 'required|numeric|min:0',
+        ];
+
+        // Custom error messages
+        $messages = [
+            'category.exists' => 'The selected category is invalid.',
+            'w_unit.exists' => 'The selected wholesale unit is invalid.',
+            'r_unit.exists' => 'The selected retail unit is invalid.',
+            'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif.',
+            'image.max' => 'The image may not be larger than 2MB.',
+            'packaging.min' => 'Packaging must be at least 1.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
+
+        try {
+            // Handle image upload
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                // Store image in /storage/app/public/products
+                $path = $request->file('image')->store('products', 'public');
+
+                // Extract only the filename (no folder path)
+                $validated['image'] = basename($path);
+
+                if ($isUpdate) {
+                    $product = Product::findOrFail($productId);
+                    if ($product->image && $product->image !== 'default-product.png') {
+                        Storage::disk('public')->delete('products/' . $product->image);
+                    }
+                }
+            } elseif ($request->input('remove_image', 0) && $isUpdate) {
+                $product = Product::findOrFail($productId);
+                if ($product->image && $product->image !== 'default-product.png') {
+                    Storage::disk('public')->delete('products/' . $product->image);
+                }
+                $validated['image'] = 'default-product.png';
+            } elseif (!$isUpdate && !$request->hasFile('image')) {
+                $validated['image'] = 'default-product.png';
+            } elseif ($isUpdate) {
+                unset($validated['image']); // Exclude image if no change
+            }
+
+            $branchId = env('BRANCH_ID', config('app.default_branch_id', 1));
+            if (!$branchId) {
+                Log::warning('Branch ID not configured, using default: ' . $branchId);
+            }
+
+            // Fields allowed for Product model
+            $productFields = collect($validated)->only([
+                'barcode', 'w_barcode', 'product_name', 'model', 'more_details',
+                'product_type', 'category', 'packaging', 'warranty', 'rep_duration', 'image'
+            ])->filter()->toArray(); // Filter out null values
+
+            if ($isUpdate) {
+                $product = Product::findOrFail($productId);
+                $product->update($productFields);
+
+                BranchProduct::updateOrCreate(
+                    ['product_id' => $productId, 'branch_id' => $branchId],
+                    collect($validated)->only([
+                        'w_capital', 'w_price', 'w_unit', 'w_stock_alert',
+                        'r_capital', 'r_price', 'r_unit', 'r_stock_alert'
+                    ])->filter()->toArray()
+                );
+
+                if ($inventory = Inventory::where('status', 1)->first()) {
+                    InventoryItems::where('inventory_id', $inventory->id)
+                        ->where('product_id', $productId)
+                        ->update([
+                            'r_capital' => $validated['r_capital'],
+                            'w_capital' => $validated['w_capital'],
+                        ]);
+                }
+
+                $message = 'Product updated successfully!';
+            } else {
+                $product = Product::create($productFields);
+
+                BranchProduct::create([
+                    'branch_id' => $branchId,
+                    'product_id' => $product->id,
+                    'w_capital' => $validated['w_capital'],
+                    'w_price' => $validated['w_price'],
+                    'w_unit' => $validated['w_unit'] ?? null, // Handle nullable w_unit
+                    'w_stock_alert' => $validated['w_stock_alert'] ?? 0,
+                    'r_capital' => $validated['r_capital'],
+                    'r_price' => $validated['r_price'],
+                    'r_unit' => $validated['r_unit'],
+                    'r_stock_alert' => $validated['r_stock_alert'],
+                ]);
+
+                if ($inventory = Inventory::where('status', 1)->first()) {
+                    InventoryItems::create([
+                        'inventory_id' => $inventory->id,
+                        'product_id' => $product->id,
+                        'r_qty' => 0,
+                        'w_qty' => 0,
+                        'r_capital' => $validated['r_capital'],
+                        'w_capital' => $validated['w_capital'],
+                        'r_subtotal' => 0,
+                        'w_subtotal' => 0,
+                        'price_type' => 'retail',
+                        'status' => 1,
+                    ]);
+
+                    if ($validated['packaging'] > 1) {
+                        InventoryItems::create([
+                            'inventory_id' => $inventory->id,
+                            'product_id' => $product->id,
+                            'r_qty' => 0,
+                            'w_qty' => 0,
+                            'r_capital' => $validated['r_capital'],
+                            'w_capital' => $validated['w_capital'],
+                            'r_subtotal' => 0,
+                            'w_subtotal' => 0,
+                            'price_type' => 'wholesale',
+                            'status' => 1,
+                        ]);
+                    }
+                } else {
+                    Log::warning('No active inventory found, skipping inventory item creation.');
+                }
+
+                $message = 'Product created successfully!';
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Product store/update error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+    }
+
     public function productCreate(Request $request)
     {
         $validated = $request->validate([

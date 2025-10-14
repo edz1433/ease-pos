@@ -78,9 +78,10 @@ Route::group(['middleware' => ['login_auth']], function() {
 
     Route::prefix('products')->group(function() {
         Route::get('/',[MasterController::class,'productRead'])->name('productRead');
+        Route::get('/products/ajax', [ProductController::class, 'productReadAjax'])->name('products.ajax');
         Route::post('/create',[ProductController::class,'productCreate'])->name('productCreate');
-        Route::post('/',[ProductController::class,'productEdit'])->name('productEdit');
-        Route::post('/update/{id}',[ProductController::class,'productUpdate'])->name('productUpdate');
+        Route::match(['post', 'put'], '/store-or-update', [ProductController::class, 'storeOrUpdate'])->name('storeOrUpdate');
+        Route::put('/update/{id}',[ProductController::class,'productUpdate'])->name('productUpdate');
 
         Route::get('/presets', [ProductController::class, 'getProductPresets'])->name('getProductPresets');
         Route::get('/next-barcode/{id}', [ProductController::class, 'getNextBarcode'])->name('getNextBarcode');
