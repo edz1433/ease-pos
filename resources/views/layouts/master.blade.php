@@ -50,16 +50,10 @@
         border: 2px solid #ddd !important;
         display: block !important;
     }
-
-    .nav-item.dropdown .dropdown-menu.notifications{
-        width: 500px !important; /* Or whatever width you prefer */
-        max-width: none !important; /* Ensure it doesn't get constrained by max-width */
-    }
     </style>
 </head>
 
-
-<body class="hold-transition sidebar-mini layout-fixed {{ request()->is('payments*') || request()->is('reports*') ? 'sidebar-collapse' : '' }} layout-navbar-fixed text-sm">
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse layout-navbar-fixed text-sm">
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -84,25 +78,42 @@
                 </li>
             </ul>
         </nav>
-        
-        <!-- /.navbar -->
 
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dim-green elevation-2">
+         <aside class="main-sidebar sidebar-dim-green elevation-2">
             <!-- Brand Logo -->
             <a href="#" class="brand-link">
                 <img src="{{ asset('template/img/logo.png') }}" alt="AdminLTE Logo" class="brand-image">
-                <span class="brand-text font-weight-bold text-main">EASE</span>
-            </a>        
-
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Sidebar Menu -->
-                @include('partials.control')
-                <!-- /.sidebar-menu -->
-            </div>
-            <!-- /.sidebar -->
-        </aside>
+                <span class="brand-text font-weight-bold text-success1">EASE</span>
+            </a>       
+                <!-- /.navbar -->
+                <div class="sidebar">
+                    <hr class="sidebar-divider">
+                    <!-- Sidebar user panel (optional) -->
+                    <div class="user-panel mt-4 d-flex">
+                        <div class="image">
+                            <img src="{{ (auth()->user()->gender == 'Male') ? asset('template/img/default-male.png') : asset('template/img/default-female.png') }}" alt="AdminLTE Logo" class="brand-image">
+                        </div>                    
+                        <div class="info ml-2" style="margin-top: -7px;">
+                            <span class="d-block">
+                                {{ auth()->user()->fname }} {{ auth()->user()->lname }}
+                            </span>
+                            <small class="d-block text-sm text-muted">
+                                @if (auth()->user()->role == 1)
+                                    Administrator
+                                @elseif (auth()->user()->role == 2)
+                                    Cashier
+                                @elseif (auth()->user()->role == 3)
+                                    Manager
+                                @endif
+                            </small>
+                        </div>
+                    </div>                
+                    <hr>
+                    <!-- Sidebar Menu -->
+                    @include('partials.control')
+                    <!-- /.sidebar-menu -->
+                </div>
+         </aside>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper" style="padding-top: 20px;">

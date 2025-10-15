@@ -190,7 +190,7 @@
                             <div class="card">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-hover product-table" width="100%">
-                                        <thead class="bg-main-9 text-dark">
+                                        <thead class="text-dark">
                                             <tr>
                                                 <th>Image</th>
                                                 <th>Product</th>
