@@ -83,7 +83,7 @@
             <!-- Brand Logo -->
             <a href="#" class="brand-link">
                 <img src="<?php echo e(asset('template/img/logo.png')); ?>" alt="AdminLTE Logo" class="brand-image">
-                <span class="brand-text font-weight-bold text-success1">EASE</span>
+                <span class="brand-text font-weight-bold text-main">EASE</span>
             </a>       
                 <!-- /.navbar -->
                 <div class="sidebar">
