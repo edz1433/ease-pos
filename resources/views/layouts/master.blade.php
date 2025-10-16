@@ -56,11 +56,11 @@
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed text-sm">
     <div class="wrapper">
         <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <nav class="main-header navbar navbar-expand primary-light">
             <!-- Left navbar links -->
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars text-dark"></i></a>
+                    <a class="nav-link no-bg" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars text-dark"></i></a>
                 </li>
             </ul>
         
@@ -68,7 +68,7 @@
             <ul class="navbar-nav ml-auto">
                 <!-- User Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle text-dark no-bg" href="#" role="button" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img src="{{ (auth()->user()->gender == "Male") ? asset('template/img/default-male.png') : asset('template/img/default-female.png')}}" alt="User Image" class="profile-image">
                     </a>                    
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
@@ -116,7 +116,7 @@
          </aside>
 
         <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper" style="padding-top: 20px;">
+        <div class="content-wrapper primary-light" style="padding-top: 20px;">
             <!-- Main content -->
             <div class="content">
                 @yield('body')
