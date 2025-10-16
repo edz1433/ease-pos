@@ -96,7 +96,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-8">
                     <div class="card">
                         <div class="card-header border-0 d-flex justify-content-between">
                             <h3 class="card-title">Top Products</h3>
@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="card">
                         <div class="card-header border-0 d-flex justify-content-between">
                             <h3 class="card-title">Top Category</h3>
