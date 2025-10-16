@@ -1,145 +1,160 @@
-<?php $role = auth()->user()->isAdmin; ?>
+<nav class="custom-sidebar-menu">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
-<aside class="custom-sidebar">
-    <!-- User Info -->
-    <div class="sidebar-user text-center p-3">
-        <img src="<?php echo e((auth()->user()->gender == 'Male') ? asset('template/img/default-male.png') : asset('template/img/default-female.png')); ?>" 
-            alt="User Avatar" 
-            class="rounded-circle mb-2" 
-            style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ddd;">
-            
-        <h6 class="mb-0 font-weight-bold">
-            <?php echo e(auth()->user()->fname); ?> <?php echo e(auth()->user()->lname); ?>
-
-        </h6>
-        <small class="text-muted">Administrator</small>
-    </div>
-
-    <!-- Sidebar Menu -->
-    <ul class="custom-sidebar-menu">
-        <li>
-            <a href="<?php echo e(route('dashboard')); ?>" class="<?php echo e(request()->is('dashboard') ? 'active' : ''); ?>">
+        <!-- Dashboard -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('dashboard')); ?>" 
+               class="nav-link <?php echo e(request()->is('dashboard') ? 'active' : ''); ?>">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
         </li>
-        <li>
-            <a href="<?php echo e(route('purchaseRead')); ?>" class="<?php echo e(request()->is('purchases*') ? 'active' : ''); ?>">
+
+        <!-- Purchases -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('purchaseRead')); ?>" 
+               class="nav-link <?php echo e(request()->is('purchases*') ? 'active' : ''); ?>">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Purchases</span>
             </a>
         </li>
-        <li>
-            <a href="<?php echo e(route('warehouseRead')); ?>" class="<?php echo e(request()->is('warehouse*') ? 'active' : ''); ?>">
-                <i class="fas fa-shopping-cart"></i>
+
+        <!-- Warehouse -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('warehouseRead')); ?>" 
+               class="nav-link <?php echo e(request()->is('warehouse*') ? 'active' : ''); ?>">
+                <i class="fas fa-warehouse"></i>
                 <span>Warehouse</span>
             </a>
         </li>
-        <li class="has-submenu <?php echo e(request()->is('products*') || request()->is('categories*') || request()->is('bundles*') ? 'active-menu' : ''); ?>">
-            <a href="<?php echo e(route('productRead')); ?>" class="<?php echo e(request()->is('products*') ? 'active' : ''); ?>">
+
+        <!-- Products (with submenu) -->
+        <li class="nav-item has-submenu <?php echo e(request()->is('products*') || request()->is('categories*') || request()->is('bundles*') ? 'active-menu' : ''); ?>">
+            <a href="#" class="nav-link">
                 <i class="fas fa-boxes"></i>
                 <span>Products</span>
-                <i class="fas fa-chevron-down submenu-arrow"></i>
+                <i class="submenu-arrow fas fa-angle-down"></i>
             </a>
-            <ul class="nav-treeview" style="display: none;">
+            <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="<?php echo e(route('productRead')); ?>" class="nav-link <?php echo e(request()->is('products*') && !request()->is('products/classifications*') && !request()->is('products/bundles*') ? 'active' : ''); ?>">
+                    <a href="<?php echo e(route('productRead')); ?>" 
+                       class="nav-link <?php echo e(request()->is('products') ? 'active' : ''); ?>">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Product list</p>
+                        <span>Product List</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?php echo e(route('classificationRead')); ?>" class="nav-link <?php echo e(request()->is('products/classifications*') ? 'active' : ''); ?>">
+                    <a href="<?php echo e(route('classificationRead')); ?>" 
+                       class="nav-link <?php echo e(request()->is('products/classifications*') ? 'active' : ''); ?>">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Classifications</p>
+                        <span>Classifications</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?php echo e(route('bundleRead')); ?>" class="nav-link <?php echo e(request()->is('products/bundles*') ? 'active' : ''); ?>">
+                    <a href="<?php echo e(route('bundleRead')); ?>" 
+                       class="nav-link <?php echo e(request()->is('products/bundles*') ? 'active' : ''); ?>">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Bundles</p>
+                        <span>Bundles</span>
                     </a>
                 </li>
             </ul>
         </li>
-        <li>
-            <a href="<?php echo e(route('inventoryRead')); ?>" class="<?php echo e(request()->is('inventory*') ? 'active' : ''); ?>">
-                <i class="fas fa-warehouse"></i>
+
+        <!-- Inventory -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('inventoryRead')); ?>" 
+               class="nav-link <?php echo e(request()->is('inventory*') ? 'active' : ''); ?>">
+                <i class="fas fa-box"></i>
                 <span>Inventory</span>
             </a>
         </li>
-        <li>
-            <a href="<?php echo e(config('app.react_url')); ?>" target="_blank"
-                class="<?php echo e(request()->is('pos*') ? 'active' : ''); ?>">
+
+        <!-- POS -->
+        <li class="nav-item">
+            <a href="<?php echo e(config('app.react_url')); ?>" target="_blank" class="nav-link">
                 <i class="fas fa-cash-register"></i>
                 <span>POS</span>
             </a>
         </li>
-        <li>
-            <a href="<?php echo e(route('salesRead')); ?>" class="<?php echo e(request()->is('sales*') ? 'active' : ''); ?>">
+
+        <!-- Sales -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('salesRead')); ?>" 
+               class="nav-link <?php echo e(request()->is('sales*') ? 'active' : ''); ?>">
                 <i class="fas fa-receipt"></i>
                 <span>Sales</span>
             </a>
         </li>
-        <li>
-            <a href="<?php echo e(route('cashbankRead')); ?>" class="<?php echo e(request()->is('cash-bank*') ? 'active' : ''); ?>">
+
+        <!-- Cash & Bank -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('cashbankRead')); ?>" 
+               class="nav-link <?php echo e(request()->is('cash-bank*') ? 'active' : ''); ?>">
                 <i class="fas fa-university"></i>
                 <span>Cash & Bank</span>
             </a>
         </li>
-        <li class="has-submenu <?php echo e(request()->is('cash-count*') ? 'active-menu' : ''); ?>">
-            <a href="<?php echo e(route('cashCountRead')); ?>" class="<?php echo e(request()->is('cash-count*') ? 'active' : ''); ?>">
+
+        <!-- Cash Count (with submenu) -->
+        <li class="nav-item has-submenu <?php echo e(request()->is('cash-count*') ? 'active-menu' : ''); ?>">
+            <a href="#" class="nav-link">
                 <i class="fas fa-coins"></i>
                 <span>Cash Count</span>
-                <i class="fas fa-chevron-down submenu-arrow"></i>
+                <i class="submenu-arrow fas fa-angle-down"></i>
             </a>
-            <ul class="nav-treeview" style="display: none;">
+            <ul class="nav nav-treeview">
                 <li class="nav-item">
                     <a href="<?php echo e(route('cashCountRead')); ?>" 
-                    class="nav-link <?php echo e(request()->is('cash-count') ? 'active' : ''); ?>">
+                       class="nav-link <?php echo e(request()->is('cash-count') ? 'active' : ''); ?>">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Cash Count List</p>
+                        <span>Cash Count List</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="<?php echo e(route('cashCountEntry')); ?>" 
-                    class="nav-link <?php echo e(request()->is('cash-count/cash-entry*') ? 'active' : ''); ?>">
+                       class="nav-link <?php echo e(request()->is('cash-count/cash-entry*') ? 'active' : ''); ?>">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Cash Entry</p>
+                        <span>Cash Entry</span>
                     </a>
                 </li>
             </ul>
         </li>
-        <li>
-            <a href="<?php echo e(route('supplierRead')); ?>" class="<?php echo e(request()->is('suppliers*') ? 'active' : ''); ?>">
-                <i class="fas fa-users"></i>
+
+        <!-- Suppliers -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('supplierRead')); ?>" 
+               class="nav-link <?php echo e(request()->is('suppliers*') ? 'active' : ''); ?>">
+                <i class="fas fa-truck"></i>
                 <span>Suppliers</span>
             </a>
         </li>
-        <li>
-            <a href="#" class="<?php echo e(request()->is('reports*') ? 'active' : ''); ?>">
-                <i class="fas fa-chart-bar"></i>
-                <span>Reports</span>
-            </a>
-        </li>
-        <li>
-            <a href="<?php echo e(route('customerRead')); ?>" class="<?php echo e(request()->is('customer*') ? 'active' : ''); ?>">
+
+        <!-- Customer -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('customerRead')); ?>" 
+               class="nav-link <?php echo e(request()->is('customer*') ? 'active' : ''); ?>">
                 <i class="fas fa-user"></i>
                 <span>Customer</span>
             </a>
         </li>
-        <li>
-            <a href="<?php echo e(route('userRead')); ?>" class="<?php echo e(request()->is('user*') ? 'active' : ''); ?>">
+
+        <!-- Users -->
+        <li class="nav-item">
+            <a href="<?php echo e(route('userRead')); ?>" 
+               class="nav-link <?php echo e(request()->is('user*') ? 'active' : ''); ?>">
                 <i class="fas fa-users"></i>
                 <span>Users</span>
             </a>
         </li>
-        <li>
-            <a href="#" class="<?php echo e(request()->is('settings*') ? 'active' : ''); ?>">
+
+        <!-- Settings -->
+        <li class="nav-item">
+            <a href="#" class="nav-link <?php echo e(request()->is('settings*') ? 'active' : ''); ?>">
                 <i class="fas fa-cogs"></i>
                 <span>Settings</span>
             </a>
         </li>
+
     </ul>
-</aside>
+</nav>
 <?php /**PATH E:\xampp\htdocs\ease-pos\resources\views/partials/control.blade.php ENDPATH**/ ?>

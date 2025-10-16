@@ -50,16 +50,10 @@
         border: 2px solid #ddd !important;
         display: block !important;
     }
-
-    .nav-item.dropdown .dropdown-menu.notifications{
-        width: 500px !important; /* Or whatever width you prefer */
-        max-width: none !important; /* Ensure it doesn't get constrained by max-width */
-    }
     </style>
 </head>
 
-
-<body class="hold-transition sidebar-mini layout-fixed <?php echo e(request()->is('payments*') || request()->is('reports*') ? 'sidebar-collapse' : ''); ?> layout-navbar-fixed text-sm">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed text-sm">
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -84,25 +78,43 @@
                 </li>
             </ul>
         </nav>
-        
-        <!-- /.navbar -->
 
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dim-green elevation-2">
+         <aside class="main-sidebar sidebar-dim-green elevation-2">
             <!-- Brand Logo -->
             <a href="#" class="brand-link">
                 <img src="<?php echo e(asset('template/img/logo.png')); ?>" alt="AdminLTE Logo" class="brand-image">
-                <span class="brand-text font-weight-bold text-main">EASE</span>
-            </a>        
+                <span class="brand-text font-weight-bold text-success1">EASE</span>
+            </a>       
+                <!-- /.navbar -->
+                <div class="sidebar">
+                    <hr class="sidebar-divider">
+                    <!-- Sidebar user panel (optional) -->
+                    <div class="user-panel mt-4 d-flex">
+                        <div class="image">
+                            <img src="<?php echo e((auth()->user()->gender == 'Male') ? asset('template/img/default-male.png') : asset('template/img/default-female.png')); ?>" alt="AdminLTE Logo" class="brand-image">
+                        </div>                    
+                        <div class="info ml-2" style="margin-top: -7px;">
+                            <span class="d-block">
+                                <?php echo e(auth()->user()->fname); ?> <?php echo e(auth()->user()->lname); ?>
 
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Sidebar Menu -->
-                <?php echo $__env->make('partials.control', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-                <!-- /.sidebar-menu -->
-            </div>
-            <!-- /.sidebar -->
-        </aside>
+                            </span>
+                            <small class="d-block text-sm text-muted">
+                                <?php if(auth()->user()->role == 1): ?>
+                                    Administrator
+                                <?php elseif(auth()->user()->role == 2): ?>
+                                    Cashier
+                                <?php elseif(auth()->user()->role == 3): ?>
+                                    Manager
+                                <?php endif; ?>
+                            </small>
+                        </div>
+                    </div>                
+                    <hr>
+                    <!-- Sidebar Menu -->
+                    <?php echo $__env->make('partials.control', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                    <!-- /.sidebar-menu -->
+                </div>
+         </aside>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper" style="padding-top: 20px;">
