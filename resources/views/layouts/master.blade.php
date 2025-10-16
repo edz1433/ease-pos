@@ -53,7 +53,7 @@
     </style>
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse layout-navbar-fixed text-sm">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed text-sm">
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">

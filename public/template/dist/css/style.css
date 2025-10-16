@@ -10,9 +10,12 @@ body.sidebar-text-hide .custom-sidebar {
     overflow: hidden;
 }
 
-body.sidebar-text-hide .custom-sidebar-menu a {
-    justify-content: center;
+/* === FIX: Ensure normal sidebar items are left-aligned === */
+.custom-sidebar-menu a {
+    justify-content: flex-start !important;
+    text-align: left !important;
 }
+
 
 body.sidebar-text-hide .custom-sidebar-menu a span,
 body.sidebar-text-hide .sidebar-user h6,
@@ -76,9 +79,11 @@ body.sidebar-text-hide .content-wrapper {
     padding: 0;
     margin: 0;
 }
+
 .custom-sidebar-menu li {
     margin-bottom: 10px;
 }
+
 .custom-sidebar-menu a {
     display: flex;
     align-items: center;
@@ -89,30 +94,44 @@ body.sidebar-text-hide .content-wrapper {
     text-decoration: none;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 .custom-sidebar-menu a i {
     margin-right: 10px;
-    color: #fc204f; /* rose-500 */
+    color: #fc204f !important; /* default rose-500 for icons */
     min-width: 20px;
     text-align: center;
+    transition: color 0.3s ease;
 }
 
-/* Active menu item */
+/* === ACTIVE MENU ITEM === */
 .custom-sidebar-menu .active {
-    background-color: #fc204f; /* rose-500 */
+    background-color: #fc204f !important; /* solid rose-500 */
     color: hsl(340, 82%, 97%) !important; /* rose-50 */
     font-weight: bold;
 }
+
 .custom-sidebar-menu .active i {
-    color: hsl(340, 82%, 97%) !important; /* rose-50 */
+    color: hsl(340, 82%, 97%) !important; /* icon turns white */
 }
 
-/* Hover effect */
+/* === HOVER EFFECT === */
 .custom-sidebar-menu a:hover {
-    background-color: hsl(340, 80%, 94%) !important; /* rose-100 */
-    color: #fc204f !important; /* rose-500 */
+    background-color: hsl(340, 80%, 94%) !important; /* soft rose background */
+    color: #fc204f !important; /* text turns rose-500 */
 }
+
 .custom-sidebar-menu a:hover i {
-    color: #fc204f !important; /* rose-500 */
+    color: #fc204f !important; /* icon turns rose-500 */
+}
+
+.custom-sidebar-menu .nav-pills .nav-item > .nav-link:hover {
+    background-color: #fc204f !important; /* Matches active background */
+    color: hsl(340, 82%, 97%) !important; /* Matches active text color */
+    border-radius: 8px !important;
+}
+
+.custom-sidebar-menu .nav-pills .nav-item > .nav-link:hover i {
+    color: hsl(340, 82%, 97%) !important; /* Matches active icon color */
 }
 
 /* === SUBMENU STYLING === */
@@ -125,7 +144,7 @@ body.sidebar-text-hide .content-wrapper {
     transition: max-height 0.3s ease-in-out !important;
 }
 
-/* Auto-open for active submenus */
+/* Auto-open for active or hovered submenus */
 .custom-sidebar-menu li.has-submenu.active-menu > .nav-treeview,
 .custom-sidebar-menu li.has-submenu.open > .nav-treeview,
 .custom-sidebar-menu li:hover > .nav-treeview {
@@ -159,6 +178,7 @@ body.sidebar-text-hide .content-wrapper {
     text-align: center !important;
 }
 
+/* Submenu hover and active */
 .custom-sidebar-menu .nav-treeview .nav-link:hover,
 .custom-sidebar-menu .nav-treeview .nav-link.active {
     background-color: hsl(340, 80%, 94%) !important; /* rose-100 */
@@ -170,56 +190,55 @@ body.sidebar-text-hide .content-wrapper {
     color: #fc204f !important; /* rose-500 */
 }
 
-/* Parent item highlight when submenu is active */
-.custom-sidebar-menu li.has-submenu.active-menu > a,
-.custom-sidebar-menu li.has-submenu.open > a {
-    background-color: hsl(340, 80%, 94%) !important; /* rose-100 */
-    color: #fc204f !important; /* rose-500 */
-}
-
-.custom-sidebar-menu li.has-submenu.active-menu > a {
-    background-color: #fc204f !important; /* rose-500 */
-    color: hsl(340, 82%, 97%) !important; /* rose-50 */
-}
-
-/* Make the icon and the span text white */
-.custom-sidebar-menu li.has-submenu.active-menu > a i,
-.custom-sidebar-menu li.has-submenu.active-menu > a .nav-icon,
-.custom-sidebar-menu li.has-submenu.active-menu > a span {
-    color: hsl(340, 82%, 97%) !important; /* rose-50 */
-}
-
-/* Font Awesome uses ::before for icons — target that too */
-.custom-sidebar-menu li.has-submenu.active-menu > a i.fas::before,
-.custom-sidebar-menu li.has-submenu.active-menu > a i.far::before,
-.custom-sidebar-menu li.has-submenu.active-menu > a i.fab::before {
-    color: hsl(340, 82%, 97%) !important; /* rose-50 */
-}
-
-/* === SUBMENU ARROW STYLING === */
+/* === PARENT ITEM (WHEN SUBMENU ACTIVE/OPEN) === */
 .custom-sidebar-menu li.has-submenu > a {
     position: relative !important;
     display: flex !important;
     align-items: center !important;
 }
 
-/* Add arrow using a separate element instead of ::after pseudo-element */
+.custom-sidebar-menu li.has-submenu.open > a,
+.custom-sidebar-menu li.has-submenu:hover > a {
+    background-color: hsl(340, 80%, 94%) !important; /* light rose background */
+    color: #fc204f !important;
+}
+
+.custom-sidebar-menu li.has-submenu.active-menu > a {
+    background-color: #fc204f !important; /* solid rose for active parent */
+    color: hsl(340, 82%, 97%) !important; /* rose-50 text */
+}
+
+/* Active parent icon + text color */
+.custom-sidebar-menu li.has-submenu.active-menu > a i,
+.custom-sidebar-menu li.has-submenu.active-menu > a .nav-icon,
+.custom-sidebar-menu li.has-submenu.active-menu > a span {
+    color: hsl(340, 82%, 97%) !important; /* white/rose-50 */
+}
+
+/* Ensure Font Awesome icons also turn white */
+.custom-sidebar-menu li.has-submenu.active-menu > a i.fas::before,
+.custom-sidebar-menu li.has-submenu.active-menu > a i.far::before,
+.custom-sidebar-menu li.has-submenu.active-menu > a i.fab::before {
+    color: hsl(340, 82%, 97%) !important;
+}
+
+/* === SUBMENU ARROW === */
 .custom-sidebar-menu li.has-submenu > a .submenu-arrow {
     margin-left: auto !important;
     transition: transform 0.3s ease !important;
     font-size: 14px !important;
     color: hsl(0, 0%, 60%) !important; /* light gray */
     margin-right: 5px !important;
+    display: inline-block !important;
 }
 
-.custom-sidebar-menu li.has-submenu.active-menu > a .submenu-arrow,
 .custom-sidebar-menu li.has-submenu.open > a .submenu-arrow {
     transform: rotate(180deg) !important;
-    color: hsl(340, 82%, 97%) !important; /* rose-50 */
+    color: #fc204f !important; /* arrow turns rose */
 }
 
-.custom-sidebar-menu li.has-submenu > a .submenu-arrow {
-    display: inline-block !important;
+.custom-sidebar-menu li.has-submenu.active-menu > a .submenu-arrow {
+    color: hsl(340, 82%, 97%) !important; /* white when active */
 }
 
 /* Collapsed state */
@@ -502,7 +521,7 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
 }
 
 /* === SCROLLBAR === */
-::-webkit-scrollbar {s
+::-webkit-scrollbar {
     width: 5px !important;
 }
 ::-webkit-scrollbar-track {

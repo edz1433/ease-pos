@@ -1,0 +1,143 @@
+@php $role = auth()->user()->isAdmin; @endphp
+
+<aside class="custom-sidebar">
+    <!-- User Info -->
+    <div class="sidebar-user text-center p-3">
+        <img src="{{ (auth()->user()->gender == 'Male') ? asset('template/img/default-male.png') : asset('template/img/default-female.png') }}" 
+            alt="User Avatar" 
+            class="rounded-circle mb-2" 
+            style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ddd;">
+            
+        <h6 class="mb-0 font-weight-bold">
+            {{ auth()->user()->fname }} {{ auth()->user()->lname }}
+        </h6>
+        <small class="text-muted">Administrator</small>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <ul class="custom-sidebar-menu">
+        <li>
+            <a href="{{ route('dashboard') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('purchaseRead') }}" class="{{ request()->is('purchases*') ? 'active' : '' }}">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Purchases</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('warehouseRead') }}" class="{{ request()->is('warehouse*') ? 'active' : '' }}">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Warehouse</span>
+            </a>
+        </li>
+        <li class="has-submenu {{ request()->is('products*') || request()->is('categories*') || request()->is('bundles*') ? 'active-menu' : '' }}">
+            <a href="{{ route('productRead') }}" class="{{ request()->is('products*') ? 'active' : '' }}">
+                <i class="fas fa-boxes"></i>
+                <span>Products</span>
+                <i class="fas fa-chevron-down submenu-arrow"></i>
+            </a>
+            <ul class="nav-treeview" style="display: none;">
+                <li class="nav-item">
+                    <a href="{{ route('productRead') }}" class="nav-link {{ request()->is('products*') && !request()->is('products/classifications*') && !request()->is('products/bundles*') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Product list</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('classificationRead') }}" class="nav-link {{ request()->is('products/classifications*') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Classifications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('bundleRead') }}" class="nav-link {{ request()->is('products/bundles*') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Bundles</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="{{ route('inventoryRead') }}" class="{{ request()->is('inventory*') ? 'active' : '' }}">
+                <i class="fas fa-warehouse"></i>
+                <span>Inventory</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ config('app.react_url') }}" target="_blank"
+                class="{{ request()->is('pos*') ? 'active' : '' }}">
+                <i class="fas fa-cash-register"></i>
+                <span>POS</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('salesRead') }}" class="{{ request()->is('sales*') ? 'active' : '' }}">
+                <i class="fas fa-receipt"></i>
+                <span>Sales</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('cashbankRead') }}" class="{{ request()->is('cash-bank*') ? 'active' : '' }}">
+                <i class="fas fa-university"></i>
+                <span>Cash & Bank</span>
+            </a>
+        </li>
+        <li class="has-submenu {{ request()->is('cash-count*') ? 'active-menu' : '' }}">
+            <a href="{{ route('cashCountRead') }}" class="{{ request()->is('cash-count*') ? 'active' : '' }}">
+                <i class="fas fa-coins"></i>
+                <span>Cash Count</span>
+                <i class="fas fa-chevron-down submenu-arrow"></i>
+            </a>
+            <ul class="nav-treeview" style="display: none;">
+                <li class="nav-item">
+                    <a href="{{ route('cashCountRead') }}" 
+                    class="nav-link {{ request()->is('cash-count') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Cash Count List</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('cashCountEntry') }}" 
+                    class="nav-link {{ request()->is('cash-count/cash-entry*') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Cash Entry</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="{{ route('supplierRead') }}" class="{{ request()->is('suppliers*') ? 'active' : '' }}">
+                <i class="fas fa-users"></i>
+                <span>Suppliers</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="{{ request()->is('reports*') ? 'active' : '' }}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('customerRead') }}" class="{{ request()->is('customer*') ? 'active' : '' }}">
+                <i class="fas fa-user"></i>
+                <span>Customer</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('userRead') }}" class="{{ request()->is('user*') ? 'active' : '' }}">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="{{ request()->is('settings*') ? 'active' : '' }}">
+                <i class="fas fa-cogs"></i>
+                <span>Settings</span>
+            </a>
+        </li>
+    </ul>
+</aside>

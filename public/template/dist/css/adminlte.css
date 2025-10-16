@@ -4431,7 +4431,6 @@ input[type="button"].btn-block {
   display: flex;
   -ms-flex-direction: column;
   flex-direction: column;
-  /*padding-left: 8%;*/
   padding-left: 0;
   margin-bottom: 0;
   list-style: none;
@@ -12631,7 +12630,7 @@ body:not(.layout-fixed) .main-sidebar .sidebar {
 
 .user-panel img {
   height: auto;
-  width: 2.5rem;
+  width: 2.1rem;
 }
 
 .user-panel .info {
@@ -53011,18 +53010,3 @@ a.text-muted:hover {
   border-color: #4b545c !important;
 }
 /*# sourceMappingURL=adminlte.css.map */
-
-
-
-/*animation*/
-/* Chrome, Safari, Opera */
-@-webkit-keyframes showSlowlyElement {
-    100%    { transform: scale(1); opacity: 1; }
-    0%      { transform: scale(1.2); opacity: 0; }
-}
-
-/* Standard syntax */
-@keyframes showSlowlyElement {
-    100%    { transform: scale(1); opacity: 1; }
-    0%      { transform: scale(1.2); opacity: 0; }
-}
