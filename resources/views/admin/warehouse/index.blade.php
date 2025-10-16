@@ -18,7 +18,7 @@
                             <div class="card">
                                 <div class="table-responsive">
                                     <table id="example3" class="table table-bordered table-hover" width="100%">
-                                        <thead class="bg-main-9 text-dark">
+                                        <thead>
                                             <tr>
                                                 <th>Image</th>
                                                 <th>Product</th>

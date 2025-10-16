@@ -116,7 +116,6 @@ body.sidebar-text-hide .content-wrapper {
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-dark);
-    border-radius: 10px;
     text-decoration: none;
     transition: var(--transition);
 }
@@ -156,7 +155,6 @@ body.sidebar-text-hide .content-wrapper {
 .custom-sidebar-menu .nav-pills .nav-item > .nav-link:hover {
     background-color: var(--primary);
     color: var(--text-light);
-    border-radius: 10px;
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
 }
@@ -195,7 +193,6 @@ body.sidebar-text-hide .content-wrapper {
     color: var(--text-gray);
     text-decoration: none;
     transition: var(--transition);
-    border-radius: 8px;
     background: transparent;
 }
 
@@ -391,7 +388,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
     color: var(--primary);
     cursor: pointer;
     padding: 8px;
-    border-radius: 8px;
     transition: var(--transition);
 }
 
@@ -426,7 +422,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
 .navbar-light .navbar-nav .nav-link {
     color: var(--text-dark);
     padding: 0.75rem 1.25rem;
-    border-radius: 8px;
     transition: var(--transition);
     font-weight: 500;
     font-size: 0.95rem;
@@ -442,7 +437,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
 .navbar-light .navbar-nav .nav-item.active .nav-link.active {
     background-color: var(--primary);
     color: var(--text-light);
-    border-radius: 8px;
     box-shadow: var(--shadow);
     font-weight: 600;
 }
@@ -451,7 +445,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
 .nav-link {
     font-size: 0.95rem;
     color: var(--text-dark);
-    border-radius: 8px;
     display: block;
     padding: 0.75rem 1.25rem;
     transition: var(--transition);
@@ -461,7 +454,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
 .nav-link:hover {
     background-color: var(--primary-light);
     color: var(--primary);
-    border-radius: 8px;
     transform: translateY(-2px);
     box-shadow: var(--shadow);
 }
@@ -470,7 +462,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
 .nav-link.active {
     background-color: var(--primary);
     color: var(--text-light);
-    border-radius: 8px;
     box-shadow: var(--shadow);
     font-weight: 600;
 }
@@ -479,7 +470,7 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
 .nav-link:focus,
 .custom-sidebar-menu a:focus,
 .btn-app:focus {
-    outline: 2px solid var(--primary);
+    /* outline: 2px solid var(--primary); */
     outline-offset: 2px;
 }
 
@@ -489,7 +480,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
     border: 1px solid var(--border);
     background-color: var(--primary-light);
     padding: 0.75rem 1.5rem;
-    border-radius: 8px;
     transition: var(--transition);
     font-weight: 500;
 }
@@ -564,7 +554,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 8px;
 }
 
 #capture-image img {
@@ -573,7 +562,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
     height: 100%;
     object-fit: cover;
     border: 1px solid var(--text-dark);
-    border-radius: 8px;
 }
 
 /* === LABEL === */
@@ -634,7 +622,6 @@ body.sidebar-text-hide .custom-sidebar-menu li .nav-treeview .nav-link {
 .nav-sidebar > .nav-item > .nav-link:hover {
     background-color: var(--primary);
     color: var(--text-light);
-    border-radius: 10px;
     padding-top: 6px;
     box-shadow: var(--shadow);
 }
