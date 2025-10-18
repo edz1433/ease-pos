@@ -21,23 +21,29 @@
     <div class="wrapper">
         <section class="content">
             <div class="row">
+                <!-- Total Sales -->
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box d-flex justify-content-between">
                         <div class="info-box-content text-left">
                             <span class="info-box-text">Total Sales</span>
-                            <span class="info-box-number">₱{{ number_format($totalSales, 2) }}</span>
+                            <span class="info-box-number">₱0.00</span>
                         </div>
-                        <span class="info-box-icon bg-main-4 elevation-1"><i class="fas fa-money-bill-wave text-light"></i></span>
+                        <span class="info-box-icon bg-main-4 elevation-1">
+                            <i class="fas fa-money-bill-wave text-light"></i>
+                        </span>
                     </div>
                 </div>
 
+                <!-- Total Purchases -->
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box d-flex justify-content-between">
                         <div class="info-box-content text-left">
                             <span class="info-box-text">Total Purchases</span>
-                            <span class="info-box-number">₱{{ number_format($totalPurchases, 2) }}</span>
+                            <span class="info-box-number">₱0.00</span>
                         </div>
-                        <span class="info-box-icon bg-main-3 elevation-1"><i class="fas fa-cart-plus text-light"></i></span>
+                        <span class="info-box-icon bg-main-3 elevation-1">
+                            <i class="fas fa-cart-plus text-light"></i>
+                        </span>
                     </div>
                 </div>
 
@@ -63,7 +69,7 @@
                         </span>
                     </div>
                 </div>
-                
+                @if(auth()->user()->role == 1)
                 <div class="col-12 mb-3">
                     <div class="float-right">
                         <form id="filterForm" class="d-inline-flex align-items-center">
@@ -95,21 +101,17 @@
                         </form>
                     </div>
                 </div>
-
-                <div class="col-lg-8">
+                @endif
+                <div class="col-lg-6">
                     <div class="card">
                         <div class="card-header border-0 d-flex justify-content-between">
-                            <h3 class="card-title">Top Products</h3>
+                            <h3 class="card-title">Top Products / Qty Sold</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-3">
-                                    <ul id="topProductsList" class="list-group list-group-flush"></ul>
-                                </div>
-
-                                <div class="col-9">
+                                <div class="col-12">
                                     <div class="chart">
-                                        <canvas id="topProducts" height="250"></canvas>
+                                        <canvas id="topProducts" height="400"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -117,13 +119,13 @@
                     </div>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="card">
                         <div class="card-header border-0 d-flex justify-content-between">
                             <h3 class="card-title">Top Category</h3>
                         </div>
-                        <div style="height: 380px;">
-                            <canvas id="categoryPie"></canvas>
+                        <div style="margin-bottom: 40px;">
+                            <canvas id="categoryPie" height="400"></canvas>
                         </div>
                     </div>
                 </div>

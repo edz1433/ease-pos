@@ -54,7 +54,8 @@ class DashboardController extends Controller
         $start    = $request->input('start_date');
         $end      = $request->input('end_date');
 
-        $purchases = 
+        $totalSalesQuery     = Sale::query();
+        $totalPurchasesQuery = Purchase::query(); 
 
         $query = SalesOrder::join('products', 'sales_orders.product_id', '=', 'products.id')
             ->select(
@@ -68,17 +69,34 @@ class DashboardController extends Controller
             $query->where('products.category', $category);
         }
 
-        // Date filters for Top Products
+        if (auth()->user()->role != 1) {
+            $filter = 'day';
+            $category = null;
+            $start = null;
+            $end = null;
+        }
+
+        // Apply filter
         if ($filter === 'day') {
             $query->whereDate('sales_orders.created_at', now());
+            $totalSalesQuery->whereDate('created_at', now());
+            $totalPurchasesQuery->whereDate('created_at', now());
         } elseif ($filter === 'week') {
             $query->whereBetween('sales_orders.created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+            $totalSalesQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+            $totalPurchasesQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
         } elseif ($filter === 'month') {
             $query->whereMonth('sales_orders.created_at', now()->month);
+            $totalSalesQuery->whereMonth('created_at', now()->month);
+            $totalPurchasesQuery->whereMonth('created_at', now()->month);
         } elseif ($filter === 'year') {
             $query->whereYear('sales_orders.created_at', now()->year);
+            $totalSalesQuery->whereYear('created_at', now()->year);
+            $totalPurchasesQuery->whereYear('created_at', now()->year);
         } elseif ($filter === 'custom' && $start && $end) {
             $query->whereBetween('sales_orders.created_at', [$start, $end]);
+            $totalSalesQuery->whereBetween('created_at', [$start, $end]);
+            $totalPurchasesQuery->whereBetween('created_at', [$start, $end]);
         }
 
         $topProducts = $query
@@ -180,7 +198,14 @@ class DashboardController extends Controller
                 ? round(($grossprofitData->sum() / $salesData->sum()) * 100, 2) : 0,
         ];
 
+        $totalSales     = $totalSalesQuery->sum('total_wvat');
+        $totalPurchases = $totalPurchasesQuery->sum('total_amount');
+        $totalExpenses  = 0;
+
         return response()->json([
+            'total_sales'     => $totalSales,
+            'total_purchases' => $totalPurchases,
+            'total_expenses'  => $totalExpenses,
             // Top Products
             'labels' => $topProducts->pluck('row_number'),
             'data'   => $topProducts->pluck('total_items_sold'),

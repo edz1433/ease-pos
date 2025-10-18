@@ -1,3 +1,4 @@
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const topProductsCtx   = document.getElementById('topProducts').getContext('2d');
@@ -13,42 +14,115 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "GET",
             data: { filter, category, start_date: startDate, end_date: endDate },
             success: function (res) {
-                // ---------------- Top Products (Bar) ----------------
-                if (topProductsChart) topProductsChart.destroy();
 
+            // Update totals
+            $('.info-box:contains("Total Sales") .info-box-number').text(
+                '₱' + Number(res.total_sales || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            );
+            $('.info-box:contains("Total Purchases") .info-box-number').text(
+                '₱' + Number(res.total_purchases || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            );
+
+            // destroy previous instance if exists
+            if (topProductsChart) {
+                try { topProductsChart.destroy(); } catch (e) { console.warn('destroy error', e); }
+                topProductsChart = null;
+            }
+
+            // defensive checks
+            if (!res || !Array.isArray(res.labels) || !Array.isArray(res.data)) {
+                console.error('Invalid data for topProductsChart', res);
+                return;
+            }
+            if (res.labels.length !== res.data.length) {
+                console.warn('labels and data length mismatch', res.labels.length, res.data.length);
+            }
+
+            // ensure values are numbers
+            const numericData = res.data.map(d => Number(d) || 0);
+
+            // shared dataset config
+            const dataset = {
+                label: 'Total Sold',
+                data: numericData,
+                backgroundColor: [
+                    'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)',
+                    'rgba(252, 32, 120, 0.8)', 'rgba(252, 32, 140, 0.8)',
+                    'rgba(252, 32, 160, 0.8)', 'rgba(32, 252, 194, 0.8)',
+                    'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)',
+                    'rgba(32, 140, 194, 0.8)', 'rgba(32, 110, 194, 0.8)'
+                ],
+                borderWidth: 1,
+                borderColor: '#fff',
+            };
+
+            // tooltip title fallback: avoid error if res.names missing
+            const tooltipTitle = ctx => {
+                try {
+                    const idx = ctx[0].dataIndex;
+                    return (res.names && res.names[idx]) ? res.names[idx] : res.labels[idx];
+                } catch (e) {
+                    return '';
+                }
+            };
+
+            // fallback for Chart.js v2.x
+            // Note: horizontalBar was removed in v3; v2 uses 'horizontalBar' type
                 topProductsChart = new Chart(topProductsCtx, {
-                    type: 'bar',
+                    type: 'horizontalBar',
                     data: {
-                        labels: res.labels,
-                        datasets: [{
-                            label: 'Total Sold',
-                            data: res.data.map(Number),
-                            backgroundColor: [
-                                'rgba(252, 32, 79, 0.8)', 'rgba(252, 32, 100, 0.8)',
-                                'rgba(252, 32, 120, 0.8)', 'rgba(252, 32, 140, 0.8)',
-                                'rgba(252, 32, 160, 0.8)', 'rgba(32, 252, 194, 0.8)',
-                                'rgba(32, 200, 194, 0.8)', 'rgba(32, 170, 194, 0.8)',
-                                'rgba(32, 140, 194, 0.8)', 'rgba(32, 110, 194, 0.8)'
-                            ]
-                        }]
+                        labels: res.labels, // rank numbers
+                        datasets: [dataset]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    title: ctx => res.names[ctx[0].dataIndex],
-                                    label: ctx => `Sold: ${ctx.raw}`
+                        legend: { display: false },
+                        tooltips: {
+                            callbacks: {
+                                title: function(items) {
+                                    const idx = items[0].dataIndex;
+                                    return (res.names && res.names[idx]) ? res.names[idx] : 'Unknown';
+                                },
+                                label: function(item) {
+                                    return 'Sold: ' + item.xLabel;
                                 }
                             }
                         },
+                        plugins: {
+                            datalabels: {
+                                anchor: 'center',
+                                align: 'center',
+                                color: 'black',
+                                font: { weight: 'bold', size: 12 },
+                                formatter: (value, ctx) => {
+                                    const idx = ctx.dataIndex;
+                                    const name = (res.list && res.list[idx]) ? res.list[idx].name : '';
+                                    return name;
+                                }
+                            }
+                        },
+                        // 👇 ADD HERE — inside 'options'
                         scales: {
-                            y: { beginAtZero: true },
-                            x: { ticks: { autoSkip: false, maxRotation: 45 } }
+                            xAxes: [{
+                                ticks: { beginAtZero: true, stepSize: 1 },
+                                gridLines: { color: 'rgba(0,0,0,0.05)' }
+                            }],
+                            yAxes: [{
+                                gridLines: { display: false },
+                                barThickness: 35,          // adjust bar height
+                                categoryPercentage: 0.3,   // space between bars
+                                barPercentage: 0.9,        // fill ratio
+                                ticks: {
+                                    fontSize: 13,
+                                    callback: function(value, index) {
+                                        return '#' + value;
+                                    }
+                                }
+                            }]
                         }
-                    }
+                    },
+                    plugins: [ChartDataLabels]
                 });
 
                 // ---------------- Categories (Modern Doughnut) ----------------
@@ -78,6 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         maintainAspectRatio: false,
                         cutout: '65%',
                         plugins: {
+                            datalabels: { display: false },
                             tooltip: {
                                 callbacks: {
                                     label: ctx => `${ctx.label}: ${ctx.raw}%`
@@ -104,10 +179,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         {
                             id: 'centerText',
                             beforeDraw(chart) {
-                                const {width, height} = chart;
+                                const { width, height } = chart;
                                 const ctx = chart.ctx;
                                 ctx.save();
-                                const total = res.categories.data.reduce((a, b) => a + Number(b), 0);
+
+                                // ✅ Default to 100% if sum isn’t 100
+                                const sum = res.categories.data.reduce((a, b) => a + Number(b), 0);
+                                const total = sum > 0 ? 100 : 0;
+
                                 ctx.font = "bold 16px sans-serif";
                                 ctx.fillStyle = "#444";
                                 ctx.textAlign = "center";
@@ -121,18 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     ]
                 });
-
-                // ---------------- Top Products List ----------------
-                const listContainer = document.getElementById("topProductsList");
-                listContainer.innerHTML = "";
-                res.list.forEach(item => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item py-1 px-2";
-                    li.style.fontSize = "0.8rem";
-                    li.textContent = `${item.rank}. ${item.name}`;
-                    listContainer.appendChild(li);
-                });
-
+                
                 // ---------------- Gross Sales & Profit (Line) ----------------
                 if (grossSalesProfitChart) grossSalesProfitChart.destroy();
 
@@ -163,17 +231,56 @@ document.addEventListener("DOMContentLoaded", function () {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            title: { display: true, text: 'POS Daily Sales & Profit', font: { size: 18 } },
+                            datalabels: {
+                                color: 'rgba(0,0,0,0)', // fully transparent
+                                font: { size: 12 },
+                                anchor: 'end',
+                                align: 'top'
+                            },
+                            title: {
+                                display: true,
+                                text: 'POS Daily Sales & Profit',
+                                font: { size: 18 }
+                            },
                             legend: { position: 'top' }
                         },
-                        scales: {
+                        scales: {  // ✅ add missing comma before scales
                             y: {
                                 beginAtZero: true,
-                                ticks: { callback: val => '₱' + val.toLocaleString() }
+                                ticks: {
+                                    callback: val => '₱' + val.toLocaleString()
+                                }
                             },
-                            x: { title: { display: true, text: 'Date' } }
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            }
                         }
-                    }
+                    },
+                    plugins: [
+                        {
+                            id: 'centerTextLine',
+                            beforeDraw(chart) {
+                                const { width, height } = chart;
+                                const ctx = chart.ctx;
+                                ctx.save();
+
+                                const totalSales = res.analytics.sales.reduce((a, b) => a + Number(b), 0);
+                                const totalProfit = res.analytics.profit.reduce((a, b) => a + Number(b), 0);
+
+                                ctx.font = "bold 18px sans-serif";
+                                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText(`Sales: ₱${totalSales.toLocaleString()}`, width / 2, height / 2 - 10);
+                                ctx.fillText(`Profit: ₱${totalProfit.toLocaleString()}`, width / 2, height / 2 + 20);
+
+                                ctx.restore();
+                            }
+                        }
+                    ]
                 });
 
                 // ---------------- Net Sales & Profit (Line) ----------------
@@ -206,7 +313,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            title: { display: true, text: 'POS Daily Sales & Profit', font: { size: 18 } },
+                            datalabels: {
+                                color: 'rgba(0,0,0,0)', // fully transparent
+                                font: { size: 12 },
+                                anchor: 'end',
+                                align: 'top'
+                            },
+                            title: {
+                                display: true,
+                                text: 'POS Daily Sales & Profit',
+                                font: { size: 18 }
+                            },
                             legend: { position: 'top' }
                         },
                         scales: {
@@ -216,7 +333,29 @@ document.addEventListener("DOMContentLoaded", function () {
                             },
                             x: { title: { display: true, text: 'Date' } }
                         }
-                    }
+                    },
+                    plugins: [
+                        {
+                            id: 'centerTextLine',
+                            beforeDraw(chart) {
+                                const { width, height } = chart;
+                                const ctx = chart.ctx;
+                                ctx.save();
+
+                                const totalSales = res.analytics.sales.reduce((a, b) => a + Number(b), 0);
+                                const totalProfit = res.analytics.profit.reduce((a, b) => a + Number(b), 0);
+
+                                ctx.font = "bold 18px sans-serif";
+                                ctx.fillStyle = "rgba(0,0,0,0.5)"; // semi-transparent but visible
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText(`Sales: ₱${totalSales.toLocaleString()}`, width / 2, height / 2 - 10);
+                                ctx.fillText(`Profit: ₱${totalProfit.toLocaleString()}`, width / 2, height / 2 + 20);
+
+                                ctx.restore();
+                            }
+                        }
+                    ]
                 });
 
             }
