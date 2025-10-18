@@ -65,28 +65,16 @@ class MasterController extends Controller
         $units = Unit::all();
         $branches = Branch::where('id', '!=', env('BRANCH_ID'))->get();
 
-        $products = Product::select(
-                'products.*',
-                'branch_products.*',
-                'categories.name as category_name',
-                'r_unit.name as r_unit_name',
-                'w_unit.name as w_unit_name',
-                DB::raw("(SELECT COALESCE(SUM(s.quantity),0) 
-                        FROM sales_orders s 
-                        WHERE s.product_id = products.id 
-                            AND s.price_type = 'retail') as total_sold_r"),
-                DB::raw("(SELECT COALESCE(SUM(s.quantity),0) 
-                        FROM sales_orders s 
-                        WHERE s.product_id = products.id 
-                            AND s.price_type = 'wholesale') as total_sold_w")
+        $totals = Product::leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
+            ->where('branch_products.branch_id', env('BRANCH_ID'))
+            ->select(
+                DB::raw("SUM(COALESCE(branch_products.r_capital,0) + COALESCE(branch_products.w_capital,0)) as total_capital"),
+                DB::raw("SUM(COALESCE(branch_products.r_price,0) + COALESCE(branch_products.w_price,0)) as total_price")
             )
-            ->leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
-            ->leftJoin('categories', 'products.category', '=', 'categories.id')
-            ->leftJoin('units as r_unit', 'branch_products.r_unit', '=', 'r_unit.id')
-            ->leftJoin('units as w_unit', 'branch_products.w_unit', '=', 'w_unit.id')
-            ->get();
+            ->first();
 
-        return view('admin.products.index', compact('categories', 'units', 'branches', 'products'));
+
+        return view('admin.products.index', compact('categories', 'units', 'branches', 'totals'));
     }
 
     public function warehouseRead()

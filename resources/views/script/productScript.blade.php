@@ -239,6 +239,16 @@ document.addEventListener("DOMContentLoaded", function () {
 @endif
 
 <script>
+function toNumber(v) {
+  const s = v == null ? '0' : String(v).replace(/,/g, '').replace(/[^0-9.\-]/g, '');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
+function formatPH(n) {
+  return Number(n).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const storagePath = "{{ asset('storage/uploads/products') }}";
     // ✅ Function to set form mode dynamically
@@ -307,9 +317,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (data.wqty == 0) badge = '<span class="badge bg-danger">Out</span>';
                     else if (data.wqty < 10) badge = '<span class="badge bg-warning text-dark">Low</span>';
                     return `
-                        <small>Cap: ₱${parseFloat(data.w_capital || 0).toFixed(2)}</small><br>
-                        <small>Price: ₱${parseFloat(data.w_price || 0).toFixed(2)}</small><br>
-                        <small>Qty: ${data.wqty || 0} ${data.w_unit_name || ''} ${badge}</small>
+                    <small>Cap: ₱${formatPH(toNumber(data.w_capital))}</small><br>
+                    <small>Price: ₱${formatPH(toNumber(data.w_price))}</small><br>
+                    <small>Qty: ${data.wqty || 0} ${data.w_unit_name || ''} ${badge}</small>
                     `;
                 }
             },
@@ -321,8 +331,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (data.rqty == 0) badge = '<span class="badge bg-danger">Out</span>';
                     else if (data.rqty < 10) badge = '<span class="badge bg-warning text-dark">Low</span>';
                     return `
-                        <small>Cap: ₱${parseFloat(data.r_capital || 0).toFixed(2)}</small><br>
-                        <small>Price: ₱${parseFloat(data.r_price || 0).toFixed(2)}</small><br>
+                        <small>Cap: ₱${formatPH(toNumber(data.r_capital))}</small><br>
+                        <small>Price: ₱${formatPH(toNumber(data.r_price))}</small><br>
                         <small>Qty: ${data.rqty || 0} ${data.r_unit_name || ''} ${badge}</small>
                     `;
                 }
@@ -338,13 +348,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 render: function(data) {
                     return `
                         <a href="javascript:void(0)" 
-                        class="btn btn-warning btn-sm adjust-stock-btn" 
+                        class="btn btn-warning btn-sm adjust-stock-btn action-btn" 
                         data-id="${data.id || ''}" 
                         data-name="${encodeURIComponent(data.product_name || '') + ' ' + (data.model || '')}" 
                         title="Stock Management">
                         <i class="fas fa-cubes"></i>
-                        </a>
-                        <button class="btn btn-info btn-sm edit-btn" 
+                        </a><br>
+                        <button class="btn btn-info btn-sm edit-btn action-btn" 
                                 data-id="${data.id || ''}"
                                 data-barcode="${encodeURIComponent(data.barcode || '')}"
                                 data-w_barcode="${encodeURIComponent(data.w_barcode || '')}"
@@ -366,8 +376,8 @@ document.addEventListener("DOMContentLoaded", function() {
                                 data-w_stock_alert="${data.w_stock_alert || ''}"
                                 title="Edit">
                             <i class="fas fa-edit"></i>
-                        </button>
-                        <a href="#" class="btn btn-danger btn-sm delete-row" 
+                        </button><br>
+                        <a href="#" class="btn btn-danger btn-sm delete-row action-btn" 
                         data-model="Product" 
                         data-id="${data.id || ''}" 
                         title="Delete">

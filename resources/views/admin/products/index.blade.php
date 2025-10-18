@@ -8,6 +8,19 @@
     height: 60px !important;
     border-radius: 5% !important;
 }
+.action-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.action-btn i {
+    font-size: 14px;
+    line-height: 1;
+}
 </style>
 
 <div class="container-fluid">
@@ -207,6 +220,37 @@
                                     </table>
                                 </div>
                             </div>
+                            @if(auth()->user()->role == 1)
+                                <div class="row">
+                                    <div class="col-md-6 col-12">
+                                        <div class="info-box bg-light shadow-sm">
+                                            <span class="info-box-icon bg-success elevation-1">
+                                                <i class="fas fa-coins"></i>
+                                            </span>
+                                            <div class="info-box-content">
+                                                <span class="info-box-text text-muted">Total Capital</span>
+                                                <span class="info-box-number text-dark">
+                                                    ₱{{ number_format($totals->total_capital ?? 0, 2) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 col-12">
+                                        <div class="info-box bg-light shadow-sm">
+                                            <span class="info-box-icon bg-info elevation-1">
+                                                <i class="fas fa-tags"></i>
+                                            </span>
+                                            <div class="info-box-content">
+                                                <span class="info-box-text text-muted">Total Price</span>
+                                                <span class="info-box-number text-dark">
+                                                    ₱{{ number_format($totals->total_price ?? 0, 2) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
