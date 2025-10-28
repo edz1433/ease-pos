@@ -68,8 +68,18 @@ class MasterController extends Controller
         $totals = Product::leftJoin('branch_products', 'products.id', '=', 'branch_products.product_id')
             ->where('branch_products.branch_id', env('BRANCH_ID'))
             ->select(
-                DB::raw("SUM(COALESCE(branch_products.r_capital,0) + COALESCE(branch_products.w_capital,0)) as total_capital"),
-                DB::raw("SUM(COALESCE(branch_products.r_price,0) + COALESCE(branch_products.w_price,0)) as total_price")
+                DB::raw("
+                    SUM(
+                        COALESCE(branch_products.r_capital, 0) * COALESCE(branch_products.rqty, 0) +
+                        COALESCE(branch_products.w_capital, 0) * COALESCE(branch_products.wqty, 0)
+                    ) AS total_capital
+                "),
+                DB::raw("
+                    SUM(
+                        COALESCE(branch_products.r_price, 0) * COALESCE(branch_products.rqty, 0) +
+                        COALESCE(branch_products.w_price, 0) * COALESCE(branch_products.wqty, 0)
+                    ) AS total_price
+                ")
             )
             ->first();
 
